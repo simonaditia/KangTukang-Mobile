@@ -1,16 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:tukang_online/screens/RegisterScreen.dart';
-import 'package:tukang_online/screens/customer/CustomerDashboardScreen.dart';
+import 'package:tukang_online/screens/LoginScreen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   var _isVisible = false;
   @override
   Widget build(BuildContext context) {
@@ -32,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               Container(
-                height: deviceHeight * 0.65,
+                height: deviceHeight * 0.75,
                 width: double.infinity,
                 margin: EdgeInsets.symmetric(horizontal: 20),
                 child: LayoutBuilder(builder: (ctx, constraints) {
@@ -40,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Login',
+                        'Selamat Datang',
                         style: TextStyle(
                             fontSize: 28, fontWeight: FontWeight.bold),
                       ),
@@ -49,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Center(
                         child: Text(
-                          'Silakan masukkan Email dan Kata sandi \nAnda untuk masuk ke aplikasi',
+                          "Silahkan daftarkan akun anda untuk\n mulai meikmati layanan tukang online",
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -57,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: constraints.maxHeight * 0.08,
                       ),
                       Container(
-                        height: constraints.maxHeight * 0.12,
+                        height: constraints.maxHeight * 0.10,
                         decoration: BoxDecoration(
                           color: Color(0xffB4B4B4).withOpacity(0.4),
                           borderRadius: BorderRadius.circular(16),
@@ -68,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: TextField(
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "test@gmail.com",
+                                hintText: "Nama Lengkap",
                               ),
                               textInputAction: TextInputAction.next,
                             ),
@@ -79,7 +78,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: constraints.maxHeight * 0.02,
                       ),
                       Container(
-                        height: constraints.maxHeight * 0.12,
+                        height: constraints.maxHeight * 0.10,
+                        decoration: BoxDecoration(
+                          color: Color(0xffB4B4B4).withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: Center(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Email",
+                              ),
+                              textInputAction: TextInputAction.next,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: constraints.maxHeight * 0.02,
+                      ),
+                      Container(
+                        height: constraints.maxHeight * 0.10,
                         decoration: BoxDecoration(
                           color: Color(0xffB4B4B4).withOpacity(0.4),
                           borderRadius: BorderRadius.circular(16),
@@ -127,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Container(
                         width: double.infinity,
-                        height: constraints.maxHeight * 0.12,
+                        height: constraints.maxHeight * 0.10,
                         margin: EdgeInsets.only(
                           top: constraints.maxHeight * 0.05,
                         ),
@@ -137,13 +158,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return CustomerDashboardScreen();
+                                  return LoginScreen();
                                 },
                               ),
                             );
                           },
                           child: Text(
-                            'Login',
+                            'Register',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 22),
                           ),
@@ -160,26 +181,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       RichText(
                         text: TextSpan(
-                          text: "Belum punya akun!",
+                          text: "Sudah punya akun?",
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 18,
                           ),
                           children: [
                             TextSpan(
-                                text: " Register",
+                                text: " Login",
                                 style: TextStyle(
                                   color: Color(0xffFF5403),
                                   fontSize: 18,
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              RegisterScreen()),
-                                    );
+                                    Navigator.pushAndRemoveUntil(context,
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) {
+                                      return LoginScreen();
+                                    }), (r) {
+                                      return false;
+                                    });
                                   }),
                           ],
                         ),
