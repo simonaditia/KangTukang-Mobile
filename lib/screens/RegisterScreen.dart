@@ -154,7 +154,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.push(
+                            Navigator.pop(
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
@@ -195,13 +195,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Navigator.pushAndRemoveUntil(context,
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) {
-                                      return LoginScreen();
-                                    }), (r) {
-                                      return false;
-                                    });
+                                    Navigator.pop(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return LoginScreen();
+                                        },
+                                      ),
+                                    );
                                   }),
                           ],
                         ),
