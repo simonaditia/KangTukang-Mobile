@@ -300,8 +300,9 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                       ],
                     )),
                 Container(
-                    padding: EdgeInsets.all(10),
-                    color: Colors.green,
+                    padding: EdgeInsets.only(
+                        left: 10, top: 10, right: 10, bottom: 20),
+                    // color: Colors.green,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -327,23 +328,39 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                             //   ),
                             // ),
                             ElevatedButton.icon(
-                              icon: Icon(Icons.ac_unit),
+                              icon: Icon(Icons.info, color: Color(0xffFF5403)),
                               label: Text("Tentang APP"),
                               onPressed: () {},
-                            ),
-
-                            Card(
-                              child: SizedBox(
-                                width: 177,
-                                height: 47,
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.favorite, color: Colors.green),
-                                    Text("Hubungi Kami"),
-                                  ],
-                                ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                minimumSize: Size(180, 40),
                               ),
                             ),
+                            ElevatedButton.icon(
+                              icon: Icon(Icons.contact_mail,
+                                  color: Color(0xffFF5403)),
+                              label: Text("Hubungi Kami"),
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                minimumSize: Size(180, 40),
+                              ),
+                            ),
+
+                            // Card(
+                            //   child: SizedBox(
+                            //     width: 177,
+                            //     height: 47,
+                            //     child: Row(
+                            //       children: [
+                            //         Icon(Icons.favorite, color: Colors.green),
+                            //         Text("Hubungi Kami"),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         )
                       ],
