@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukang_online/screens/customer/CustomerSearchScreen.dart';
 
 class CustomerDashboardScreen extends StatefulWidget {
   const CustomerDashboardScreen({super.key});
@@ -91,36 +92,28 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                             // ],
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 20),
-                            // height: constraints.maxHeight * 0.10,
-                            height: 50,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 2,
-                                  offset: Offset(
-                                      0, 3), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 15),
-                              child: Center(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Cari Tukang Terdekat",
+                        Container(
+                          margin: EdgeInsets.only(bottom: 20),
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: ElevatedButton.icon(
+                              icon:
+                                  Icon(Icons.search, color: Color(0xffFF5403)),
+                              label: Text("Cari Tukang Terdekat"),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return CustomerSearchScreen();
+                                    },
                                   ),
-                                  textInputAction: TextInputAction.next,
-                                ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                minimumSize: Size(320, 55),
                               ),
                             ),
                           ),
