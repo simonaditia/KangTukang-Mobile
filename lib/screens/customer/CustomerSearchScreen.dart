@@ -60,12 +60,15 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Cari Tukang Terdekat",
-                style: TextStyle(
-                  color: Color(0xffFF5403),
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.bold,
+              Center(
+                child: Text(
+                  "Cari Tukang Terdekat",
+                  style: TextStyle(
+                    // color: Color(0xffFF5403),
+                    color: Color.fromARGB(255, 44, 44, 44),
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: 20.0),

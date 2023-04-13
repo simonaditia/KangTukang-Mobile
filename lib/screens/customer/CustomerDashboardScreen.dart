@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukang_online/screens/customer/CustomerPesananScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerSearchScreen.dart';
 
 class CustomerDashboardScreen extends StatefulWidget {
@@ -29,7 +30,16 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.edit_note),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return CustomerPesananScreen();
+                        },
+                      ),
+                    );
+                  },
                   color: Colors.black,
                 ),
               ],
