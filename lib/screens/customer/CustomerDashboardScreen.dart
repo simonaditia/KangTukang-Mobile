@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tukang_online/screens/customer/CustomerPesananScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerSearchScreen.dart';
+import 'package:tukang_online/screens/customer/CustomerTentangAppScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerDashboardScreen extends StatefulWidget {
   const CustomerDashboardScreen({super.key});
@@ -11,6 +13,22 @@ class CustomerDashboardScreen extends StatefulWidget {
 }
 
 class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
+  // Uri gmailUrl = Uri.parse(
+  //     'mailto:simonaditia22@gmail.com?subject=KangTukang&body=Halo, ...');
+  void _sendEmail() async {
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: 'simonaditia22@gmail.com',
+      query: 'subject=KangTukang&body=Halo, ...',
+    );
+    String url = params.toString();
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -168,13 +186,16 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                   ),
                 ),
                 Container(
-                    padding: EdgeInsets.all(10),
+                    // padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.only(
+                        left: 17, top: 10, right: 10, bottom: 10),
                     // color: Colors.blue,
                     child: Column(
                       // mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
+                            padding: EdgeInsets.only(left: 5),
                             margin: EdgeInsets.only(bottom: 10),
                             child: Text("Kategori")),
                         Card(
@@ -310,6 +331,7 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
+                            padding: EdgeInsets.only(left: 10),
                             margin: EdgeInsets.only(bottom: 10),
                             child: Text("Lainnya")),
                         Row(
@@ -333,7 +355,16 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                             ElevatedButton.icon(
                               icon: Icon(Icons.info, color: Color(0xffFF5403)),
                               label: Text("Tentang APP"),
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return CustomerTentangAppScreen();
+                                    },
+                                  ),
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: Colors.black,
@@ -344,7 +375,7 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                               icon: Icon(Icons.contact_mail,
                                   color: Color(0xffFF5403)),
                               label: Text("Hubungi Kami"),
-                              onPressed: () {},
+                              onPressed: _sendEmail,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: Colors.black,

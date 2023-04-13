@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukang_online/screens/customer/CustomerPesanScreen.dart';
 import 'package:tukang_online/screens/customer/food_model.dart';
 
 class CustomerSearchScreen extends StatefulWidget {
@@ -95,6 +96,16 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                     ? ListView.builder(
                         itemCount: display_list.length,
                         itemBuilder: ((context, index) => ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return CustomerPesanScreen();
+                                    },
+                                  ),
+                                );
+                              },
                               contentPadding: EdgeInsets.all(8.0),
                               title: Text(
                                 display_list[index].str_meal!,
