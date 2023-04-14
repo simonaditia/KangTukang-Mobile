@@ -15,19 +15,18 @@ class CustomerDashboardScreen extends StatefulWidget {
 class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
   // Uri gmailUrl = Uri.parse(
   //     'mailto:simonaditia22@gmail.com?subject=KangTukang&body=Halo, ...');
-  void _sendEmail() async {
-    final Uri params = Uri(
-      scheme: 'mailto',
-      path: 'simonaditia22@gmail.com',
-      query: 'subject=KangTukang&body=Halo, ...',
-    );
-    String url = params.toString();
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  /*void _sendEmail() async {
+    final Uri emailLaunchUri = Uri(
+  scheme: 'mailto',
+  path: 'youremail@example.com',
+  query: 'subject=Email Subject&body=Email body',
+);
+if (await canLaunchUrl(emailLaunchUri.toString())) {
+  await launchUrl(emailLaunchUri.toString());
+} else {
+  throw 'Could not launch ${emailLaunchUri.toString()}';
+}
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -375,7 +374,23 @@ class _CustomerDashboardScreenState extends State<CustomerDashboardScreen> {
                               icon: Icon(Icons.contact_mail,
                                   color: Color(0xffFF5403)),
                               label: Text("Hubungi Kami"),
-                              onPressed: _sendEmail,
+                              onPressed: () async {
+                                debugPrint("keklik, tapi gk masuk ke if");
+                                String email = 'simonaditia22@gmail.com';
+                                String subject = 'KangTukang - Bertanya';
+                                String body = 'Halo ....';
+
+                                String emailUrl =
+                                    "mailto:$email?subject=$subject&body=$body";
+
+                                if (await canLaunch(emailUrl)) {
+                                  await launch(emailUrl);
+                                  debugPrint("INi harusnya bisa");
+                                } else {
+                                  debugPrint("INI ERROR harusnya");
+                                  throw "Error occured sending an email";
+                                }
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: Colors.black,
