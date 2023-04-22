@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukang_online/screens/customer/CustomerMapScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerSearchScreen.dart';
 import 'package:intl/intl.dart';
 
@@ -186,7 +187,16 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                       child: Text("Pesan Tukang",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 18)),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return CustomerMapScreen();
+                            },
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xffFF5403),
                         foregroundColor: Colors.white,

@@ -154,28 +154,52 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Card(
+                                    semanticContainer: true,
+                                    clipBehavior: Clip.antiAliasWithSaveLayer,
                                     child: SizedBox(
                                       width: 100,
                                       height: 100,
-                                      child:
-                                          Center(child: Text('Elevated Card')),
+                                      child: Image.asset(
+                                          "assets/images/dashboard-img1b.jpg",
+                                          fit: BoxFit.fill),
                                     ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    elevation: 5,
+                                    margin: EdgeInsets.all(10),
                                   ),
                                   Card(
+                                    semanticContainer: true,
+                                    clipBehavior: Clip.antiAliasWithSaveLayer,
                                     child: SizedBox(
                                       width: 100,
                                       height: 100,
-                                      child:
-                                          Center(child: Text('Elevated Card')),
+                                      child: Image.asset(
+                                          "assets/images/dashboard-img2.jpg",
+                                          fit: BoxFit.fill),
                                     ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    elevation: 5,
+                                    margin: EdgeInsets.all(10),
                                   ),
                                   Card(
+                                    semanticContainer: true,
+                                    clipBehavior: Clip.antiAliasWithSaveLayer,
                                     child: SizedBox(
                                       width: 100,
                                       height: 100,
-                                      child:
-                                          Center(child: Text('Elevated Card')),
+                                      child: Image.asset(
+                                          "assets/images/dashboard-img3c.jpg",
+                                          fit: BoxFit.fill),
                                     ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    elevation: 5,
+                                    margin: EdgeInsets.all(10),
                                   ),
                                 ],
                               )),
@@ -206,7 +230,8 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                 Column(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.all(15.0),
+                                      padding: const EdgeInsets.only(
+                                          top: 17.0, bottom: 15.0),
                                       child: Flexible(
                                           flex: 1,
                                           child: Row(
@@ -220,7 +245,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                                     children: [
                                                       CircleAvatar(
                                                         backgroundImage: AssetImage(
-                                                            'assets/images/logo.png'),
+                                                            'assets/images/renovasi.jpg'),
                                                         radius: 50,
                                                       ),
                                                       Text("Renovasi"),
@@ -235,10 +260,10 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                                     children: [
                                                       CircleAvatar(
                                                         backgroundImage: AssetImage(
-                                                            'assets/images/logo.png'),
+                                                            'assets/images/catb.jpg'),
                                                         radius: 50,
                                                       ),
-                                                      Text("Renovasi"),
+                                                      Text("Cat"),
                                                     ],
                                                   ),
                                                 ),
@@ -250,10 +275,10 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                                     children: [
                                                       CircleAvatar(
                                                         backgroundImage: AssetImage(
-                                                            'assets/images/logo.png'),
+                                                            'assets/images/plafon.jpg'),
                                                         radius: 50,
                                                       ),
-                                                      Text("Renovasi"),
+                                                      Text("Plafon"),
                                                     ],
                                                   ),
                                                 ),
@@ -274,10 +299,10 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                                   children: [
                                                     CircleAvatar(
                                                       backgroundImage: AssetImage(
-                                                          'assets/images/logo.png'),
+                                                          'assets/images/kebocoran.jpg'),
                                                       radius: 50,
                                                     ),
-                                                    Text("Renovasi"),
+                                                    Text("Kebocoran"),
                                                   ],
                                                 ),
                                               ),
@@ -289,10 +314,10 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                                   children: [
                                                     CircleAvatar(
                                                       backgroundImage: AssetImage(
-                                                          'assets/images/logo.png'),
+                                                          'assets/images/keramik.jpg'),
                                                       radius: 50,
                                                     ),
-                                                    Text("Renovasi"),
+                                                    Text("Keramik"),
                                                   ],
                                                 ),
                                               ),
@@ -304,10 +329,10 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                                   children: [
                                                     CircleAvatar(
                                                       backgroundImage: AssetImage(
-                                                          'assets/images/logo.png'),
+                                                          'assets/images/dinding.jpeg'),
                                                       radius: 50,
                                                     ),
-                                                    Text("Renovasi"),
+                                                    Text("Dinding"),
                                                   ],
                                                 ),
                                               ),
