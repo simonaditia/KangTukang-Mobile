@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
+import 'package:tukang_online/screens/tukang/TukangTentangAppScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TukangProfileScreen extends StatefulWidget {
   const TukangProfileScreen({super.key});
@@ -11,7 +13,13 @@ class TukangProfileScreen extends StatefulWidget {
 }
 
 class _TukangProfileScreenState extends State<TukangProfileScreen> {
-  bool? check3 = false;
+  bool? _checked1 = false;
+  bool? _checked2 = false;
+  bool? _checked3 = false;
+  bool? _checked4 = false;
+  bool? _checked5 = false;
+  bool? _checked6 = false;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -34,193 +42,216 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                 elevation: 0,
                 title: Text("Profile", style: TextStyle(color: Colors.black)),
                 centerTitle: true),
-            body: Container(
-                child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 50, bottom: 20),
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage('assets/images/logo.png'),
-                    radius: 50,
+            body: ListView(children: [
+              Container(
+                  child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(top: 50, bottom: 20),
+                    child: CircleAvatar(
+                      backgroundImage: AssetImage('assets/images/logo.png'),
+                      radius: 50,
+                    ),
                   ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 5),
-                  child: TextField(
-                    style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                        borderSide: BorderSide(color: Colors.white, width: 5.5),
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: 20, right: 20, top: 10, bottom: 5),
+                    child: TextField(
+                      style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                          borderSide:
+                              BorderSide(color: Colors.white, width: 5.5),
+                        ),
+                        hintText: "Nama",
                       ),
-                      hintText: "Nama",
                     ),
                   ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                  child: TextField(
-                    style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                        borderSide: BorderSide(color: Colors.white, width: 5.5),
+                  Container(
+                    padding:
+                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    child: TextField(
+                      style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                          borderSide:
+                              BorderSide(color: Colors.white, width: 5.5),
+                        ),
+                        hintText: "Email",
                       ),
-                      hintText: "Email",
                     ),
                   ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                  child: TextField(
-                    style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                        borderSide: BorderSide(color: Colors.white, width: 5.5),
+                  Container(
+                    padding:
+                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    child: TextField(
+                      style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                          borderSide:
+                              BorderSide(color: Colors.white, width: 5.5),
+                        ),
+                        hintText: "No.Telp",
                       ),
-                      hintText: "No.Telp",
                     ),
                   ),
-                ),
-                // Container(
-                //     child: Row(
-                //   children: [
-                //     Column(
-                //       children: [
-                //         CheckboxListTile(
-                //           //checkbox positioned at left
-                //           value: check3,
-                //           controlAffinity: ListTileControlAffinity.leading,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               check3 = value;
-                //             });
-                //           },
-                //           title: Text("Do you"),
-                //         ),
-                //         CheckboxListTile(
-                //           //checkbox positioned at left
-                //           value: check3,
-                //           controlAffinity: ListTileControlAffinity.leading,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               check3 = value;
-                //             });
-                //           },
-                //           title: Text("Do you really want to learn Flutter?"),
-                //         ),
-                //         CheckboxListTile(
-                //           //checkbox positioned at left
-                //           value: check3,
-                //           controlAffinity: ListTileControlAffinity.leading,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               check3 = value;
-                //             });
-                //           },
-                //           title: Text("Do you really want to learn Flutter?"),
-                //         ),
-                //       ],
-                //     ),
-                //     Column(
-                //       children: [
-                //         CheckboxListTile(
-                //           //checkbox positioned at left
-                //           value: check3,
-                //           controlAffinity: ListTileControlAffinity.leading,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               check3 = value;
-                //             });
-                //           },
-                //           title: Text("Do you"),
-                //         ),
-                //         CheckboxListTile(
-                //           //checkbox positioned at left
-                //           value: check3,
-                //           controlAffinity: ListTileControlAffinity.leading,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               check3 = value;
-                //             });
-                //           },
-                //           title: Text("Do you really want to learn Flutter?"),
-                //         ),
-                //         CheckboxListTile(
-                //           //checkbox positioned at left
-                //           value: check3,
-                //           controlAffinity: ListTileControlAffinity.leading,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               check3 = value;
-                //             });
-                //           },
-                //           title: Text("Do you really want to learn Flutter?"),
-                //         ),
-                //       ],
-                //     )
-                //   ],
-                // )),
-
-                Container(
-                  padding:
-                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                  child: TextField(
-                    style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                        borderSide: BorderSide(color: Colors.white, width: 5.5),
+                  Container(
+                      padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Kategori Pekerjaan",
+                            style: TextStyle(fontSize: 16),
+                          ))),
+                  Container(
+                      padding: EdgeInsets.only(left: 18, right: 18),
+                      child: Card(
+                        child: SizedBox(
+                          width: 600,
+                          height: 340,
+                          child: Column(children: [
+                            CheckboxListTile(
+                              // secondary: Icon(Icons.beach_access),
+                              title: Text("Renovasi"),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _checked1,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _checked1 = value;
+                                });
+                              },
+                              activeColor: Color(0xffFF5403),
+                              checkColor: Colors.white,
+                            ),
+                            CheckboxListTile(
+                              // secondary: Icon(Icons.beach_access),
+                              title: Text("Cat"),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _checked2,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _checked2 = value;
+                                });
+                              },
+                              activeColor: Color(0xffFF5403),
+                              checkColor: Colors.white,
+                            ),
+                            CheckboxListTile(
+                              // secondary: Icon(Icons.beach_access),
+                              title: Text("Plafon"),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _checked3,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _checked3 = value;
+                                });
+                              },
+                              activeColor: Color(0xffFF5403),
+                              checkColor: Colors.white,
+                            ),
+                            CheckboxListTile(
+                              // secondary: Icon(Icons.beach_access),
+                              title: Text("Kebocoran"),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _checked4,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _checked4 = value;
+                                });
+                              },
+                              activeColor: Color(0xffFF5403),
+                              checkColor: Colors.white,
+                            ),
+                            CheckboxListTile(
+                              // secondary: Icon(Icons.beach_access),
+                              title: Text("Keramik"),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _checked5,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _checked5 = value;
+                                });
+                              },
+                              activeColor: Color(0xffFF5403),
+                              checkColor: Colors.white,
+                            ),
+                            CheckboxListTile(
+                              // secondary: Icon(Icons.beach_access),
+                              title: Text("Dinding"),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _checked6,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  _checked6 = value;
+                                });
+                              },
+                              activeColor: Color(0xffFF5403),
+                              checkColor: Colors.white,
+                            ),
+                          ]),
+                        ),
+                      )),
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: 20, right: 20, top: 10, bottom: 5),
+                    child: TextField(
+                      style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                          borderSide:
+                              BorderSide(color: Colors.white, width: 5.5),
+                        ),
+                        hintText: "Biaya Perhari, Rp.100.000",
                       ),
-                      hintText: "Biaya Perhari, Rp.100.000",
                     ),
                   ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 10),
-                  child: TextField(
-                    style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                        borderSide: BorderSide(color: Colors.white, width: 5.5),
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: 20, right: 20, top: 5, bottom: 10),
+                    child: TextField(
+                      style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                          borderSide:
+                              BorderSide(color: Colors.white, width: 5.5),
+                        ),
+                        hintText: "Alamat",
                       ),
-                      hintText: "Alamat",
                     ),
                   ),
-                ),
-                Container(
-                  padding:
-                      EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
-                  // width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xffFF5403),
-                      foregroundColor: Colors.white,
-                      minimumSize: Size(430, 45),
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: 20, right: 20, top: 10, bottom: 40),
+                    // width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xffFF5403),
+                        foregroundColor: Colors.white,
+                        minimumSize: Size(430, 45),
+                      ),
+                      onPressed: () {},
+                      child: const Text('Simpan',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18)),
                     ),
-                    onPressed: () {},
-                    child: const Text('Simpan',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18)),
                   ),
-                )
-              ],
-            ))));
+                ],
+              )),
+            ])));
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:tukang_online/screens/tukang/TukangProfileScreen.dart';
+import 'package:tukang_online/screens/tukang/TukangTentangAppScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TukangDashboardScreen extends StatefulWidget {
   const TukangDashboardScreen({super.key});
@@ -49,7 +51,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
             elevation: 0,
             // automaticallyImplyLeading: false,
           ),
-          body: ListView(
+          body: Column(
             children: [
               Container(
                 child: SizedBox(
@@ -219,7 +221,79 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                         ),
                       ),
                     ],
-                  ))
+                  )),
+              Expanded(
+                child: Container(
+                  padding:
+                      EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 20),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      // crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            padding: EdgeInsets.only(left: 10),
+                            margin: EdgeInsets.only(bottom: 10),
+                            child: Text("Lainnya")),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            ElevatedButton.icon(
+                              icon: Icon(Icons.info, color: Color(0xffFF5403)),
+                              label: Text("Tentang APP"),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return TukangTentangAppScreen();
+                                    },
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                minimumSize: Size(180, 40),
+                              ),
+                            ),
+                            ElevatedButton.icon(
+                              icon: Icon(Icons.contact_mail,
+                                  color: Color(0xffFF5403)),
+                              label: Text("Hubungi Kami"),
+                              onPressed: () async {
+                                debugPrint("keklik, tapi gk masuk ke if");
+                                String email = 'simonaditia22@gmail.com';
+                                String subject = 'KangTukang - Bertanya';
+                                String body = 'Halo ....';
+
+                                String emailUrl =
+                                    "mailto:$email?subject=$subject&body=$body";
+
+                                if (await canLaunch(emailUrl)) {
+                                  await launch(emailUrl);
+                                  debugPrint("INi harusnya bisa");
+                                } else {
+                                  debugPrint("INI ERROR harusnya");
+                                  throw "Error occured sending an email";
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                minimumSize: Size(180, 40),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           )),
     );
