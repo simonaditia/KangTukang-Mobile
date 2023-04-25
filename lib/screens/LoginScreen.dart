@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tukang_online/screens/RegisterScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerDashboardScreen.dart';
+import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -182,6 +183,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                     );
                                   }),
                           ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: constraints.maxHeight * 0.02,
+                      ),
+                      ElevatedButton.icon(
+                        icon: Icon(Icons.info, color: Color(0xffFF5403)),
+                        label: Text("Tukang Dashboard"),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return TukangDashboardScreen();
+                              },
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          minimumSize: Size(180, 40),
                         ),
                       ),
                     ],

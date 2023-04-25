@@ -181,7 +181,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                   ),
                   Container(
                     padding: EdgeInsets.only(top: 25, left: 20, right: 20),
-                    width: double.infinity,
+                    // width: double.infinity,
                     // alignment: Alignment.c,
                     child: ElevatedButton(
                       child: Text("Pesan Tukang",
@@ -200,6 +200,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xffFF5403),
                         foregroundColor: Colors.white,
+                        minimumSize: Size(430, 45),
                         // minimumSize: Size(50, 26),
                       ),
                     ),
