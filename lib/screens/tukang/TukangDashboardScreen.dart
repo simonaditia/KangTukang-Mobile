@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:tukang_online/screens/LoginScreen.dart';
+import 'package:tukang_online/screens/customer/CustomerPesanScreen.dart';
+import 'package:tukang_online/screens/customer/CustomerPesananScreen.dart';
+import 'package:tukang_online/screens/tukang/TukangPesananScreen.dart';
 import 'package:tukang_online/screens/tukang/TukangProfileScreen.dart';
 import 'package:tukang_online/screens/tukang/TukangTentangAppScreen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,20 +34,82 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
               style: TextStyle(color: Colors.black),
             ),
             actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.manage_accounts),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return TukangProfileScreen();
-                      },
-                    ),
-                  );
-                },
-                color: Colors.black,
-              ),
+              PopupMenuButton(
+                  // add icon, by default "3 dot" icon
+                  // icon: Icon(Icons.book)
+                  icon: Icon(Icons.more_vert, color: Color(0xffFF5403)),
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem<int>(
+                        value: 0,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.edit_note,
+                              color: Color(0xffFF5403),
+                            ),
+                            Text(" Status Pesanan"),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.manage_accounts,
+                              color: Color(0xffFF5403),
+                            ),
+                            Text(" Edit Profile"),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<int>(
+                          value: 2,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.logout,
+                                color: Color(0xffFF5403),
+                              ),
+                              Text(" Log Out"),
+                            ],
+                          )),
+                    ];
+                  },
+                  onSelected: (value) {
+                    if (value == 0) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return TukangPesananScreen();
+                          },
+                        ),
+                      );
+                    } else if (value == 1) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return TukangProfileScreen();
+                          },
+                        ),
+                      );
+                    } else if (value == 2) {
+                      Navigator.pop(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return LoginScreen();
+                          },
+                        ),
+                      );
+                    }
+                    // else if (value == 2) {
+                    //   print("Logout menu is selected.");
+                    // }
+                  }),
             ],
             flexibleSpace: Container(
               color: Colors.white,

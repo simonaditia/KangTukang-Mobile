@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 // import 'package:here_sdk/core.engine.dart';
 // import 'package:here_sdk/core.errors.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
+import 'package:tukang_online/screens/RegisterScreen.dart';
+import 'package:tukang_online/screens/customer/CustomerDashboardScreen.dart';
 
 void main() {
   // SdkContext.init(IsolateOrigin.main);
@@ -40,6 +42,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: LoginScreen(),
+      // initialRoute: '/',
+      // routes: {
+      //   '/': (context) => LoginScreen(),
+      //   '/register': (context) => RegisterScreen(),
+      //   '/customer_dashboard': (context) => CustomerDashboardScreen(),
+      // },
     );
   }
 }

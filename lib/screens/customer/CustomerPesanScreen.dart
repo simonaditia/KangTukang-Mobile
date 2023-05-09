@@ -51,7 +51,9 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                           children: [
                             CircleAvatar(
                               backgroundImage:
-                                  AssetImage('assets/images/logo.png'),
+                                  // AssetImage('assets/images/logo.png'),
+                                  NetworkImage(
+                                      "https://images.unsplash.com/photo-1499996860823-5214fcc65f8f"),
                               radius: 50,
                             )
                           ],
@@ -63,14 +65,14 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Nama Tukang: James Pieter",
+                              "Nama Tukang: Adi Mansur",
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w600),
                             ),
                             Container(
                               padding: EdgeInsets.only(top: 10),
                               child: Text(
-                                "Kategori Tukang: Tukang Plafon",
+                                "Kategori Tukang: Renovasi",
                                 style: TextStyle(fontSize: 14),
                               ),
                             ),

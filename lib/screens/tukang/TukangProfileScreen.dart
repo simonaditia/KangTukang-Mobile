@@ -49,14 +49,15 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                   Container(
                     padding: EdgeInsets.only(top: 50, bottom: 20),
                     child: CircleAvatar(
-                      backgroundImage: AssetImage('assets/images/logo.png'),
-                      radius: 50,
+                      backgroundImage: AssetImage('assets/images/tukang1.jpg'),
+                      radius: 70,
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.only(
                         left: 20, right: 20, top: 10, bottom: 5),
-                    child: TextField(
+                    child: TextFormField(
+                      initialValue: "Adi Mansur",
                       style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
                       decoration: InputDecoration(
                         filled: true,
@@ -73,7 +74,8 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                   Container(
                     padding:
                         EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                    child: TextField(
+                    child: TextFormField(
+                      initialValue: "adi.mansur@gmail.com",
                       style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
                       decoration: InputDecoration(
                         filled: true,
@@ -90,7 +92,8 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                   Container(
                     padding:
                         EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                    child: TextField(
+                    child: TextFormField(
+                      initialValue: "081359305839",
                       style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
                       decoration: InputDecoration(
                         filled: true,
@@ -104,6 +107,25 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                       ),
                     ),
                   ),
+                  Container(
+                    padding:
+                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    child: TextFormField(
+                      initialValue: "Renovasi",
+                      style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                          borderSide:
+                              BorderSide(color: Colors.white, width: 5.5),
+                        ),
+                        hintText: "Kategori",
+                      ),
+                    ),
+                  ),
+                  /*
                   Container(
                       padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
                       child: Align(
@@ -200,10 +222,12 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                           ]),
                         ),
                       )),
+                  */
                   Container(
                     padding: EdgeInsets.only(
                         left: 20, right: 20, top: 10, bottom: 5),
-                    child: TextField(
+                    child: TextFormField(
+                      initialValue: "100000",
                       style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
                       decoration: InputDecoration(
                         filled: true,
@@ -220,7 +244,8 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                   Container(
                     padding: EdgeInsets.only(
                         left: 20, right: 20, top: 5, bottom: 10),
-                    child: TextField(
+                    child: TextFormField(
+                      initialValue: "Jalan Mangga Raya",
                       style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
                       decoration: InputDecoration(
                         filled: true,

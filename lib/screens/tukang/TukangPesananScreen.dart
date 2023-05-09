@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:tukang_online/screens/customer/CustomerDashboardScreen.dart';
+import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
 
-class CustomerPesananScreen extends StatefulWidget {
-  const CustomerPesananScreen({super.key});
+class TukangPesananScreen extends StatefulWidget {
+  const TukangPesananScreen({super.key});
 
   @override
-  State<CustomerPesananScreen> createState() => _CustomerPesananScreenState();
+  State<TukangPesananScreen> createState() => _TukangPesananScreenState();
 }
 
-class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
+class _TukangPesananScreenState extends State<TukangPesananScreen> {
   @override
   Widget build(BuildContext context) {
     TabBar myTabBar = TabBar(
@@ -33,7 +33,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return CustomerDashboardScreen();
+                          return TukangDashboardScreen();
                         },
                       ),
                     );
@@ -200,7 +200,16 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
                                       ElevatedButton(
-                                          child: Text("Ubah Waktu",
+                                          child: Text("Tolak",
+                                              style: TextStyle(fontSize: 12)),
+                                          onPressed: () {},
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Color(0xffDD1D1D),
+                                              foregroundColor: Colors.white,
+                                              minimumSize: Size(50, 26))),
+                                      ElevatedButton(
+                                          child: Text("Terima",
                                               style: TextStyle(fontSize: 12)),
                                           onPressed: () {},
                                           style: ElevatedButton.styleFrom(
@@ -208,15 +217,6 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                   Color(0xffFF5403),
                                               foregroundColor: Colors.white,
                                               minimumSize: Size(50, 26))),
-                                      ElevatedButton(
-                                          child: Text("Batalkan",
-                                              style: TextStyle(fontSize: 12)),
-                                          onPressed: () {},
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Color(0xffDD1D1D),
-                                              foregroundColor: Colors.white,
-                                              minimumSize: Size(50, 26)))
                                     ],
                                   ),
                                 )
@@ -538,5 +538,3 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     );
   }
 }
-
-// Container myTab1 = 
