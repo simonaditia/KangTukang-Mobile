@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tukang_online/providers/auth_provider.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -11,8 +13,47 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   var _isVisible = false;
+  TextEditingController namaController = TextEditingController(text: '');
+  TextEditingController emailController = TextEditingController(text: '');
+  TextEditingController passwordController = TextEditingController(text: '');
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+
+//   halo tolong bantu saya, saya mempunyai kode ini dan terjadi error A nullable expression can't be used as a condition.
+// Try checking that the value isn't 'null' before using it as a condition.
+    handleSignupCustomer() async {
+      String nama = namaController.text ?? "";
+      String email = emailController.text ?? "";
+      String password = passwordController.text ?? "";
+      if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+        if (await authProvider.registerCustomer(
+              nama: nama,
+              email: email,
+              password: password,
+            ) ==
+            true) {
+          Navigator.pushNamed(context, '/dashboard-customer');
+        }
+      }
+    }
+
+    handleSignupTukang() async {
+      String nama = namaController.text ?? "";
+      String email = emailController.text ?? "";
+      String password = passwordController.text ?? "";
+      if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+        if (await authProvider.registerTukang(
+              nama: nama,
+              email: email,
+              password: password,
+            ) ==
+            true) {
+          Navigator.pushNamed(context, '/dashboard-tukang');
+        }
+      }
+    }
+
     final deviceHeight = MediaQuery.of(context).size.height;
     final deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -65,7 +106,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 15),
                             child: Center(
-                              child: TextField(
+                              child: TextFormField(
+                                controller: namaController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Nama Lengkap",
@@ -87,7 +129,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 15),
                             child: Center(
-                              child: TextField(
+                              child: TextFormField(
+                                controller: emailController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "Email",
@@ -109,7 +152,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 15),
                             child: Center(
-                              child: TextField(
+                              child: TextFormField(
+                                controller: passwordController,
                                 obscureText: _isVisible ? false : true,
                                 decoration: InputDecoration(
                                   suffixIcon: IconButton(
@@ -154,16 +198,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             top: constraints.maxHeight * 0.04,
                           ),
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return LoginScreen();
-                                  },
-                                ),
-                              );
-                            },
+                            onPressed: handleSignupCustomer,
+                            // onPressed: () {
+                            //   Navigator.pop(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (context) {
+                            //         return LoginScreen();
+                            //       },
+                            //     ),
+                            //   );
+                            // },
                             child: Text(
                               'Register Sebagai Customer',
                               style: TextStyle(
@@ -187,16 +232,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             top: constraints.maxHeight * 0.01,
                           ),
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return LoginScreen();
-                                  },
-                                ),
-                              );
-                            },
+                            onPressed: handleSignupTukang,
+                            // onPressed: () {
+                            //   Navigator.pop(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (context) {
+                            //         return LoginScreen();
+                            //       },
+                            //     ),
+                            //   );
+                            // },
                             child: Text(
                               'Register Sebagai Tukang',
                               style: TextStyle(

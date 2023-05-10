@@ -41,6 +41,7 @@ dependencies:
   geolocator: ^9.0.2
   http: ^0.13.4
   shared_preferences: ^2.0.7
+  provider: ^6.0.5
   # here_sdk:
   #   git:
   #     url: https://github.com/heremaps/here-sdk-flutter.git
