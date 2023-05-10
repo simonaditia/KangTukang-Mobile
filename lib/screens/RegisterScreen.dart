@@ -17,6 +17,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController namaController = TextEditingController(text: '');
   TextEditingController emailController = TextEditingController(text: '');
   TextEditingController passwordController = TextEditingController(text: '');
+
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
@@ -24,6 +27,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 //   halo tolong bantu saya, saya mempunyai kode ini dan terjadi error A nullable expression can't be used as a condition.
 // Try checking that the value isn't 'null' before using it as a condition.
     handleSignupCustomer() async {
+      setState(() {
+        isLoading = true;
+      });
       if (_formKey.currentState!.validate()) {
         String nama = namaController.text ?? "";
         String email = emailController.text ?? "";
@@ -47,22 +53,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             );
           }
+          setState(() {
+            isLoading = false;
+          });
         }
       }
     }
 
     handleSignupTukang() async {
-      String nama = namaController.text ?? "";
-      String email = emailController.text ?? "";
-      String password = passwordController.text ?? "";
-      if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-        if (await authProvider.registerTukang(
-              nama: nama,
-              email: email,
-              password: password,
-            ) ==
-            true) {
-          Navigator.pushNamed(context, '/dashboard-tukang');
+      if (_formKey.currentState!.validate()) {
+        String nama = namaController.text ?? "";
+        String email = emailController.text ?? "";
+        String password = passwordController.text ?? "";
+        if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+          final result = await authProvider.registerTukang(
+            nama: nama,
+            email: email,
+            password: password,
+          );
+          if (result != null) {
+            Navigator.pushNamed(context, '/dashboard-tukang');
+          } else {
+            print("di else");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  "Gagal Register Customer!",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
         }
       }
     }
@@ -221,37 +242,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           //     ),
                           //   ],
                           // ),
-                          Container(
-                            width: double.infinity,
-                            height: constraints.maxHeight * 0.10,
-                            margin: EdgeInsets.only(
-                              top: constraints.maxHeight * 0.04,
-                            ),
-                            child: ElevatedButton(
-                              onPressed: handleSignupCustomer,
-                              // onPressed: () {
-                              //   Navigator.pop(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //       builder: (context) {
-                              //         return LoginScreen();
-                              //       },
-                              //     ),
-                              //   );
-                              // },
-                              child: Text(
-                                'Register Sebagai Customer',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                primary: Color(0xffFF5403),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          isLoading
+                              ? Container(
+                                  width: double.infinity,
+                                  height: constraints.maxHeight * 0.10,
+                                  margin: EdgeInsets.only(
+                                    top: constraints.maxHeight * 0.04,
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation(
+                                              Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 4,
+                                        ),
+                                        Text(
+                                          'Loading',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Color(0xffFF5403),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  width: double.infinity,
+                                  height: constraints.maxHeight * 0.10,
+                                  margin: EdgeInsets.only(
+                                    top: constraints.maxHeight * 0.04,
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: handleSignupCustomer,
+                                    child: Text(
+                                      'Register Sebagai Customer',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Color(0xffFF5403),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
+
                           // SizedBox(
                           //   height: constraints.maxHeight * 0.02,
                           // ),
