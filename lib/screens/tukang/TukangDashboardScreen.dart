@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerPesanScreen.dart';
@@ -18,6 +19,45 @@ class TukangDashboardScreen extends StatefulWidget {
 }
 
 class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
+  String? _nama = ""; // Simpan nama pengguna di dalam variabel ini
+
+  @override
+  void initState() {
+    super.initState();
+    // _getTokenAndFetchNama();
+    // _fetchNama();
+    loadUserName();
+  }
+
+  Future<void> loadUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jwt = prefs.getString('jwt') ?? '';
+
+    // Decode token JWT untuk mendapatkan nama pengguna
+    // Misalnya, jika JWT berisi informasi pengguna seperti {'name': 'John Doe', 'role': 'customer'}
+    // maka kita dapat mengambil nilai 'name' dari token tersebut
+    // Kamu perlu menyesuaikan dengan struktur JWT yang kamu gunakan
+    String nama = decodeUserNameFromJwt(jwt);
+
+    setState(() {
+      _nama = nama;
+    });
+  }
+
+  String decodeUserNameFromJwt(String jwt) {
+    // Lakukan dekode JWT untuk mendapatkan nama pengguna
+    // Kamu perlu menggunakan library atau metode yang sesuai untuk dekode JWT
+    // Misalnya, menggunakan package jwt_decode: https://pub.dev/packages/jwt_decode
+    // Contoh sederhana:
+    // var decodedToken = jwtDecode(jwt);
+    // return decodedToken['name'];
+
+    // Contoh sederhana tanpa dekode JWT (nama langsung diambil dari JWT)
+    // return jwt; // Ubah dengan dekode JWT yang sesuai
+    var decodedToken = JwtDecoder.decode(jwt);
+    return decodedToken['nama'];
+  }
+
   void logout() async {
     // Menghapus token JWT dan role dari shared_preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -146,7 +186,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Halo, Udin!",
+                          "Halo, $_nama!",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

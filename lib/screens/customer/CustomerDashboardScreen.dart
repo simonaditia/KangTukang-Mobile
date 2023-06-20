@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerPesananScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerProfileScreen.dart';
@@ -30,6 +33,135 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
   throw 'Could not launch ${emailLaunchUri.toString()}';
 }
   }*/
+
+  String? authToken; // Simpan token di dalam variabel ini
+  String? _nama = ""; // Simpan nama pengguna di dalam variabel ini
+
+  @override
+  void initState() {
+    super.initState();
+    // _getTokenAndFetchNama();
+    // _fetchNama();
+    loadUserName();
+  }
+
+  Future<void> loadUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jwt = prefs.getString('jwt') ?? '';
+
+    // Decode token JWT untuk mendapatkan nama pengguna
+    // Misalnya, jika JWT berisi informasi pengguna seperti {'name': 'John Doe', 'role': 'customer'}
+    // maka kita dapat mengambil nilai 'name' dari token tersebut
+    // Kamu perlu menyesuaikan dengan struktur JWT yang kamu gunakan
+    String nama = decodeUserNameFromJwt(jwt);
+
+    setState(() {
+      _nama = nama;
+    });
+  }
+
+  String decodeUserNameFromJwt(String jwt) {
+    // Lakukan dekode JWT untuk mendapatkan nama pengguna
+    // Kamu perlu menggunakan library atau metode yang sesuai untuk dekode JWT
+    // Misalnya, menggunakan package jwt_decode: https://pub.dev/packages/jwt_decode
+    // Contoh sederhana:
+    // var decodedToken = jwtDecode(jwt);
+    // return decodedToken['name'];
+
+    // Contoh sederhana tanpa dekode JWT (nama langsung diambil dari JWT)
+    // return jwt; // Ubah dengan dekode JWT yang sesuai
+    var decodedToken = JwtDecoder.decode(jwt);
+    return decodedToken['nama'];
+  }
+
+  // Future<void> _getTokenAndFetchNama() async {
+  //   String? token = await _getToken();
+  //   if (token != null) {
+  //     _fetchNama(token);
+  //   }
+  // }
+
+  /*Future<String?> _getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('jwt');
+  }
+
+  Future<String?> getData() async {
+    String? token = await _getToken();
+    print("TOKEN");
+    print(token);
+    print("TOKEN");
+    if (token != null) {
+      // _fetchNama(token);
+      var url = Uri.parse('http://192.168.1.100:8000/api/v1/users');
+
+      var response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        var data = response.body;
+        print(data);
+        return data;
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    }
+    return null;
+  }
+*/
+  /*String _getNamaFromToken(String token) {
+    List<String> parts = token.split('.');
+    if (parts.length != 3) {
+      throw Exception('Token tidak valid');
+    }
+
+    String payload = parts[1];
+    String decodedPayload = _decodeBase64Url(payload);
+
+    Map<String, dynamic> payloadData = jsonDecode(decodedPayload);
+    List<dynamic> users = payloadData['data'];
+
+    if (users.isNotEmpty) {
+      String nama = users[0]['nama'] ?? '';
+      return nama;
+    } else {
+      throw Exception('Data pengguna tidak tersedia dalam respons');
+    }
+  }*/
+
+  /*String? _getNamaFromToken(String token) {
+    Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
+
+    // Pastikan token valid dan memiliki payload dengan data nama
+    if (decodedToken.containsKey('nama')) {
+      return decodedToken['nama'];
+    }
+
+    return null;
+  }*/
+
+  /*String _decodeBase64Url(String input) {
+    String normalizedInput = input;
+    while (normalizedInput.length % 4 != 0) {
+      normalizedInput += '=';
+    }
+    String decoded = utf8.decode(base64Url.decode(normalizedInput));
+    return decoded;
+  }*/
+  /*Future<void> _fetchNama() async {
+    if (authToken != null) {
+      String? fetchedNama = _getNamaFromToken(authToken!);
+
+      if (fetchedNama != null) {
+        setState(() {
+          _nama = fetchedNama;
+        });
+      }
+    }
+  }*/
+
   void logout() async {
     // Menghapus token JWT dan role dari shared_preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -184,7 +316,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Hi, Adit!",
+                                    "Hi, $_nama!",
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
