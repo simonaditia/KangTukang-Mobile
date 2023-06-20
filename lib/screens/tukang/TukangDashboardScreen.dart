@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerPesanScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerPesananScreen.dart';
@@ -17,6 +18,20 @@ class TukangDashboardScreen extends StatefulWidget {
 }
 
 class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
+  void logout() async {
+    // Menghapus token JWT dan role dari shared_preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt');
+    await prefs.remove('role');
+
+    // Pindah ke halaman login setelah logout
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/', // Ganti dengan nama route untuk halaman login
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -65,16 +80,18 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                         ),
                       ),
                       PopupMenuItem<int>(
-                          value: 2,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.logout,
-                                color: Color(0xffFF5403),
-                              ),
-                              Text(" Log Out"),
-                            ],
-                          )),
+                        value: 2,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.logout,
+                              color: Color(0xffFF5403),
+                            ),
+                            Text(" Log Out"),
+                          ],
+                        ),
+                        onTap: logout,
+                      ),
                     ];
                   },
                   onSelected: (value) {

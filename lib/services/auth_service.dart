@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:tukang_online/models/user_model.dart';
 
 class AuthServiceCustomer {
-  String baseUrl = 'http://172.10.51.23:8000/auth';
+  String baseUrl = 'http://192.168.1.100:8000/auth';
 
   get response => null;
   Future<UserModel> register({
@@ -56,7 +56,7 @@ class AuthServiceCustomer {
 }
 
 class AuthServiceTukang {
-  String baseUrl = 'http://172.10.51.23:8000/auth';
+  String baseUrl = 'http://192.168.1.100:8000/auth';
 
   get response => null;
   Future<UserModel> register({
@@ -95,6 +95,66 @@ class AuthServiceTukang {
   }
 }
 
+class AuthLogin {
+  // String baseUrl = 'http://192.168.1.100:8000/auth';
+  String baseUrl = 'http://localhost:8000/auth';
 
-// saya mendapatkan hasil log seperti: nosuchmethoderror: the method '[]' was called on null, receiver: null, tried calling: []("user")
-// hasil log lagi yaitu: type 'Null' is not a subtype of type 'Map<String, dynamic>'
+  get response => null;
+  Future<UserModel> login({
+    String? email,
+    String? password,
+  }) async {
+    if (email == null || password == null) {
+      throw Exception('Nama, email, dan password harus diisi');
+    }
+
+    var url = '$baseUrl/login';
+    var headers = {'Content-Type': 'application/json'};
+    var body = jsonEncode({
+      'email': email,
+      'password': password,
+    });
+
+    // try {
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+    print(response.toString());
+    print(response.statusCode.toString());
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body)['user'];
+      UserModel user = UserModel.fromJson(data);
+      // user.token = 'Bearer ' + data['access_token'];
+      print(data);
+      print(user);
+      print("HALOHALO");
+      return user;
+    } else {
+      throw Exception('Gagal Login');
+    }
+  }
+}
+
+class AuthLoginn {
+  static const baseUrl = 'http://192.168.1.100:8000/auth';
+
+  Future<String?> login(
+      {required String email, required String password}) async {
+    final url = Uri.parse('$baseUrl/login');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({'email': email, 'password': password});
+
+    final response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['jwt'];
+    } else {
+      throw Exception('Failed to login');
+    }
+  }
+}

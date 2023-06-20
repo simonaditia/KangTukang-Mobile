@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +20,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   var _isVisible = false;
-  String _email = "";
-  String _password = "";
   // //  final _formKey = GlobalKey<FormState>();
   // final emailController = TextEditingController();
   // final passwordController = TextEditingController();
@@ -68,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
 
-    /*handleLogin() async {
+    handleLogin() async {
       setState(() {
         isLoading = true;
       });
@@ -113,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
           });
         }
       }
-    }*/
+    }
 
 // @override
     /*void initState() {
@@ -202,21 +199,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: const EdgeInsets.only(left: 15),
                             child: Center(
                               child: TextFormField(
-                                // controller: emailController,
+                                controller: emailController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "test@gmail.com",
                                 ),
                                 textInputAction: TextInputAction.next,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your email';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _email = value!;
-                                },
                                 // onChanged: (value) =>
                                 //     setState(() => _email = value.trim()),
                                 // validator: (value) =>
@@ -238,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: const EdgeInsets.only(left: 15),
                             child: Center(
                               child: TextFormField(
-                                // controller: passwordController,
+                                controller: passwordController,
                                 obscureText: _isVisible ? false : true,
                                 decoration: InputDecoration(
                                   suffixIcon: IconButton(
@@ -257,15 +245,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   border: InputBorder.none,
                                   hintText: "Password",
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your password';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _password = value!;
-                                },
                                 textInputAction: TextInputAction.done,
                                 // onChanged: (value) =>
                                 //     setState(() => _password = value.trim()),
@@ -301,21 +280,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             top: constraints.maxHeight * 0.05,
                           ),
                           child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                loginUser(_email, _password, context);
-                              }
-                            },
-                            child: Text('Login'),
-                            style: ElevatedButton.styleFrom(
-                              primary: Color(0xffFF5403),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          /*ElevatedButton(
                             onPressed: isLoading ? null : () => handleLogin(),
                             // onPressed: () {
                             //   // if (_formKey.currentState!.validate()) {
@@ -344,7 +308,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                          ),*/
+                          ),
                         ),
                         SizedBox(
                           height: constraints.maxHeight * 0.02,
@@ -407,69 +371,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-}
-
-Future<void> loginUser(
-    String email, String password, BuildContext context) async {
-  var url = Uri.parse(
-      'http://192.168.1.100:8000/auth/login'); // Ganti dengan URL endpoint login Anda
-
-  if (email.isNotEmpty && password.isNotEmpty) {
-    // Kirim permintaan login
-    var requestBody = {'email': email, 'password': password};
-
-    var response =
-        await http.post(url, body: json.encode(requestBody), headers: {
-      'Content-Type': 'application/json',
-    });
-
-    print(response.body);
-    print(response.statusCode);
-
-    if (response.statusCode == 200) {
-      var responseData = json.decode(response.body);
-      log(responseData.toString());
-      print(responseData);
-      var token = responseData['jwt'];
-      var role = responseData['user']['role'];
-      log(token);
-      print(token);
-      log(role);
-      print(token);
-
-      // Simpan token JWT dan role di shared_preferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('jwt', token);
-      prefs.setString('role', role);
-
-      // Redirect pengguna ke halaman yang sesuai berdasarkan role
-      if (role == 'customer') {
-        // Navigator.pushReplacementNamed(context, CustomerDashboardScreen());
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return CustomerDashboardScreen();
-            },
-          ),
-        );
-      } else if (role == 'tukang') {
-        // Navigator.pushReplacementNamed(context, '/tukang_dashboard');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return TukangDashboardScreen();
-            },
-          ),
-        );
-      }
-    } else {
-      // Login gagal
-      print('Login gagal');
-    }
-  } else {
-    print("Email dan password harus diisi");
   }
 }

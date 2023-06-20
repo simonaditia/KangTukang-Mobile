@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerPesananScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerProfileScreen.dart';
@@ -29,6 +30,19 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
   throw 'Could not launch ${emailLaunchUri.toString()}';
 }
   }*/
+  void logout() async {
+    // Menghapus token JWT dan role dari shared_preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt');
+    await prefs.remove('role');
+
+    // Pindah ke halaman login setelah logout
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/', // Ganti dengan nama route untuk halaman login
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,16 +106,18 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                           ),
                         ),
                         PopupMenuItem<int>(
-                            value: 2,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.logout,
-                                  color: Color(0xffFF5403),
-                                ),
-                                Text(" Log Out"),
-                              ],
-                            )),
+                          value: 2,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.logout,
+                                color: Color(0xffFF5403),
+                              ),
+                              Text(" Log Out"),
+                            ],
+                          ),
+                          onTap: logout,
+                        ),
                       ];
                     },
                     onSelected: (value) {
@@ -123,7 +139,8 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                             },
                           ),
                         );
-                      } else if (value == 2) {
+                      }
+                      /*else if (value == 2) {
                         Navigator.pop(
                           context,
                           MaterialPageRoute(
@@ -132,7 +149,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                             },
                           ),
                         );
-                      }
+                      }*/
                       // else if (value == 2) {
                       //   print("Logout menu is selected.");
                       // }
