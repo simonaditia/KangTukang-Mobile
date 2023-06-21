@@ -1,34 +1,103 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/customer/CustomerMapScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerSearchScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:tukang_online/screens/customer/food_model.dart';
 
 class CustomerPesanScreen extends StatefulWidget {
-  const CustomerPesanScreen({super.key});
+  const CustomerPesanScreen({Key? key, required this.tukangId})
+      : super(key: key);
+  final String tukangId;
 
   @override
   State<CustomerPesanScreen> createState() => _CustomerPesanScreenState();
 }
 
 class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
+  String token = '';
   DateTime selectDate = DateTime.now();
+
+  FoodModel? tukangData;
+
+  @override
+  void initState() {
+    super.initState();
+    getToken();
+  }
+
+  void getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jwt = prefs.getString('jwt') ?? '';
+
+    setState(() {
+      token = jwt;
+    });
+    fetchTukangData(token);
+  }
+
+  Future<void> fetchTukangData(String token) async {
+    var url = Uri.parse(
+        'http://192.168.1.100:8000/api/v1/users/findTukang/${widget.tukangId}');
+    try {
+      print("didialam get token customerpesanscreen fetchTukangData");
+      print(token);
+      print("didialam get token customerpesanscreen fetchTukangData");
+      var response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+      });
+
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        print("di customer pesan screen");
+        print(response.body);
+
+        if (responseData['status'] == 'success') {
+          var data = responseData['data'];
+
+          var foodModel = FoodModel(
+            data['ID'],
+            data['nama'],
+            data['kategori'],
+            data['email'],
+            data['role'],
+            data['alamat'],
+          );
+
+          setState(() {
+            tukangData = foodModel;
+          });
+        } else {
+          throw Exception('API request failed');
+        }
+      } else {
+        throw Exception('Failed to fetch tukang data');
+      }
+    } catch (error) {
+      throw Exception('Error fetching tukang data: $error');
+    }
+  }
+
   // String selectDate2 = DateFormat.yMMMMEEEEd().format(DateTime.now());
   // DateTime selectDate3 = DateTime(2)
   @override
   Widget build(BuildContext context) {
+    if (tukangData == null) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return MaterialApp(
         home: Scaffold(
             appBar: AppBar(
                 leading: IconButton(
                     onPressed: () {
-                      Navigator.pop(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return CustomerSearchScreen();
-                          },
-                        ),
-                      );
+                      Navigator.pop(context);
                     },
                     icon: Icon(Icons.arrow_back, color: Colors.black)),
                 flexibleSpace: Container(color: Colors.white),
@@ -51,9 +120,9 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                           children: [
                             CircleAvatar(
                               backgroundImage:
-                                  // AssetImage('assets/images/logo.png'),
-                                  NetworkImage(
-                                      "https://images.unsplash.com/photo-1499996860823-5214fcc65f8f"),
+                                  AssetImage('assets/images/logo.png'),
+                              // NetworkImage(
+                              //     "https://images.unsplash.com/photo-1499996860823-5214fcc65f8f"),
                               radius: 50,
                             )
                           ],
@@ -64,15 +133,17 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // "Nama Tukang:
                             Text(
-                              "Nama Tukang: Adi Mansur",
+                              'Nama: ${tukangData != null ? tukangData!.nama : 'Nama tidak tersedia'}',
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w600),
                             ),
                             Container(
                               padding: EdgeInsets.only(top: 10),
+                              // Kategori Tukang: Renovasi
                               child: Text(
-                                "Kategori Tukang: Renovasi",
+                                'Kategori: ${tukangData != null ? tukangData!.kategori : 'Kategori tidak tersedia'}',
                                 style: TextStyle(fontSize: 14),
                               ),
                             ),

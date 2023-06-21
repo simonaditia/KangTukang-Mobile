@@ -125,8 +125,12 @@ class _MyAppState extends State<MyApp> {
           '/dashboard-customer': (context) => CustomerDashboardScreen(),
           '/status-pesanan-customer': (context) => CustomerPesananScreen(),
           '/status-pesanan-tukang': (context) => TukangPesananScreen(),
-          '/cari-tukang': (context) => CustomerSearchScreen(),
-          '/customer-pesan': (context) => CustomerPesanScreen(),
+          '/cari-tukang': (context) => CustomerSearchScreen(
+                tukangId: '',
+              ),
+          '/customer-pesan': (context) => CustomerPesanScreen(
+                tukangId: '',
+              ),
           '/edit-profile-customer': (context) => CustomerProfileScreen(),
           '/edit-profile-tukang': (context) => TukangProfileScreen(),
           '/tentang-app-customer': (context) => CustomerTentangAppScreen(),

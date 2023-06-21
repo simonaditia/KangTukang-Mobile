@@ -1,10 +1,13 @@
 class FoodModel {
+  int ID;
   String? nama;
   String? kategori;
   dynamic email; // Update the type to match your data
   String? role;
+  String? alamat;
 
-  FoodModel(this.nama, this.kategori, this.email, this.role);
+  FoodModel(
+      this.ID, this.nama, this.kategori, this.email, this.role, this.alamat);
 }
 
 

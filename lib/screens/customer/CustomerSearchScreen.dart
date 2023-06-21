@@ -6,7 +6,11 @@ import 'package:tukang_online/screens/customer/CustomerPesanScreen.dart';
 import 'package:tukang_online/screens/customer/food_model.dart';
 
 class CustomerSearchScreen extends StatefulWidget {
-  const CustomerSearchScreen({super.key});
+  final String tukangId;
+
+  // const CustomerPesanScreen({required this.tukangId});
+  const CustomerSearchScreen({Key? key, required this.tukangId})
+      : super(key: key);
 
   @override
   State<CustomerSearchScreen> createState() => _CustomerSearchScreenState();
@@ -16,15 +20,15 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
   String token = '';
 
   static List<FoodModel> main_food_list = [
-    FoodModel("Adit Pieter", "Renovasi", "1.1KM", "assets/images/logo.png"),
-    FoodModel("Adi Mansur", "Renovasi", "1.7KM", "assets/images/logo.png"),
-    FoodModel("Ali Raja", "Cat", "2.5KM", "assets/images/logo.png"),
-    FoodModel("Iman Hasan", "Cat", "3.3KM", "assets/images/logo.png"),
-    FoodModel("Daud Surya", "Plaffon", "4.2KM", "assets/images/logo.png"),
-    FoodModel("Nurul Arif", "Kebocoran", "3.9KM", "assets/images/logo.png"),
-    FoodModel("Ibrahim Abdul", "Keramik", "2.4KM", "assets/images/logo.png"),
-    FoodModel("Udin Arif", "Dinding", "2.6KM", "assets/images/logo.png"),
-    FoodModel("Samuel Bintang", "Renovasi", "4.1KM", "assets/images/logo.png"),
+    // FoodModel("Adit Pieter", "Renovasi", "1.1KM", "assets/images/logo.png"),
+    // FoodModel("Adi Mansur", "Renovasi", "1.7KM", "assets/images/logo.png"),
+    // FoodModel("Ali Raja", "Cat", "2.5KM", "assets/images/logo.png"),
+    // FoodModel("Iman Hasan", "Cat", "3.3KM", "assets/images/logo.png"),
+    // FoodModel("Daud Surya", "Plaffon", "4.2KM", "assets/images/logo.png"),
+    // FoodModel("Nurul Arif", "Kebocoran", "3.9KM", "assets/images/logo.png"),
+    // FoodModel("Ibrahim Abdul", "Keramik", "2.4KM", "assets/images/logo.png"),
+    // FoodModel("Udin Arif", "Dinding", "2.6KM", "assets/images/logo.png"),
+    // FoodModel("Samuel Bintang", "Renovasi", "4.1KM", "assets/images/logo.png"),
     // FoodModel("Adit Pieter", "Renovasi", "1.1KM",
     //     "https://images.unsplash.com/photo-1519058082700-08a0b56da9b4"),
     // FoodModel("Adi Mansur", "Renovasi", "1.7KM",
@@ -108,10 +112,12 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
             // Iterate over the response data and create FoodModel objects
             List<FoodModel> results = data
                 .map((item) => FoodModel(
+                      item['ID'],
                       item['nama'],
                       item['kategori'],
                       item['email'],
                       item['role'],
+                      item['alamat'],
                     ))
                 .toList();
 
@@ -119,10 +125,12 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
           } else if (data is Map<String, dynamic>) {
             // Handle a single JSON object
             var foodModel = FoodModel(
+              data['ID'],
               data['nama'],
               data['kategori'],
               data['email'],
               data['role'],
+              data['alamat'],
             );
 
             return [foodModel];
@@ -160,10 +168,12 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
             // Iterate over the response data and create FoodModel objects
             List<FoodModel> results = data
                 .map((item) => FoodModel(
+                      item['ID'],
                       item['nama'],
                       item['kategori'],
                       item['email'],
                       item['role'],
+                      item['alamat'],
                     ))
                 .toList();
 
@@ -171,10 +181,12 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
           } else if (data is Map<String, dynamic>) {
             // Handle a single JSON object
             var foodModel = FoodModel(
+              data['ID'],
               data['nama'],
               data['kategori'],
               data['email'],
               data['role'],
+              data['alamat'],
             );
 
             return [foodModel];
@@ -274,7 +286,13 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) {
-                                        return CustomerPesanScreen();
+                                        print(display_list[index].ID!);
+                                        print(display_list[index].nama!);
+                                        print(display_list[index].kategori!);
+                                        return CustomerPesanScreen(
+                                            tukangId: display_list[index]
+                                                .ID
+                                                .toString());
                                       },
                                     ),
                                   );
@@ -287,11 +305,11 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                subtitle:
-                                    Text('${display_list[index].kategori!}',
-                                        style: TextStyle(
-                                          color: Colors.black26,
-                                        )),
+                                subtitle: Text(
+                                    '${display_list[index].kategori!} ${display_list[index].ID!}',
+                                    style: TextStyle(
+                                      color: Colors.black26,
+                                    )),
                                 trailing: Text(
                                   "${display_list[index].email}",
                                   style: TextStyle(color: Colors.amber),
