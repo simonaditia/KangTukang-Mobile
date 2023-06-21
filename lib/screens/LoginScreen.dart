@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tukang_online/providers/auth_provider.dart';
 import 'package:tukang_online/screens/RegisterScreen.dart';
@@ -147,6 +148,90 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
     }*/
+    Future<void> loginUser(
+        String email, String password, BuildContext context) async {
+      setState(() {
+        isLoading = true;
+      });
+      var url = Uri.parse(
+          'http://192.168.1.100:8000/auth/login'); // Ganti dengan URL endpoint login Anda
+
+      if (email.isNotEmpty && password.isNotEmpty) {
+        // Kirim permintaan login
+        var requestBody = {'email': email, 'password': password};
+
+        var response =
+            await http.post(url, body: json.encode(requestBody), headers: {
+          'Content-Type': 'application/json',
+        });
+
+        print(response.body);
+        print(response.statusCode);
+
+        if (response.statusCode == 200) {
+          var responseData = json.decode(response.body);
+          log(responseData.toString());
+          print(responseData);
+          var token = responseData['jwt'];
+          var role = responseData['user']['role'];
+          log(token);
+          print(token);
+          log(role);
+          print(token);
+
+          // Simpan token JWT dan role di shared_preferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('jwt', token);
+          prefs.setString('role', role);
+
+          Fluttertoast.showToast(
+            msg: "Login Berhasil",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+
+          // Redirect pengguna ke halaman yang sesuai berdasarkan role
+          if (role == 'customer') {
+            // Navigator.pushReplacementNamed(context, CustomerDashboardScreen());
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return CustomerDashboardScreen();
+                },
+              ),
+            );
+          } else if (role == 'tukang') {
+            // Navigator.pushReplacementNamed(context, '/tukang_dashboard');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return TukangDashboardScreen();
+                },
+              ),
+            );
+          }
+        } else {
+          // Login gagal
+          print('Login gagal');
+          Fluttertoast.showToast(
+            msg: "Login Gagal\nPeriksa kembali Email & Password Anda",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        }
+      } else {
+        print("Email dan password harus diisi");
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
 
     final deviceHeight = MediaQuery.of(context).size.height;
     final deviceWidth = MediaQuery.of(context).size.width;
@@ -294,28 +379,75 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        Container(
-                          width: double.infinity,
-                          height: constraints.maxHeight * 0.12,
-                          margin: EdgeInsets.only(
-                            top: constraints.maxHeight * 0.05,
-                          ),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                loginUser(_email, _password, context);
-                              }
-                            },
-                            child: Text('Login'),
-                            style: ElevatedButton.styleFrom(
-                              primary: Color(0xffFF5403),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          /*ElevatedButton(
+                        isLoading
+                            ? Container(
+                                width: double.infinity,
+                                height: constraints.maxHeight * 0.10,
+                                margin: EdgeInsets.only(
+                                  top: constraints.maxHeight * 0.04,
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation(
+                                            Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 4,
+                                      ),
+                                      Text(
+                                        'Loading',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xffFF5403),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                width: double.infinity,
+                                height: constraints.maxHeight * 0.12,
+                                margin: EdgeInsets.only(
+                                  top: constraints.maxHeight * 0.05,
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      _formKey.currentState!.save();
+                                      loginUser(_email, _password, context);
+                                    }
+                                  },
+                                  child: Text(
+                                    'Login',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 22),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xffFF5403),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                /*ElevatedButton(
                             onPressed: isLoading ? null : () => handleLogin(),
                             // onPressed: () {
                             //   // if (_formKey.currentState!.validate()) {
@@ -345,7 +477,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),*/
-                        ),
+                              ),
                         SizedBox(
                           height: constraints.maxHeight * 0.02,
                         ),
@@ -407,69 +539,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-}
-
-Future<void> loginUser(
-    String email, String password, BuildContext context) async {
-  var url = Uri.parse(
-      'http://192.168.1.100:8000/auth/login'); // Ganti dengan URL endpoint login Anda
-
-  if (email.isNotEmpty && password.isNotEmpty) {
-    // Kirim permintaan login
-    var requestBody = {'email': email, 'password': password};
-
-    var response =
-        await http.post(url, body: json.encode(requestBody), headers: {
-      'Content-Type': 'application/json',
-    });
-
-    print(response.body);
-    print(response.statusCode);
-
-    if (response.statusCode == 200) {
-      var responseData = json.decode(response.body);
-      log(responseData.toString());
-      print(responseData);
-      var token = responseData['jwt'];
-      var role = responseData['user']['role'];
-      log(token);
-      print(token);
-      log(role);
-      print(token);
-
-      // Simpan token JWT dan role di shared_preferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('jwt', token);
-      prefs.setString('role', role);
-
-      // Redirect pengguna ke halaman yang sesuai berdasarkan role
-      if (role == 'customer') {
-        // Navigator.pushReplacementNamed(context, CustomerDashboardScreen());
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return CustomerDashboardScreen();
-            },
-          ),
-        );
-      } else if (role == 'tukang') {
-        // Navigator.pushReplacementNamed(context, '/tukang_dashboard');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return TukangDashboardScreen();
-            },
-          ),
-        );
-      }
-    } else {
-      // Login gagal
-      print('Login gagal');
-    }
-  } else {
-    print("Email dan password harus diisi");
   }
 }
