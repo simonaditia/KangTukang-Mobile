@@ -48,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               backgroundColor: Colors.green,
               textColor: Colors.white,
             );
-            Navigator.pushNamed(context, '/');
+            Navigator.pushNamed(context, '/login');
           } else {
             print("di else");
             Fluttertoast.showToast(
@@ -88,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               backgroundColor: Colors.green,
               textColor: Colors.white,
             );
-            Navigator.pushNamed(context, '/');
+            Navigator.pushNamed(context, '/login');
           } else {
             print("di else");
             Fluttertoast.showToast(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/providers/auth_provider.dart';
 // import 'package:here_sdk/core.dart';
 // import 'package:here_sdk/core.engine.dart';
@@ -41,8 +43,41 @@ void main() {
   }
 }*/
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String? role = "";
+  @override
+  void initState() {
+    super.initState();
+    // _getTokenAndFetchNama();
+    // _fetchNama();
+    // loadUserRole();
+    getUserRole(context);
+  }
+
+  Future<String> getUserRole(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jwt = prefs.getString('jwt') ?? '';
+
+    if (jwt != null && jwt.isNotEmpty) {
+      String role = decodeUserRoleFromJwt(jwt);
+      return role;
+    } else {
+      Navigator.pushReplacementNamed(context, '/login');
+      return ''; // Jika tidak ada token JWT, Anda dapat mengembalikan nilai yang sesuai di sini
+    }
+  }
+
+  String decodeUserRoleFromJwt(String jwt) {
+    var decodedToken = JwtDecoder.decode(jwt);
+    return decodedToken['role'];
+  }
 
   // This widget is the root of your application.
   @override
@@ -60,7 +95,31 @@ class MyApp extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
         routes: {
-          '/': (context) => LoginScreen(),
+          '/': (context) => FutureBuilder<String>(
+                future: getUserRole(context),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Menampilkan indikator loading saat menunggu role pengguna
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    // Menampilkan pesan error jika terjadi kesalahan dalam mengambil role pengguna
+                    return Text('Error retrieving user role');
+                  } else {
+                    if (snapshot.data == '') {
+                      // Jika tidak ada data yang tersedia (misalnya token JWT kosong), arahkan ke halaman login
+                      return LoginScreen();
+                    } else if (snapshot.data == 'customer') {
+                      return CustomerDashboardScreen();
+                    } else if (snapshot.data == 'tukang') {
+                      return TukangDashboardScreen();
+                    } else {
+                      // Jika role tidak valid, arahkan ke halaman login
+                      return LoginScreen();
+                    }
+                  }
+                },
+              ),
+          '/login': (context) => LoginScreen(),
           '/register': (context) => RegisterScreen(),
           '/dashboard-tukang': (context) => TukangDashboardScreen(),
           '/dashboard-customer': (context) => CustomerDashboardScreen(),

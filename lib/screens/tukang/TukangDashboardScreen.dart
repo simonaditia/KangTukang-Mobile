@@ -61,13 +61,14 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
   void logout() async {
     // Menghapus token JWT dan role dari shared_preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt');
-    await prefs.remove('role');
+    await prefs.setString('jwt', '');
+    // await prefs.remove('jwt');
+    // await prefs.remove('role');
 
     // Pindah ke halaman login setelah logout
     Navigator.pushNamedAndRemoveUntil(
       context,
-      '/', // Ganti dengan nama route untuk halaman login
+      '/login', // Ganti dengan nama route untuk halaman login
       (route) => false,
     );
   }

@@ -34,7 +34,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
 }
   }*/
 
-  String? authToken; // Simpan token di dalam variabel ini
+  // String? authToken; // Simpan token di dalam variabel ini
   String? _nama = ""; // Simpan nama pengguna di dalam variabel ini
 
   @override
@@ -151,8 +151,8 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
     return decoded;
   }*/
   /*Future<void> _fetchNama() async {
-    if (authToken != null) {
-      String? fetchedNama = _getNamaFromToken(authToken!);
+    // if (authToken != null) {
+      // String? fetchedNama = _getNamaFromToken(authToken!);
 
       if (fetchedNama != null) {
         setState(() {
@@ -165,13 +165,14 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
   void logout() async {
     // Menghapus token JWT dan role dari shared_preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt');
-    await prefs.remove('role');
+    await prefs.setString('jwt', '');
+    // await prefs.remove('jwt');
+    // await prefs.remove('role');
 
     // Pindah ke halaman login setelah logout
     Navigator.pushNamedAndRemoveUntil(
       context,
-      '/', // Ganti dengan nama route untuk halaman login
+      '/login', // Ganti dengan nama route untuk halaman login
       (route) => false,
     );
   }

@@ -1,12 +1,22 @@
 class FoodModel {
-  String? str_meal;
-  String? str_category;
-  String? str_area;
-  String? str_meal_thumb;
+  String? nama;
+  String? kategori;
+  dynamic email; // Update the type to match your data
+  String? role;
 
-  FoodModel(
-      this.str_meal, this.str_category, this.str_area, this.str_meal_thumb);
+  FoodModel(this.nama, this.kategori, this.email, this.role);
 }
+
+
+// class FoodModel {
+//   String? str_meal;
+//   String? str_category;
+//   String? str_area;
+//   String? str_meal_thumb;
+
+//   FoodModel(
+//       this.str_meal, this.str_category, this.str_area, this.str_meal_thumb);
+// }
 
 
 /*
