@@ -14,12 +14,18 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<bool?> registerCustomer(
-      {String? nama, String? email, String? password}) async {
+      {String? nama,
+      String? email,
+      String? password,
+      double? latitude,
+      double? longitude}) async {
     try {
       UserModel user = await AuthServiceCustomer().register(
         nama: nama,
         email: email,
         password: password,
+        latitude: latitude,
+        longitude: longitude,
       );
       _user = user;
       return true;
@@ -30,12 +36,18 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<bool?> registerTukang(
-      {String? nama, String? email, String? password}) async {
+      {String? nama,
+      String? email,
+      String? password,
+      double? latitude,
+      double? longitude}) async {
     try {
       UserModel user = await AuthServiceTukang().register(
         nama: nama,
         email: email,
         password: password,
+        latitude: latitude,
+        longitude: longitude,
       );
       _user = user;
       return true;

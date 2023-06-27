@@ -12,7 +12,12 @@ class AuthServiceCustomer {
     String? nama,
     String? email,
     String? password,
+    double? latitude,
+    double? longitude,
   }) async {
+    if (latitude == null || longitude == null) {
+      print("Latidue dan Longitude tidak ditemukan");
+    }
     if (nama == null || email == null || password == null) {
       throw Exception('Nama, email, dan password harus diisi');
     }
@@ -23,6 +28,8 @@ class AuthServiceCustomer {
       'nama': nama,
       'email': email,
       'password': password,
+      'latitude': latitude,
+      'longitude': longitude,
     });
 
     // try {
@@ -63,7 +70,12 @@ class AuthServiceTukang {
     String? nama,
     String? email,
     String? password,
+    double? latitude,
+    double? longitude,
   }) async {
+    if (latitude == null || longitude == null) {
+      print("Latidue dan Longitude tidak ditemukan");
+    }
     if (nama == null || email == null || password == null) {
       throw Exception('Nama, email, dan password harus diisi');
     }
@@ -74,6 +86,8 @@ class AuthServiceTukang {
       'nama': nama,
       'email': email,
       'password': password,
+      'latitude': latitude,
+      'longitude': longitude,
     });
 
     var response = await http.post(

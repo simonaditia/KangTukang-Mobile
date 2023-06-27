@@ -23,53 +23,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool isLoading = false;
   bool isLoadingTukang = false;
+  double latitude = 0.0;
+  double longitude = 0.0;
 
-  @override
-  void initState() {
-    super.initState();
-    // getToken();
-    getCurrentLocation();
-  }
-
-  void getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are disabled, handle this case as needed
-      return;
-    }
-
-    // Check for location permission
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Location permission not granted, handle this case as needed
-        return;
-      }
-    }
-
-    // Get the current position (latitude and longitude)
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    // Access the latitude and longitude from the position object
-    double latitude = position.latitude;
-    double longitude = position.longitude;
-
-    // Use these coordinates as needed, for example, display on a map
-    print("Latitude");
-    print(latitude);
-    print("Longitude");
-    print(longitude);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // getToken();
+  //   // getCurrentLocation();
+  // }
 
   @override
   Widget build(BuildContext context) {
+    // void getCurrentLocation() async {
+    void getCurrentLocation(
+        Function(double latitude, double longitude) locationCallback) async {
+      bool serviceEnabled;
+      LocationPermission permission;
+
+      // Check if location services are enabled
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Location services are disabled, handle this case as needed
+        return;
+      }
+
+      // Check for location permission
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          // Location permission not granted, handle this case as needed
+          return;
+        }
+      }
+
+      // Get the current position (latitude and longitude)
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Access the latitude and longitude from the position object
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+      // setState(() {
+      //   latitude = position.latitude;
+      //   longitude = position.longitude;
+      // });
+      // Invoke the callback function with the latitude and longitude values
+      locationCallback(latitude, longitude);
+
+      // Use these coordinates as needed, for example, display on a map
+      print("Latitude");
+      print(latitude);
+      print("Longitude");
+      print(longitude);
+    }
+
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
 
     handleSignupCustomer() async {
@@ -81,32 +91,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
         String email = emailController.text;
         String password = passwordController.text;
         if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-          final result = await authProvider.registerCustomer(
-            nama: nama,
-            email: email,
-            password: password,
-          );
-          if (result != null) {
-            Fluttertoast.showToast(
-              msg: 'Register Berhasil!\n Silahkan Lakukan Login',
-              gravity: ToastGravity.CENTER,
-              toastLength: Toast.LENGTH_LONG,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
+          dynamic result = null;
+          getCurrentLocation((latitude, longitude) async {
+            dynamic result = await authProvider.registerCustomer(
+              nama: nama,
+              email: email,
+              password: password,
+              latitude: latitude,
+              longitude: longitude,
             );
-            Navigator.pushNamed(context, '/login');
-          } else {
-            print("di else");
-            Fluttertoast.showToast(
-              msg: 'Gagal Register Customer!\n Silahkan Register Kembali',
-              gravity: ToastGravity.CENTER,
-              toastLength: Toast.LENGTH_LONG,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-            );
-          }
-          setState(() {
-            isLoading = false;
+            print("Register CUSTOMER");
+            print(latitude);
+            print(longitude);
+            if (result != null) {
+              Fluttertoast.showToast(
+                msg: 'Register Berhasil!\n Silahkan Lakukan Login',
+                gravity: ToastGravity.CENTER,
+                toastLength: Toast.LENGTH_LONG,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+              );
+              Navigator.pushNamed(context, '/login');
+            } else {
+              print("di else");
+              Fluttertoast.showToast(
+                msg: 'Gagal Register Customer!\n Silahkan Register Kembali',
+                gravity: ToastGravity.CENTER,
+                toastLength: Toast.LENGTH_LONG,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+              );
+            }
+            setState(() {
+              isLoading = false;
+            });
           });
         }
       }
@@ -121,32 +139,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
         String email = emailController.text;
         String password = passwordController.text;
         if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-          final result = await authProvider.registerTukang(
-            nama: nama,
-            email: email,
-            password: password,
-          );
-          if (result != null) {
-            Fluttertoast.showToast(
-              msg: 'Register Berhasil!\n Silahkan Lakukan Login',
-              gravity: ToastGravity.CENTER,
-              toastLength: Toast.LENGTH_LONG,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
+          dynamic result = null;
+          getCurrentLocation((latitude, longitude) async {
+            dynamic result = await authProvider.registerTukang(
+              nama: nama,
+              email: email,
+              password: password,
+              latitude: latitude,
+              longitude: longitude,
             );
-            Navigator.pushNamed(context, '/login');
-          } else {
-            print("di else");
-            Fluttertoast.showToast(
-              msg: 'Gagal Register Tukang!\n Silahkan Register Kembali',
-              gravity: ToastGravity.CENTER,
-              toastLength: Toast.LENGTH_LONG,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-            );
-          }
-          setState(() {
-            isLoadingTukang = false;
+            if (result != null) {
+              Fluttertoast.showToast(
+                msg: 'Register Berhasil!\n Silahkan Lakukan Login',
+                gravity: ToastGravity.CENTER,
+                toastLength: Toast.LENGTH_LONG,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+              );
+              Navigator.pushNamed(context, '/login');
+            } else {
+              print("di else");
+              Fluttertoast.showToast(
+                msg: 'Gagal Register Tukang!\n Silahkan Register Kembali',
+                gravity: ToastGravity.CENTER,
+                toastLength: Toast.LENGTH_LONG,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+              );
+            }
+            setState(() {
+              isLoadingTukang = false;
+            });
           });
         }
       }
