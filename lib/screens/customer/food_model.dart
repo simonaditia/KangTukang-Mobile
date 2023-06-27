@@ -5,11 +5,20 @@ class FoodModel {
   dynamic email; // Update the type to match your data
   String? role;
   String? alamat;
+  // double latitude;
+  // double longitude;
+  double distance;
 
   FoodModel(
-      this.ID, this.nama, this.kategori, this.email, this.role, this.alamat);
+      this.ID,
+      this.nama,
+      this.kategori,
+      this.email,
+      this.role,
+      this.alamat,
+      //  this.latitude, this.longitude,
+      this.distance);
 }
-
 
 // class FoodModel {
 //   String? str_meal;
@@ -20,7 +29,6 @@ class FoodModel {
 //   FoodModel(
 //       this.str_meal, this.str_category, this.str_area, this.str_meal_thumb);
 // }
-
 
 /*
 search bisa gk tampil dulu datanya, waktu disearch baru tampil

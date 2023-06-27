@@ -4,6 +4,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tukang_online/providers/auth_provider.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -21,6 +23,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool isLoading = false;
   bool isLoadingTukang = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // getToken();
+    getCurrentLocation();
+  }
+
+  void getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are disabled, handle this case as needed
+      return;
+    }
+
+    // Check for location permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Location permission not granted, handle this case as needed
+        return;
+      }
+    }
+
+    // Get the current position (latitude and longitude)
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    // Access the latitude and longitude from the position object
+    double latitude = position.latitude;
+    double longitude = position.longitude;
+
+    // Use these coordinates as needed, for example, display on a map
+    print("Latitude");
+    print(latitude);
+    print("Longitude");
+    print(longitude);
+  }
 
   @override
   Widget build(BuildContext context) {

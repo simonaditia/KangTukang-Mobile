@@ -111,14 +111,19 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
           if (data is List) {
             // Iterate over the response data and create FoodModel objects
             List<FoodModel> results = data
-                .map((item) => FoodModel(
-                      item['ID'],
-                      item['nama'],
-                      item['kategori'],
-                      item['email'],
-                      item['role'],
-                      item['alamat'],
-                    ))
+                .map(
+                  (item) => FoodModel(
+                    item['ID'],
+                    item['nama'],
+                    item['kategori'],
+                    item['email'],
+                    item['role'],
+                    item['alamat'],
+                    double.parse(item['distance'].toString()),
+                    // item['latitude'],
+                    // item['longitude'],
+                  ),
+                )
                 .toList();
 
             return results;
@@ -131,8 +136,10 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['email'],
               data['role'],
               data['alamat'],
+              double.parse(data['distance'].toString()),
+              // data['latitude'],
+              // data['longitude'],
             );
-
             return [foodModel];
           } else {
             throw Exception('Invalid response data');
@@ -174,6 +181,9 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                       item['email'],
                       item['role'],
                       item['alamat'],
+                      double.parse(item['distance'].toString()),
+                      // item['latitude'],
+                      // item['longitude'],
                     ))
                 .toList();
 
@@ -187,8 +197,10 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['email'],
               data['role'],
               data['alamat'],
+              double.parse(data['distance'].toString()),
+              // data['latitude'],
+              // data['longitude'],
             );
-
             return [foodModel];
           } else {
             throw Exception('Invalid response data');
@@ -311,7 +323,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                                       color: Colors.black26,
                                     )),
                                 trailing: Text(
-                                  "${display_list[index].email}",
+                                  "${display_list[index].distance}KM",
                                   style: TextStyle(color: Colors.amber),
                                 ),
                                 leading: Text('${display_list[index].role!}',

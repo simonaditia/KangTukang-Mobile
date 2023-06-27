@@ -65,6 +65,9 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
             data['email'],
             data['role'],
             data['alamat'],
+            data['distance'],
+            // data['latitude'],
+            // data['longitude'],
           );
 
           setState(() {
