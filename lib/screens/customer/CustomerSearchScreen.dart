@@ -18,6 +18,7 @@ class CustomerSearchScreen extends StatefulWidget {
 
 class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
   String token = '';
+  bool isLoading = false;
 
   static List<FoodModel> main_food_list = [
     // FoodModel("Adit Pieter", "Renovasi", "1.1KM", "assets/images/logo.png"),
@@ -218,6 +219,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
 
   void updateList(String value, String token) {
     setState(() {
+      isLoading = true;
       if (value.isEmpty) {
         display_list = [];
       } else {
@@ -226,6 +228,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
           fetchDataByName(nama, token).then((data) {
             setState(() {
               display_list = data;
+              isLoading = false;
             });
           }).catchError((error) {
             print('Error fetching data by name: $error');
@@ -234,6 +237,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
           fetchDataByCategory(value, token).then((data) {
             setState(() {
               display_list = data;
+              isLoading = false;
             });
           }).catchError((error) {
             print('Error fetching data by categoryname: $error');
@@ -288,89 +292,101 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                 ),
               ),
               SizedBox(height: 20.0),
-              Expanded(
-                  child: display_list.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: display_list.length,
-                          itemBuilder: ((context, index) => ListTile(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        print(display_list[index].ID!);
-                                        print(display_list[index].nama!);
-                                        print(display_list[index].kategori!);
-                                        return CustomerPesanScreen(
-                                            tukangId: display_list[index]
-                                                .ID
-                                                .toString());
-                                      },
-                                    ),
-                                  );
-                                },
-                                contentPadding: EdgeInsets.all(8.0),
-                                title: Text(
-                                  display_list[index].nama!,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                    '${display_list[index].kategori!} ${display_list[index].ID!}',
-                                    style: TextStyle(
-                                      color: Colors.black26,
-                                    )),
-                                trailing: Text(
-                                  "${display_list[index].distance}KM",
-                                  style: TextStyle(color: Colors.amber),
-                                ),
-                                leading: Text('${display_list[index].role!}',
-                                    style: TextStyle(
-                                      color: Colors.black26,
-                                    )),
-                                // leading: Image.asset(display_list[index].image!)
-                                // leading: Image.network(
-                                //     display_list[index].str_meal_thumb!),
-                              )),
-                        )
-                      : searchController.text.isNotEmpty
-                          ? Center(
-                              child: Text(
-                              "No Result found",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.bold),
-                            ))
-                          : Center(
-                              child: RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 34, 33, 33),
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text:
-                                          "Ingin melakukan pencarian Nama Tukang?\n",
-                                    ),
-                                    TextSpan(
-                                      text: "Ketik:",
+              isLoading
+                  ? Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 3,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xffFF5403)),
+                        ),
+                      ))
+                  : Expanded(
+                      child: display_list.isNotEmpty
+                          ? ListView.builder(
+                              itemCount: display_list.length,
+                              itemBuilder: ((context, index) => ListTile(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            print(display_list[index].ID!);
+                                            print(display_list[index].nama!);
+                                            print(
+                                                display_list[index].kategori!);
+                                            return CustomerPesanScreen(
+                                                tukangId: display_list[index]
+                                                    .ID
+                                                    .toString());
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    contentPadding: EdgeInsets.all(8.0),
+                                    title: Text(
+                                      display_list[index].nama!,
                                       style: TextStyle(
-                                        fontSize: 16.0,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    TextSpan(
-                                      text: "\nnama:namatukang",
+                                    subtitle: Text(
+                                        '${display_list[index].kategori!} ${display_list[index].ID!}',
+                                        style: TextStyle(
+                                          color: Colors.black26,
+                                        )),
+                                    trailing: Text(
+                                      "${display_list[index].distance}KM",
+                                      style: TextStyle(color: Colors.amber),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            )),
+                                    leading:
+                                        Text('${display_list[index].role!}',
+                                            style: TextStyle(
+                                              color: Colors.black26,
+                                            )),
+                                    // leading: Image.asset(display_list[index].image!)
+                                    // leading: Image.network(
+                                    //     display_list[index].str_meal_thumb!),
+                                  )),
+                            )
+                          : searchController.text.isNotEmpty
+                              ? Center(
+                                  child: Text(
+                                  "No Result found",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 22.0,
+                                      fontWeight: FontWeight.bold),
+                                ))
+                              : Center(
+                                  child: RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        color: Color.fromARGB(255, 34, 33, 33),
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text:
+                                              "Ingin melakukan pencarian Nama Tukang?\n",
+                                        ),
+                                        TextSpan(
+                                          text: "Ketik:",
+                                          style: TextStyle(
+                                            fontSize: 16.0,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: "\nnama:namatukang",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )),
             ],
           ),
         ),
