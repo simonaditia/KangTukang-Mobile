@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/models/user_model.dart';
@@ -11,6 +13,27 @@ class AuthProvider with ChangeNotifier {
   set user(UserModel user) {
     _user = user;
     notifyListeners();
+  }
+
+  Future<dynamic> checkEmailAvailability(String email) async {
+    final response = await http.get(Uri.parse(
+        'http://192.168.1.100:8000/api/v1/checkIsAvailableEmail?email=$email'));
+
+    if (response.statusCode == 200) {
+      // Sukses mendapatkan respons dari API
+      return {'status': 'success', 'available': true};
+    } else if (response.statusCode == 400) {
+      // Email sudah ada
+      return {
+        'status': 'error',
+        'message': 'Email sudah digunakan',
+      };
+    } else {
+      // Gagal mendapatkan respons dari API, tangani sesuai kebutuhan Anda
+      final errorMessage = response.body ?? 'Gagal memeriksa email';
+      print('Error message: $errorMessage');
+      throw Exception(errorMessage);
+    }
   }
 
   Future<bool?> registerCustomer(

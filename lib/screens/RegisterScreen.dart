@@ -92,40 +92,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
         String password = passwordController.text;
         if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
           dynamic result = null;
-          getCurrentLocation((latitude, longitude) async {
-            dynamic result = await authProvider.registerCustomer(
-              nama: nama,
-              email: email,
-              password: password,
-              latitude: latitude,
-              longitude: longitude,
+          // Kirim permintaan ke API untuk memeriksa email
+          dynamic checkResult =
+              await authProvider.checkEmailAvailability(email);
+
+          if (checkResult['status'] == 'success' &&
+              checkResult['available'] == true) {
+            // Email tersedia, lanjutkan proses registrasi
+            getCurrentLocation((latitude, longitude) async {
+              dynamic result = await authProvider.registerCustomer(
+                nama: nama,
+                email: email,
+                password: password,
+                latitude: latitude,
+                longitude: longitude,
+              );
+              print("Register CUSTOMER");
+              print(latitude);
+              print(longitude);
+              if (result != null && checkResult['status'] == 'success') {
+                Fluttertoast.showToast(
+                  msg: 'Register Berhasil!\n Silahkan Lakukan Login',
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                );
+                Navigator.pushNamed(context, '/login');
+              } else {
+                print("di else");
+                String errorMessage = result != null
+                    ? checkResult['error']
+                    : 'Gagal Register Customer!\n Silahkan Register Kembali';
+                Fluttertoast.showToast(
+                  msg: errorMessage,
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                );
+              }
+              setState(() {
+                isLoading = false;
+              });
+            });
+          } else {
+            // Email sudah ada, tampilkan peringatan
+            Fluttertoast.showToast(
+              msg: 'Email sudah digunakan. Gunakan email lain.',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_LONG,
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
             );
-            print("Register CUSTOMER");
-            print(latitude);
-            print(longitude);
-            if (result != null) {
-              Fluttertoast.showToast(
-                msg: 'Register Berhasil!\n Silahkan Lakukan Login',
-                gravity: ToastGravity.CENTER,
-                toastLength: Toast.LENGTH_LONG,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-              );
-              Navigator.pushNamed(context, '/login');
-            } else {
-              print("di else");
-              Fluttertoast.showToast(
-                msg: 'Gagal Register Customer!\n Silahkan Register Kembali',
-                gravity: ToastGravity.CENTER,
-                toastLength: Toast.LENGTH_LONG,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-              );
-            }
+
             setState(() {
               isLoading = false;
             });
-          });
+          }
         }
       }
     }
@@ -140,37 +164,59 @@ class _RegisterScreenState extends State<RegisterScreen> {
         String password = passwordController.text;
         if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
           dynamic result = null;
-          getCurrentLocation((latitude, longitude) async {
-            dynamic result = await authProvider.registerTukang(
-              nama: nama,
-              email: email,
-              password: password,
-              latitude: latitude,
-              longitude: longitude,
+          dynamic checkResult =
+              await authProvider.checkEmailAvailability(email);
+
+          if (checkResult['status'] == 'success' &&
+              checkResult['available'] == true) {
+            getCurrentLocation((latitude, longitude) async {
+              dynamic result = await authProvider.registerTukang(
+                nama: nama,
+                email: email,
+                password: password,
+                latitude: latitude,
+                longitude: longitude,
+              );
+              if (result != null && checkResult['status'] == 'success') {
+                Fluttertoast.showToast(
+                  msg: 'Register Berhasil!\n Silahkan Lakukan Login',
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                );
+                Navigator.pushNamed(context, '/login');
+              } else {
+                String errorMessage = result != null
+                    ? checkResult['error']
+                    : 'Gagal Register Tukang!\n Silahkan Register Kembali';
+                print("di else");
+                Fluttertoast.showToast(
+                  msg: errorMessage,
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                );
+              }
+              setState(() {
+                isLoadingTukang = false;
+              });
+            });
+          } else {
+            // Email sudah ada, tampilkan peringatan
+            Fluttertoast.showToast(
+              msg: 'Email sudah digunakan. Gunakan email lain.',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_LONG,
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
             );
-            if (result != null) {
-              Fluttertoast.showToast(
-                msg: 'Register Berhasil!\n Silahkan Lakukan Login',
-                gravity: ToastGravity.CENTER,
-                toastLength: Toast.LENGTH_LONG,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-              );
-              Navigator.pushNamed(context, '/login');
-            } else {
-              print("di else");
-              Fluttertoast.showToast(
-                msg: 'Gagal Register Tukang!\n Silahkan Register Kembali',
-                gravity: ToastGravity.CENTER,
-                toastLength: Toast.LENGTH_LONG,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-              );
-            }
+
             setState(() {
               isLoadingTukang = false;
             });
-          });
+          }
         }
       }
     }
