@@ -36,42 +36,41 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
 
   // String? authToken; // Simpan token di dalam variabel ini
   String? _nama = ""; // Simpan nama pengguna di dalam variabel ini
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
     super.initState();
     // _getTokenAndFetchNama();
     // _fetchNama();
-    loadUserName();
+    loadUserNama();
   }
 
-  Future<void> loadUserName() async {
+  Future<void> loadUserNama() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String jwt = prefs.getString('jwt') ?? '';
+    String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    int idUser = decodedToken['id'] as int;
+    final response = await http.get(
+      Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-    // Decode token JWT untuk mendapatkan nama pengguna
-    // Misalnya, jika JWT berisi informasi pengguna seperti {'name': 'John Doe', 'role': 'customer'}
-    // maka kita dapat mengambil nilai 'name' dari token tersebut
-    // Kamu perlu menyesuaikan dengan struktur JWT yang kamu gunakan
-    String nama = decodeUserNameFromJwt(jwt);
-
-    setState(() {
-      _nama = nama;
-    });
-  }
-
-  String decodeUserNameFromJwt(String jwt) {
-    // Lakukan dekode JWT untuk mendapatkan nama pengguna
-    // Kamu perlu menggunakan library atau metode yang sesuai untuk dekode JWT
-    // Misalnya, menggunakan package jwt_decode: https://pub.dev/packages/jwt_decode
-    // Contoh sederhana:
-    // var decodedToken = jwtDecode(jwt);
-    // return decodedToken['name'];
-
-    // Contoh sederhana tanpa dekode JWT (nama langsung diambil dari JWT)
-    // return jwt; // Ubah dengan dekode JWT yang sesuai
-    var decodedToken = JwtDecoder.decode(jwt);
-    return decodedToken['nama'];
+    if (response.statusCode == 200) {
+      // Menangani respons yang berhasil
+      var responseData = response.body;
+      print(responseData);
+      var decodedData = json.decode(responseData);
+      setState(() {
+        userData = decodedData['data'];
+        print(userData);
+      });
+    } else {
+      // Menangani respons yang gagal
+      throw Exception('Gagal mengambil data dari API');
+    }
   }
 
   // Future<void> _getTokenAndFetchNama() async {
@@ -181,20 +180,20 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            appBar: AppBar(
-              leading: Padding(
-                padding: const EdgeInsets.fromLTRB(15.0, 0, 0, 0),
-                child: Image(
-                  image: AssetImage("assets/images/logo.png"),
-                ),
-              ),
-              // leadingWidth: 50,
-              title: Text(
-                "Kang Tukang",
-                style: TextStyle(color: Colors.black),
-              ),
-              actions: <Widget>[
-                /*IconButton(
+      appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(15.0, 0, 0, 0),
+          child: Image(
+            image: AssetImage("assets/images/logo.png"),
+          ),
+        ),
+        // leadingWidth: 50,
+        title: Text(
+          "Kang Tukang",
+          style: TextStyle(color: Colors.black),
+        ),
+        actions: <Widget>[
+          /*IconButton(
                   icon: Icon(Icons.edit_note),
                   onPressed: () {
                     Navigator.push(
@@ -208,72 +207,72 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                   },
                   color: Colors.black,
                 ),*/
-                PopupMenuButton(
-                    // add icon, by default "3 dot" icon
-                    // icon: Icon(Icons.book)
-                    icon: Icon(Icons.more_vert, color: Color(0xffFF5403)),
-                    itemBuilder: (context) {
-                      return [
-                        PopupMenuItem<int>(
-                          value: 0,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.edit_note,
-                                color: Color(0xffFF5403),
-                              ),
-                              Text(" Status Pesanan"),
-                            ],
-                          ),
+          PopupMenuButton(
+              // add icon, by default "3 dot" icon
+              // icon: Icon(Icons.book)
+              icon: Icon(Icons.more_vert, color: Color(0xffFF5403)),
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem<int>(
+                    value: 0,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.edit_note,
+                          color: Color(0xffFF5403),
                         ),
-                        PopupMenuItem<int>(
-                          value: 1,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.manage_accounts,
-                                color: Color(0xffFF5403),
-                              ),
-                              Text(" Edit Profile"),
-                            ],
-                          ),
+                        Text(" Status Pesanan"),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<int>(
+                    value: 1,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.manage_accounts,
+                          color: Color(0xffFF5403),
                         ),
-                        PopupMenuItem<int>(
-                          value: 2,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.logout,
-                                color: Color(0xffFF5403),
-                              ),
-                              Text(" Log Out"),
-                            ],
-                          ),
-                          onTap: logout,
+                        Text(" Edit Profile"),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<int>(
+                    value: 2,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.logout,
+                          color: Color(0xffFF5403),
                         ),
-                      ];
-                    },
-                    onSelected: (value) {
-                      if (value == 0) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return CustomerPesananScreen();
-                            },
-                          ),
-                        );
-                      } else if (value == 1) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return CustomerProfileScreen();
-                            },
-                          ),
-                        );
-                      }
-                      /*else if (value == 2) {
+                        Text(" Log Out"),
+                      ],
+                    ),
+                    onTap: logout,
+                  ),
+                ];
+              },
+              onSelected: (value) {
+                if (value == 0) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CustomerPesananScreen();
+                      },
+                    ),
+                  );
+                } else if (value == 1) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CustomerProfileScreen();
+                      },
+                    ),
+                  );
+                }
+                /*else if (value == 2) {
                         Navigator.pop(
                           context,
                           MaterialPageRoute(
@@ -283,18 +282,19 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                           ),
                         );
                       }*/
-                      // else if (value == 2) {
-                      //   print("Logout menu is selected.");
-                      // }
-                    }),
-              ],
-              flexibleSpace: Container(
-                color: Colors.white,
-              ),
-              elevation: 0,
-              // automaticallyImplyLeading: false,
-            ),
-            body: ListView(
+                // else if (value == 2) {
+                //   print("Logout menu is selected.");
+                // }
+              }),
+        ],
+        flexibleSpace: Container(
+          color: Colors.white,
+        ),
+        elevation: 0,
+        // automaticallyImplyLeading: false,
+      ),
+      body: userData != null
+          ? ListView(
               // crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisSize: MainAxisSize.min,
               // mainAxisSize: MainAxisSize.max,
@@ -317,7 +317,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Hi, $_nama!",
+                                    "Hi,  ${userData!['nama']}!",
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -670,6 +670,12 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                       ],
                     )),
               ],
-            )));
+            )
+          : Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xffFF5403)),
+              ),
+            ),
+    ));
   }
 }
