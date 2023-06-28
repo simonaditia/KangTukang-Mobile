@@ -10,6 +10,8 @@ import 'package:tukang_online/screens/tukang/TukangPesananScreen.dart';
 import 'package:tukang_online/screens/tukang/TukangProfileScreen.dart';
 import 'package:tukang_online/screens/tukang/TukangTentangAppScreen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class TukangDashboardScreen extends StatefulWidget {
   const TukangDashboardScreen({super.key});
@@ -27,6 +29,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
     // _getTokenAndFetchNama();
     // _fetchNama();
     loadUserName();
+    fetchDataStatusMenunggu();
   }
 
   Future<void> loadUserName() async {
@@ -71,6 +74,98 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
       '/login', // Ganti dengan nama route untuk halaman login
       (route) => false,
     );
+  }
+
+  List<dynamic> dataSDikerjakan = []; // Variabel untuk menyimpan data dari API
+  List<dynamic> dataSSelesai = []; // Variabel untuk menyimpan data dari API
+  List<dynamic> dataSMenunggu = []; // Variabel untuk menyimpan data dari API
+  // var random = Random();
+
+  Future<void> fetchDataStatusMenunggu() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    int idTukang = decodedToken['id'] as int;
+    final String apiUrlSMenunggu =
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangMenunggu?id_tukang=$idTukang';
+
+    print("TOKEN DI Pesanan screen");
+    print(token);
+    final responseSMenunggu = await http.get(
+      Uri.parse(apiUrlSMenunggu),
+      headers: {
+        'Authorization':
+            'Bearer $token', // Ganti <your_jwt_token> dengan token JWT yang valid
+      },
+    );
+
+    if (responseSMenunggu.statusCode == 200) {
+      final jsonData = jsonDecode(responseSMenunggu.body);
+      final List<dynamic> responseSMenungguData =
+          jsonData['data']; // Mengakses array 'data'
+
+      setState(() {
+        dataSMenunggu = responseSMenungguData;
+      });
+    } else {
+      throw Exception('Failed to fetch data from API');
+    }
+  }
+
+  void _refreshData() {
+    // Tambahkan fungsi ini untuk mengambil data baru
+    // dari server menggunakan API atau sumber data lainnya
+    setState(() {
+      // Contoh penggunaan data sementara
+      dataSMenunggu = List<dynamic>.empty(growable: true);
+    });
+  }
+
+  Future<void> _rejectOrder(int orderId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    int idTukang = decodedToken['id'] as int;
+
+    final String response =
+        'http://192.168.1.100:8000/api/v1/orders/rejectOrderByTukang/$orderId';
+
+    final responsePost = await http.put(
+      Uri.parse(response),
+      headers: {
+        'Authorization':
+            'Bearer $token', // Ganti <your_jwt_token> dengan token JWT yang valid
+      },
+    );
+
+    // final response = await http.post(
+    //   'http://localhost:8000/api/v1/orders/rejectOrderByTukang/$orderId',
+    // );
+    if (responsePost.statusCode == 200) {
+      fetchDataStatusMenunggu();
+    }
+  }
+
+  Future<void> _acceptOrder(int orderId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    int idTukang = decodedToken['id'] as int;
+
+    final String response =
+        'http://192.168.1.100:8000/api/v1/orders/accOrderByTukang/$orderId';
+
+    final responsePost = await http.put(
+      Uri.parse(response),
+      headers: {
+        'Authorization':
+            'Bearer $token', // Ganti <your_jwt_token> dengan token JWT yang valid
+      },
+    );
+
+    if (responsePost.statusCode == 200) {
+      fetchDataStatusMenunggu();
+    }
   }
 
   @override
@@ -228,122 +323,167 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                           padding: EdgeInsets.only(left: 5),
                           child: Text("Daftar Pesanan")),
                       Container(
-                        margin: EdgeInsets.only(top: 10),
-                        child: Card(
-                          child: SizedBox(
-                            width: 370,
-                            height: 190,
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Spacer(flex: 1),
-                                      Column(
-                                        children: [
-                                          Icon(
-                                            Icons.house_siding,
-                                            color: Color(0xffFF5403),
-                                            size: 30.0,
+                          margin: EdgeInsets.only(top: 10),
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              _refreshData();
+                            },
+                            child: SingleChildScrollView(
+                              child: Column(children: [
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    // physics: NeverScrollableScrollPhysics(),
+                                    itemCount: dataSMenunggu.length,
+                                    itemBuilder: (context, index) {
+                                      final item = dataSMenunggu[index];
+                                      return Card(
+                                        child: SizedBox(
+                                          width: 370,
+                                          height: 190,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                margin: EdgeInsets.only(
+                                                    top: 10, bottom: 10),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    Spacer(flex: 1),
+                                                    Column(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.house_siding,
+                                                          color:
+                                                              Color(0xffFF5403),
+                                                          size: 30.0,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      padding:
+                                                          EdgeInsets.all(10),
+                                                    ),
+                                                    // Spacer(flex: 1),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          item['nama_customer'],
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10),
+                                                          child: Text(
+                                                            item[
+                                                                'detail_perbaikan'],
+                                                            style: TextStyle(
+                                                                fontSize: 14),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Spacer(flex: 1),
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 10),
+                                                child: Text(
+                                                  "Lama Pengerjaan: 2 hari",
+                                                  style:
+                                                      TextStyle(fontSize: 14),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 10),
+                                                child: Center(
+                                                  child: Text(
+                                                      "Total Biaya: Rp.300.000"),
+                                                ),
+                                              ),
+                                              Container(
+                                                  padding: EdgeInsets.all(10),
+                                                  child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        ElevatedButton.icon(
+                                                          icon: Icon(
+                                                              Icons.close,
+                                                              color: Color(
+                                                                  0xffFF5403)),
+                                                          label: Text("Tolak"),
+                                                          onPressed: () {
+                                                            _rejectOrder(
+                                                                item['ID']);
+                                                            // Navigator.push(
+                                                            //   context,
+                                                            //   MaterialPageRoute(
+                                                            //     builder: (context) {
+                                                            //       return CustomerTentangAppScreen();
+                                                            //     },
+                                                            //   ),
+                                                            // );
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            foregroundColor:
+                                                                Colors.black,
+                                                            minimumSize:
+                                                                Size(130, 40),
+                                                          ),
+                                                        ),
+                                                        ElevatedButton.icon(
+                                                          icon: Icon(Icons.done,
+                                                              color: Color(
+                                                                  0xffFF5403)),
+                                                          label: Text("Terima"),
+                                                          onPressed: () {
+                                                            _acceptOrder(
+                                                                item['ID']);
+                                                            // Navigator.push(
+                                                            //   context,
+                                                            //   MaterialPageRoute(
+                                                            //     builder: (context) {
+                                                            //       return CustomerTentangAppScreen();
+                                                            //     },
+                                                            //   ),
+                                                            // );
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            foregroundColor:
+                                                                Colors.black,
+                                                            minimumSize:
+                                                                Size(130, 40),
+                                                          ),
+                                                        ),
+                                                      ]))
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(10),
-                                      ),
-                                      // Spacer(flex: 1),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Adit Joko",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(top: 10),
-                                            child: Text(
-                                              "Renovasi Rumah",
-                                              style: TextStyle(fontSize: 14),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Spacer(flex: 1),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: Text(
-                                    "Lama Pengerjaan: 2 hari",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: Center(
-                                    child: Text("Total Biaya: Rp.300.000"),
-                                  ),
-                                ),
-                                Container(
-                                    padding: EdgeInsets.all(10),
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          ElevatedButton.icon(
-                                            icon: Icon(Icons.close,
-                                                color: Color(0xffFF5403)),
-                                            label: Text("Tolak"),
-                                            onPressed: () {
-                                              // Navigator.push(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //     builder: (context) {
-                                              //       return CustomerTentangAppScreen();
-                                              //     },
-                                              //   ),
-                                              // );
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.white,
-                                              foregroundColor: Colors.black,
-                                              minimumSize: Size(130, 40),
-                                            ),
-                                          ),
-                                          ElevatedButton.icon(
-                                            icon: Icon(Icons.done,
-                                                color: Color(0xffFF5403)),
-                                            label: Text("Terima"),
-                                            onPressed: () {
-                                              // Navigator.push(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //     builder: (context) {
-                                              //       return CustomerTentangAppScreen();
-                                              //     },
-                                              //   ),
-                                              // );
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.white,
-                                              foregroundColor: Colors.black,
-                                              minimumSize: Size(130, 40),
-                                            ),
-                                          ),
-                                        ]))
-                              ],
+                                        ),
+                                      );
+                                    }),
+                              ]),
                             ),
-                          ),
-                        ),
-                      ),
+                          )),
                     ],
                   )),
               Expanded(

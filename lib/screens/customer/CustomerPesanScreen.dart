@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/customer/CustomerMapScreen.dart';
+import 'package:tukang_online/screens/customer/CustomerPesananScreen.dart';
 import 'package:tukang_online/screens/customer/CustomerSearchScreen.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +26,9 @@ class CustomerPesanScreen extends StatefulWidget {
 class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
   String token = '';
   DateTime selectDate = DateTime.now();
+  TextEditingController detailPerbaikanController =
+      TextEditingController(text: '');
+  String alamat = '';
 
   FoodModel? tukangData;
 
@@ -84,6 +90,52 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
       }
     } catch (error) {
       throw Exception('Error fetching tukang data: $error');
+    }
+  }
+
+  Future<void> postOrderData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jwt = prefs.getString('jwt') ?? '';
+    var idCustomer = JwtDecoder.decode(jwt)['id'].toString();
+    var idTukang = tukangData!.ID;
+
+    var url = Uri.parse(
+        'http://192.168.1.100:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $jwt'
+    };
+    var body = jsonEncode({
+      'detail_perbaikan': detailPerbaikanController.text,
+      'waktu_perbaikan': '2023-06-27 13:44:00',
+      'status': 'Menunggu Konfirmasi',
+      'Alamat': tukangData!.alamat
+    });
+
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        // Tindakan yang diambil saat menerima respons sukses
+        Fluttertoast.showToast(
+          msg: 'Pemesanan tukang berhasil. Mohon tunggu konfirmasi tukang.',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CustomerPesananScreen(),
+          ),
+        );
+      } else {
+        throw Exception('Failed to post order data');
+      }
+    } catch (error) {
+      throw Exception('Error posting order data: $error');
     }
   }
 
@@ -180,6 +232,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                     Container(
                       padding: EdgeInsets.only(left: 20, right: 20),
                       child: TextField(
+                        controller: detailPerbaikanController,
                         style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
                         decoration: InputDecoration(
                           filled: true,
@@ -329,14 +382,15 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18)),
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return CustomerMapScreen();
-                              },
-                            ),
-                          );
+                          postOrderData();
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) {
+                          //       return CustomerMapScreen();
+                          //     },
+                          //   ),
+                          // );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xffFF5403),
