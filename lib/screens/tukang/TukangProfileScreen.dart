@@ -67,7 +67,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
         _emailController.text = userData!['email'];
         _noTelpController.text = userData!['no_telp'];
         _kategoriController.text = userData!['kategori'];
-        _biayaController.text = userData!['biaya'];
+        _biayaController.text = userData!['biaya'].toString();
         _alamatController.text = userData!['alamat'];
       });
     } else {

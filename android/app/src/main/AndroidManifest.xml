@@ -21,9 +21,9 @@
       </intent>
     </queries>
    <application
-        android:label="tukang_online"
+        android:label="KangTukang"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/logo">
         <!-- <meta-data android:name="com.here.sdk.access_key_id" android:value="2MWr5nhadSBUvYYJEZVgpA">
         <meta-data android:name="com.here.sdk.access_key_secret" android:value="pi14N0N5P-otav3SjsN7x571t5w4G6rw7UYmwz_yrAlgd9LitaCiknkhg7bUYZBJe1ZHj7GOcOrPwkdq1aLeqA"> -->
         <activity

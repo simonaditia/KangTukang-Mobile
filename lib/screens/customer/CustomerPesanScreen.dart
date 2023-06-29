@@ -31,11 +31,13 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
   String alamat = '';
 
   FoodModel? tukangData;
+  Map<String, dynamic>? userData;
 
   @override
   void initState() {
     super.initState();
     getToken();
+    // loadCustomerLatitudeLongitude();
   }
 
   void getToken() async {
@@ -47,6 +49,21 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     });
     fetchTukangData(token);
   }
+
+  // Future<void> executeOrderProcess() async {
+  //   try {
+  //     await Future.wait([
+  //       fetchTukangData(token),
+  //       loadCustomerLatitudeLongitude(),
+  //       postOrderData(),
+  //     ]);
+
+  //     // Kode selanjutnya yang perlu dijalankan setelah kedua fungsi selesai
+  //   } catch (error) {
+  //     // Tangani error yang terjadi
+  //     print('Error executing order process: $error');
+  //   }
+  // }
 
   Future<void> fetchTukangData(String token) async {
     var url = Uri.parse(
@@ -93,49 +110,98 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     }
   }
 
+  Future<void> loadCustomerLatitudeLongitude() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    int idUser = decodedToken['id'] as int;
+    final response = await http.get(
+      Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Menangani respons yang berhasil
+      var responseData = response.body;
+      // print(responseData);
+      var decodedData = json.decode(responseData);
+      setState(() {
+        userData = decodedData['data'];
+        // print(userData);
+      });
+    } else {
+      // Menangani respons yang gagal
+      throw Exception('Gagal mengambil data dari API');
+    }
+  }
+
   Future<void> postOrderData() async {
+    await fetchTukangData(token);
+    await loadCustomerLatitudeLongitude();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jwt = prefs.getString('jwt') ?? '';
     var idCustomer = JwtDecoder.decode(jwt)['id'].toString();
     var idTukang = tukangData!.ID;
+    if (tukangData != null && userData != null) {
+      var customerLatitude = userData!['latitude'];
+      var customerLongitude = userData!['longitude'];
+      var customerNama = userData!['nama'];
+      var tukangNama = tukangData!.nama;
+      var tukangKategori = tukangData!.kategori;
+      print(customerLatitude);
+      print(customerLatitude.runtimeType);
+      print(customerLongitude);
+      print(customerLongitude.runtimeType);
 
-    var url = Uri.parse(
-        'http://192.168.1.100:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $jwt'
-    };
-    var body = jsonEncode({
-      'detail_perbaikan': detailPerbaikanController.text,
-      'waktu_perbaikan': '2023-06-27 13:44:00',
-      'status': 'Menunggu Konfirmasi',
-      'Alamat': tukangData!.alamat
-    });
+      var url = Uri.parse(
+          'http://192.168.1.100:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwt'
+      };
+      var body = jsonEncode({
+        'detail_perbaikan': detailPerbaikanController.text,
+        'waktu_perbaikan': '2023-06-27 13:44:00',
+        'status': 'Menunggu Konfirmasi',
+        'Alamat': tukangData!.alamat,
+        'latitude_customer': customerLatitude,
+        'longitude_customer': customerLongitude,
+        'nama_customer': customerNama,
+        'nama_tukang': tukangNama,
+        'kategori_tukang': tukangKategori,
+      });
 
-    try {
-      var response = await http.post(url, headers: headers, body: body);
+      try {
+        var response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 200) {
-        var responseData = json.decode(response.body);
-        // Tindakan yang diambil saat menerima respons sukses
-        Fluttertoast.showToast(
-          msg: 'Pemesanan tukang berhasil. Mohon tunggu konfirmasi tukang.',
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CustomerPesananScreen(),
-          ),
-        );
-      } else {
-        throw Exception('Failed to post order data');
+        if (response.statusCode == 200) {
+          var responseData = json.decode(response.body);
+          // Tindakan yang diambil saat menerima respons sukses
+          Fluttertoast.showToast(
+            msg: 'Pemesanan tukang berhasil. Mohon tunggu konfirmasi tukang.',
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomerPesananScreen(),
+            ),
+          );
+        } else {
+          throw Exception('Failed to post order data');
+        }
+      } catch (error) {
+        throw Exception('Error posting order data: $error');
       }
-    } catch (error) {
-      throw Exception('Error posting order data: $error');
+
+      // Lakukan operasi dengan tukangNama dan userLatitude di sini
+    } else {
+      throw Exception('Tukang data or user data is null');
     }
   }
 
