@@ -198,10 +198,10 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     fetchDataUser();
     fetchDataStatusMenunggu();
     fetchDataStatusDikerjakan();
-    // refreshDataStatusDikerjakan();
     fetchDataStatusSelesai();
-    // _refreshData();
   }
+  // refreshDataStatusDikerjakan();
+  // _refreshData();
 
   void _launchGoogleMaps(double customerLat, double customerLng,
       double tukangLat, double tukangLng) async {
@@ -294,7 +294,11 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     // );
     if (responsePost.statusCode == 200) {
       fetchDataStatusMenunggu();
+      setState(() {
+        dataSMenunggu.removeWhere((item) => item['ID'] == orderId);
+      });
     }
+    fetchDataStatusSelesai();
   }
 
   Future<void> _acceptOrder(int orderId) async {
@@ -319,6 +323,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
       setState(() {
         dataSMenunggu.removeWhere((item) => item['ID'] == orderId);
       });
+      fetchDataStatusDikerjakan();
     }
   }
 
@@ -344,6 +349,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
       setState(() {
         dataSDikerjakan.removeWhere((item) => item['ID'] == orderId);
       });
+      fetchDataStatusSelesai();
     }
   }
 
