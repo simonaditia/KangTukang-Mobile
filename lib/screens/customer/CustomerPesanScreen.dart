@@ -94,6 +94,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
             data['role'],
             data['alamat'],
             double.parse(data['distance'].toString()),
+            double.parse(data['biaya'].toString()),
             // data['latitude'],
             // data['longitude'],
           );
@@ -152,10 +153,15 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
       var customerNama = userData!['nama'];
       var tukangNama = tukangData!.nama;
       var tukangKategori = tukangData!.kategori;
+      var tukangBiaya = tukangData!.biaya;
       print(customerLatitude);
       print(customerLatitude.runtimeType);
       print(customerLongitude);
       print(customerLongitude.runtimeType);
+
+      int differenceInDays =
+          selectedDateTimeAkhir.difference(selectedDateTimeAwal).inDays + 1;
+      double totalBiaya = differenceInDays * tukangBiaya;
 
       var url = Uri.parse(
           'http://192.168.1.100:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
@@ -174,6 +180,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
         'nama_customer': customerNama,
         'nama_tukang': tukangNama,
         'kategori_tukang': tukangKategori,
+        'total_biaya': totalBiaya
       });
       // jadi kalau tukang nya sedang ada jadawl
       // tukang dengan status sedang bekerja tidak akan
@@ -293,7 +300,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                               Container(
                                 padding: EdgeInsets.only(top: 10),
                                 child: Text(
-                                  "Biaya Tukang: Rp.100.000",
+                                  "Biaya Tukang: Rp.${tukangData!.biaya}/hr",
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),

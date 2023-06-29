@@ -8,6 +8,7 @@ class FoodModel {
   // double latitude;
   // double longitude;
   double distance;
+  double biaya;
 
   FoodModel(
       this.ID,
@@ -17,7 +18,8 @@ class FoodModel {
       this.role,
       this.alamat,
       //  this.latitude, this.longitude,
-      this.distance);
+      this.distance,
+      this.biaya);
 }
 
 // class FoodModel {

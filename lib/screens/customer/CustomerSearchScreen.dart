@@ -121,6 +121,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                     item['role'],
                     item['alamat'],
                     double.parse(item['distance'].toString()),
+                    double.parse(item['biaya'].toString()),
                     // item['latitude'],
                     // item['longitude'],
                   ),
@@ -138,6 +139,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['role'],
               data['alamat'],
               double.parse(data['distance'].toString()),
+              double.parse(data['biaya'].toString()),
               // data['latitude'],
               // data['longitude'],
             );
@@ -183,6 +185,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                       item['role'],
                       item['alamat'],
                       double.parse(item['distance'].toString()),
+                      double.parse(item['biaya'].toString()),
                       // item['latitude'],
                       // item['longitude'],
                     ))
@@ -199,6 +202,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['role'],
               data['alamat'],
               double.parse(data['distance'].toString()),
+              double.parse(data['biaya'].toString()),
               // data['latitude'],
               // data['longitude'],
             );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
@@ -449,7 +450,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                   return Card(
                                     child: SizedBox(
                                       width: 350,
-                                      height: 324,
+                                      height: 345,
                                       child: Container(
                                         padding: EdgeInsets.all(5),
                                         child: Column(
@@ -474,15 +475,14 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          "Status Pemesanan - Bekasi Selatan",
+                                                          "Status Pemesanan - ${item['detail_perbaikan']}",
                                                           textAlign:
                                                               TextAlign.end,
                                                           style: TextStyle(
                                                               fontSize: 12),
                                                         ),
                                                         Text(
-                                                          item[
-                                                              'detail_perbaikan'],
+                                                          item['nama_customer'],
                                                           textAlign:
                                                               TextAlign.justify,
                                                           style: TextStyle(
@@ -543,15 +543,17 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                         // Text("#20230316",
                                                         //     style: TextStyle(fontSize: 14)),
                                                         Text(
-                                                            item['nama_tukang'] +
-                                                                '-' +
-                                                                random
-                                                                    .nextInt(
-                                                                        1000)
+                                                            "Kang-" +
+                                                                item['ID']
                                                                     .toString(),
                                                             style: TextStyle(
                                                                 fontSize: 14)),
-                                                        Text("Rp.100.000",
+                                                        Text(
+                                                            "Rp." +
+                                                                NumberFormat(
+                                                                        '#,##0')
+                                                                    .format(item[
+                                                                        'total_biaya']),
                                                             style: TextStyle(
                                                                 fontSize: 14)),
                                                         ElevatedButton(
@@ -577,16 +579,55 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                 ],
                                               ),
                                             ),
-                                            Container(
-                                                padding: EdgeInsets.only(
-                                                    top: 8, left: 8),
-                                                child: Text(
-                                                  "Waktu Perjanjian",
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                )),
+                                            // Container(
+                                            //     padding: EdgeInsets.only(
+                                            //         top: 8, left: 8),
+                                            //     child: Text(
+                                            //       "Waktu Perjanjian",
+                                            //       style: TextStyle(
+                                            //           fontSize: 12,
+                                            //           fontWeight:
+                                            //               FontWeight.w500),
+                                            //     )),
+                                            // Container(
+                                            //   child: Row(
+                                            //     mainAxisAlignment:
+                                            //         MainAxisAlignment
+                                            //             .spaceAround,
+                                            //     children: [
+                                            //       Container(
+                                            //         child: Row(
+                                            //           children: [
+                                            //             IconButton(
+                                            //               icon: Icon(
+                                            //                   Icons.date_range),
+                                            //               onPressed: () {},
+                                            //               color:
+                                            //                   Color(0xffF24E1E),
+                                            //             ),
+                                            //             Text("2023-03-16"),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            //       Container(
+                                            //         margin: EdgeInsets.only(
+                                            //             right: 17),
+                                            //         child: Row(
+                                            //           children: [
+                                            //             IconButton(
+                                            //               icon: Icon(Icons
+                                            //                   .access_time),
+                                            //               onPressed: () {},
+                                            //               color:
+                                            //                   Color(0xffF24E1E),
+                                            //             ),
+                                            //             Text("08:00"),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // ),
                                             Container(
                                               child: Row(
                                                 mainAxisAlignment:
@@ -603,7 +644,11 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                           color:
                                                               Color(0xffF24E1E),
                                                         ),
-                                                        Text("2023-03-16"),
+                                                        Text(DateFormat
+                                                                .yMMMMEEEEd()
+                                                            .format(DateTime
+                                                                .parse(item[
+                                                                    'jadwal_perbaikan_awal']))),
                                                       ],
                                                     ),
                                                   ),
@@ -619,7 +664,54 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                           color:
                                                               Color(0xffF24E1E),
                                                         ),
-                                                        Text("08:00"),
+                                                        Text(DateFormat.jm().format(
+                                                            DateTime.parse(item[
+                                                                'jadwal_perbaikan_awal']))),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Container(
+                                                    child: Row(
+                                                      children: [
+                                                        IconButton(
+                                                          icon: Icon(
+                                                              Icons.date_range),
+                                                          onPressed: () {},
+                                                          color:
+                                                              Color(0xffF24E1E),
+                                                        ),
+                                                        Text(DateFormat
+                                                                .yMMMMEEEEd()
+                                                            .format(DateTime
+                                                                .parse(item[
+                                                                    'jadwal_perbaikan_akhir']))),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        right: 17),
+                                                    child: Row(
+                                                      children: [
+                                                        IconButton(
+                                                          icon: Icon(Icons
+                                                              .access_time),
+                                                          onPressed: () {},
+                                                          color:
+                                                              Color(0xffF24E1E),
+                                                        ),
+                                                        Text(DateFormat.jm().format(
+                                                            DateTime.parse(item[
+                                                                'jadwal_perbaikan_akhir']))),
                                                       ],
                                                     ),
                                                   ),
@@ -761,7 +853,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                       return Card(
                                         child: SizedBox(
                                           width: 350,
-                                          height: 325,
+                                          height: 343,
                                           child: Container(
                                             padding: EdgeInsets.all(5),
                                             child: Column(
@@ -789,7 +881,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                                   .start,
                                                           children: [
                                                             Text(
-                                                              "Status Pemesanan - Bekasi Selatan",
+                                                              "Status Pemesanan - ${item['detail_perbaikan']}",
                                                               textAlign:
                                                                   TextAlign.end,
                                                               style: TextStyle(
@@ -797,7 +889,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                             ),
                                                             Text(
                                                               item[
-                                                                  'detail_perbaikan'],
+                                                                  'nama_customer'],
                                                               textAlign:
                                                                   TextAlign
                                                                       .justify,
@@ -863,16 +955,18 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                                   .end,
                                                           children: [
                                                             Text(
-                                                                item['nama_tukang'] +
-                                                                    '-' +
-                                                                    random
-                                                                        .nextInt(
-                                                                            1000)
+                                                                "Kang-" +
+                                                                    item['ID']
                                                                         .toString(),
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         14)),
-                                                            Text("Rp.100.000",
+                                                            Text(
+                                                                "Rp." +
+                                                                    NumberFormat(
+                                                                            '#,##0')
+                                                                        .format(item[
+                                                                            'total_biaya']),
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         14)),
@@ -901,16 +995,55 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                     ],
                                                   ),
                                                 ),
-                                                Container(
-                                                    padding: EdgeInsets.only(
-                                                        top: 8, left: 8),
-                                                    child: Text(
-                                                      "Waktu Perjanjian",
-                                                      style: TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w500),
-                                                    )),
+                                                // Container(
+                                                //     padding: EdgeInsets.only(
+                                                //         top: 8, left: 8),
+                                                //     child: Text(
+                                                //       "Waktu Perjanjian",
+                                                //       style: TextStyle(
+                                                //           fontSize: 12,
+                                                //           fontWeight:
+                                                //               FontWeight.w500),
+                                                //     )),
+                                                // Container(
+                                                //   child: Row(
+                                                //     mainAxisAlignment:
+                                                //         MainAxisAlignment
+                                                //             .spaceAround,
+                                                //     children: [
+                                                //       Container(
+                                                //         child: Row(
+                                                //           children: [
+                                                //             IconButton(
+                                                //               icon: Icon(Icons
+                                                //                   .date_range),
+                                                //               onPressed: () {},
+                                                //               color: Color(
+                                                //                   0xffF24E1E),
+                                                //             ),
+                                                //             Text("2023-03-16"),
+                                                //           ],
+                                                //         ),
+                                                //       ),
+                                                //       Container(
+                                                //         margin: EdgeInsets.only(
+                                                //             right: 17),
+                                                //         child: Row(
+                                                //           children: [
+                                                //             IconButton(
+                                                //               icon: Icon(Icons
+                                                //                   .access_time),
+                                                //               onPressed: () {},
+                                                //               color: Color(
+                                                //                   0xffF24E1E),
+                                                //             ),
+                                                //             Text("08:00"),
+                                                //           ],
+                                                //         ),
+                                                //       ),
+                                                //     ],
+                                                //   ),
+                                                // ),
                                                 Container(
                                                   child: Row(
                                                     mainAxisAlignment:
@@ -927,7 +1060,11 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                               color: Color(
                                                                   0xffF24E1E),
                                                             ),
-                                                            Text("2023-03-16"),
+                                                            Text(DateFormat
+                                                                    .yMMMMEEEEd()
+                                                                .format(DateTime
+                                                                    .parse(item[
+                                                                        'jadwal_perbaikan_awal']))),
                                                           ],
                                                         ),
                                                       ),
@@ -943,7 +1080,56 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                               color: Color(
                                                                   0xffF24E1E),
                                                             ),
-                                                            Text("08:00"),
+                                                            Text(DateFormat.jm()
+                                                                .format(DateTime
+                                                                    .parse(item[
+                                                                        'jadwal_perbaikan_awal']))),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Container(
+                                                        child: Row(
+                                                          children: [
+                                                            IconButton(
+                                                              icon: Icon(Icons
+                                                                  .date_range),
+                                                              onPressed: () {},
+                                                              color: Color(
+                                                                  0xffF24E1E),
+                                                            ),
+                                                            Text(DateFormat
+                                                                    .yMMMMEEEEd()
+                                                                .format(DateTime
+                                                                    .parse(item[
+                                                                        'jadwal_perbaikan_akhir']))),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        margin: EdgeInsets.only(
+                                                            right: 17),
+                                                        child: Row(
+                                                          children: [
+                                                            IconButton(
+                                                              icon: Icon(Icons
+                                                                  .access_time),
+                                                              onPressed: () {},
+                                                              color: Color(
+                                                                  0xffF24E1E),
+                                                            ),
+                                                            Text(DateFormat.jm()
+                                                                .format(DateTime
+                                                                    .parse(item[
+                                                                        'jadwal_perbaikan_akhir']))),
                                                           ],
                                                         ),
                                                       ),
@@ -1063,7 +1249,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                   return Card(
                                     child: SizedBox(
                                       width: 350,
-                                      height: 275,
+                                      height: 295,
                                       child: Container(
                                         padding: EdgeInsets.all(5),
                                         child: Column(
@@ -1088,15 +1274,14 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          "Status Pemesanan - Bekasi Selatan",
+                                                          "Status Pemesanan - ${item['detail_perbaikan']}",
                                                           textAlign:
                                                               TextAlign.end,
                                                           style: TextStyle(
                                                               fontSize: 12),
                                                         ),
                                                         Text(
-                                                          item[
-                                                              'detail_perbaikan'],
+                                                          item['nama_customer'],
                                                           textAlign:
                                                               TextAlign.justify,
                                                           style: TextStyle(
@@ -1156,15 +1341,17 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                               .end,
                                                       children: [
                                                         Text(
-                                                            item['nama_tukang'] +
-                                                                '-' +
-                                                                random
-                                                                    .nextInt(
-                                                                        1000)
+                                                            "Kang-" +
+                                                                item['ID']
                                                                     .toString(),
                                                             style: TextStyle(
                                                                 fontSize: 14)),
-                                                        Text("Rp.100.000",
+                                                        Text(
+                                                            "Rp." +
+                                                                NumberFormat(
+                                                                        '#,##0')
+                                                                    .format(item[
+                                                                        'total_biaya']),
                                                             style: TextStyle(
                                                                 fontSize: 14)),
                                                         ElevatedButton(
@@ -1194,16 +1381,55 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                 ],
                                               ),
                                             ),
-                                            Container(
-                                                padding: EdgeInsets.only(
-                                                    top: 8, left: 8),
-                                                child: Text(
-                                                  "Waktu Perjanjian",
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                )),
+                                            // Container(
+                                            //     padding: EdgeInsets.only(
+                                            //         top: 8, left: 8),
+                                            //     child: Text(
+                                            //       "Waktu Perjanjian",
+                                            //       style: TextStyle(
+                                            //           fontSize: 12,
+                                            //           fontWeight:
+                                            //               FontWeight.w500),
+                                            //     )),
+                                            // Container(
+                                            //   child: Row(
+                                            //     mainAxisAlignment:
+                                            //         MainAxisAlignment
+                                            //             .spaceAround,
+                                            //     children: [
+                                            //       Container(
+                                            //         child: Row(
+                                            //           children: [
+                                            //             IconButton(
+                                            //               icon: Icon(
+                                            //                   Icons.date_range),
+                                            //               onPressed: () {},
+                                            //               color:
+                                            //                   Color(0xffF24E1E),
+                                            //             ),
+                                            //             Text("2023-03-16"),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            //       Container(
+                                            //         margin: EdgeInsets.only(
+                                            //             right: 17),
+                                            //         child: Row(
+                                            //           children: [
+                                            //             IconButton(
+                                            //               icon: Icon(Icons
+                                            //                   .access_time),
+                                            //               onPressed: () {},
+                                            //               color:
+                                            //                   Color(0xffF24E1E),
+                                            //             ),
+                                            //             Text("08:00"),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // ),
                                             Container(
                                               child: Row(
                                                 mainAxisAlignment:
@@ -1220,7 +1446,11 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                           color:
                                                               Color(0xffF24E1E),
                                                         ),
-                                                        Text("2023-03-16"),
+                                                        Text(DateFormat
+                                                                .yMMMMEEEEd()
+                                                            .format(DateTime
+                                                                .parse(item[
+                                                                    'jadwal_perbaikan_awal']))),
                                                       ],
                                                     ),
                                                   ),
@@ -1236,7 +1466,54 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                           color:
                                                               Color(0xffF24E1E),
                                                         ),
-                                                        Text("08:00"),
+                                                        Text(DateFormat.jm().format(
+                                                            DateTime.parse(item[
+                                                                'jadwal_perbaikan_awal']))),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Container(
+                                                    child: Row(
+                                                      children: [
+                                                        IconButton(
+                                                          icon: Icon(
+                                                              Icons.date_range),
+                                                          onPressed: () {},
+                                                          color:
+                                                              Color(0xffF24E1E),
+                                                        ),
+                                                        Text(DateFormat
+                                                                .yMMMMEEEEd()
+                                                            .format(DateTime
+                                                                .parse(item[
+                                                                    'jadwal_perbaikan_akhir']))),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        right: 17),
+                                                    child: Row(
+                                                      children: [
+                                                        IconButton(
+                                                          icon: Icon(Icons
+                                                              .access_time),
+                                                          onPressed: () {},
+                                                          color:
+                                                              Color(0xffF24E1E),
+                                                        ),
+                                                        Text(DateFormat.jm().format(
+                                                            DateTime.parse(item[
+                                                                'jadwal_perbaikan_akhir']))),
                                                       ],
                                                     ),
                                                   ),

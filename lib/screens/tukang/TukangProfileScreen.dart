@@ -129,7 +129,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
         'email': email,
         'no_telp': noTelp,
         'kategori': kategori,
-        'biaya': biaya,
+        'biaya': double.parse(biaya),
         // 'alamat': alamat,
         'latitude': latitude,
         'longitude': longitude,
@@ -389,6 +389,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                     left: 20, right: 20, top: 10, bottom: 5),
                                 child: TextFormField(
                                   //initialValue: "userData!['biaya']",
+                                  keyboardType: TextInputType.number,
                                   controller: _biayaController,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),
