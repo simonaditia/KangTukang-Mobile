@@ -25,10 +25,12 @@ class CustomerPesanScreen extends StatefulWidget {
 
 class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
   String token = '';
-  DateTime selectDate = DateTime.now();
+  // DateTime selectDate = DateTime.now();
   TextEditingController detailPerbaikanController =
       TextEditingController(text: '');
   String alamat = '';
+  DateTime selectedDateTimeAwal = DateTime.now();
+  DateTime selectedDateTimeAkhir = DateTime.now();
 
   FoodModel? tukangData;
   Map<String, dynamic>? userData;
@@ -163,15 +165,31 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
       };
       var body = jsonEncode({
         'detail_perbaikan': detailPerbaikanController.text,
-        'waktu_perbaikan': '2023-06-27 13:44:00',
+        'jadwal_perbaikan_awal': selectedDateTimeAwal.toString(),
+        'jadwal_perbaikan_akhir': selectedDateTimeAkhir.toString(),
         'status': 'Menunggu Konfirmasi',
-        'Alamat': tukangData!.alamat,
+        'alamat': tukangData!.alamat,
         'latitude_customer': customerLatitude,
         'longitude_customer': customerLongitude,
         'nama_customer': customerNama,
         'nama_tukang': tukangNama,
         'kategori_tukang': tukangKategori,
       });
+      // jadi kalau tukang nya sedang ada jadawl
+      // tukang dengan status sedang bekerja tidak akan
+      // bisa muncul dalam pencarian
+      // tukang dengan status tidak sedang bekerja
+      // bisa muncul dalam pencarian
+
+      if (selectedDateTimeAkhir.isBefore(selectedDateTimeAwal)) {
+        Fluttertoast.showToast(
+          msg: 'Tanggal akhir harus lebih besar dari tanggal awal.',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Color(0xffFF5403),
+        );
+        return; // Menghentikan eksekusi fungsi jika kondisi terpenuhi
+      }
 
       try {
         var response = await http.post(url, headers: headers, body: body);
@@ -317,7 +335,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                         child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              "Jadwalkan",
+                              "Jadwalkan dari kapan?",
                               style: TextStyle(fontSize: 16),
                             ))),
                     // Container(
@@ -326,34 +344,151 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                     Container(
                       padding: EdgeInsets.only(left: 20, right: 20),
                       width: double.infinity,
-                      // alignment: Alignment.c,
                       child: ElevatedButton(
                         child: Text(
-                            // selectDate.toString(),
-                            DateFormat.yMMMMEEEEd().format(selectDate),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18)),
-                        onPressed: () {
-                          showDatePicker(
+                          DateFormat.yMMMMEEEEd()
+                              .add_jm()
+                              .format(selectedDateTimeAwal),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        onPressed: () async {
+                          final date = await showDatePicker(
                             context: context,
-                            initialDate: selectDate,
+                            initialDate: selectedDateTimeAwal,
                             firstDate: DateTime.now(),
                             lastDate: DateTime(2025),
                             initialEntryMode: DatePickerEntryMode.calendar,
-                          ).then((value) {
-                            if (value != null)
-                              setState(() {
-                                selectDate = value;
-                              });
-                          });
+                          );
+
+                          if (date != null) {
+                            final TimeOfDay initialTime =
+                                TimeOfDay(hour: 8, minute: 0);
+                            final TimeOfDay finalTime =
+                                TimeOfDay(hour: 17, minute: 0);
+                            TimeOfDay? selectedTime = await showTimePicker(
+                              context: context,
+                              initialTime:
+                                  TimeOfDay.fromDateTime(selectedDateTimeAwal),
+                            );
+
+                            if (selectedTime != null) {
+                              if (selectedTime.hour < initialTime.hour ||
+                                  selectedTime.hour > finalTime.hour) {
+                                Fluttertoast.showToast(
+                                  msg:
+                                      'Mohon pilih waktu antara 8 pagi dan 5 sore.',
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.CENTER,
+                                  backgroundColor: Color(0xffFF5403),
+                                );
+                              } else {
+                                setState(() {
+                                  selectedDateTimeAwal = DateTime(
+                                    date.year,
+                                    date.month,
+                                    date.day,
+                                    selectedTime.hour,
+                                    selectedTime.minute,
+                                  );
+                                });
+                              }
+                            }
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 218, 218, 218),
-                          foregroundColor: Color.fromARGB(255, 54, 54, 54),
-                          // minimumSize: Size(50, 26),
+                          foregroundColor: Colors.black,
                         ),
                       ),
                     ),
+
+                    Container(
+                        padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Jadwalkan sampai kapan?",
+                              style: TextStyle(fontSize: 16),
+                            ))),
+                    // Container(
+                    //   child: Text(DateFormat.yMMMMEEEEd().format(DateTime.now())),
+                    // ),
+                    Container(
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        child: Text(
+                          DateFormat.yMMMMEEEEd()
+                              .add_jm()
+                              .format(selectedDateTimeAkhir),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        onPressed: () async {
+                          final DateTime? selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: selectedDateTimeAkhir,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2025),
+                            initialEntryMode: DatePickerEntryMode.calendar,
+                          );
+
+                          if (selectedDate != null) {
+                            final TimeOfDay initialTime =
+                                TimeOfDay(hour: 8, minute: 0);
+                            final TimeOfDay finalTime =
+                                TimeOfDay(hour: 17, minute: 0);
+                            TimeOfDay? selectedTime = await showTimePicker(
+                              context: context,
+                              initialTime:
+                                  TimeOfDay.fromDateTime(selectedDateTimeAkhir),
+                            );
+
+                            if (selectedTime != null) {
+                              DateTime selectedDateTime = DateTime(
+                                selectedDate.year,
+                                selectedDate.month,
+                                selectedDate.day,
+                                selectedTime.hour,
+                                selectedTime.minute,
+                              );
+
+                              if (selectedDateTime
+                                  .isBefore(selectedDateTimeAwal)) {
+                                Fluttertoast.showToast(
+                                  msg:
+                                      'Tanggal akhir harus lebih besar dari tanggal awal.',
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.CENTER,
+                                  backgroundColor: Color(0xffFF5403),
+                                );
+                              } else if (selectedTime.hour < initialTime.hour ||
+                                  selectedTime.hour > finalTime.hour) {
+                                Fluttertoast.showToast(
+                                  msg:
+                                      'Mohon pilih waktu antara 8 pagi dan 5 sore.',
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.CENTER,
+                                  backgroundColor: Color(0xffFF5403),
+                                );
+                              } else {
+                                setState(() {
+                                  selectedDateTimeAkhir = selectedDateTime;
+                                });
+                              }
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 218, 218, 218),
+                          foregroundColor: Colors.black,
+                        ),
+                      ),
+                    ),
+
                     // Container(
                     //     padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
                     //     child: Align(

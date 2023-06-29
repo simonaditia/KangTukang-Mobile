@@ -389,7 +389,8 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                             color: Color(
                                                                 0xffF24E1E),
                                                           ),
-                                                          Text("2023-03-16"),
+                                                          Text(item[
+                                                              'jadwal_perbaikan_awal']),
                                                         ],
                                                       ),
                                                     ),
@@ -683,8 +684,8 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                                 color: Color(
                                                                     0xffF24E1E),
                                                               ),
-                                                              Text(
-                                                                  "2023-03-16"),
+                                                              Text(item[
+                                                                  'jadwal_perbaikan_awal']),
                                                             ],
                                                           ),
                                                         ),
@@ -922,7 +923,8 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                             color: Color(
                                                                 0xffF24E1E),
                                                           ),
-                                                          Text("2023-03-16"),
+                                                          Text(item[
+                                                              'jadwal_perbaikan_awal']),
                                                         ],
                                                       ),
                                                     ),
