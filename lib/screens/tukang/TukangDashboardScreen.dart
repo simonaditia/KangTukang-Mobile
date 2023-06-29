@@ -148,6 +148,9 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
     // );
     if (responsePost.statusCode == 200) {
       fetchDataStatusMenunggu();
+      setState(() {
+        dataSMenunggu.removeWhere((item) => item['ID'] == orderId);
+      });
     }
   }
 
@@ -170,6 +173,9 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
 
     if (responsePost.statusCode == 200) {
       fetchDataStatusMenunggu();
+      setState(() {
+        dataSMenunggu.removeWhere((item) => item['ID'] == orderId);
+      });
     }
   }
 
@@ -328,185 +334,229 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                           Container(
                               padding: EdgeInsets.only(left: 5),
                               child: Text("Daftar Pesanan")),
-                          Container(
-                              margin: EdgeInsets.only(top: 10),
-                              child: RefreshIndicator(
-                                onRefresh: () async {
-                                  _refreshData();
-                                },
-                                child: SingleChildScrollView(
-                                  child: Column(children: [
-                                    ListView.builder(
-                                        shrinkWrap: true,
-                                        // physics: NeverScrollableScrollPhysics(),
-                                        itemCount: dataSMenunggu.length,
-                                        itemBuilder: (context, index) {
-                                          final item = dataSMenunggu[index];
-                                          return Card(
-                                            child: SizedBox(
-                                              width: 370,
-                                              height: 190,
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    margin: EdgeInsets.only(
-                                                        top: 10, bottom: 10),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
+                          SingleChildScrollView(
+                            child: Container(
+                                margin: EdgeInsets.only(top: 10),
+                                child: SizedBox(
+                                  width: 370,
+                                  height: 425,
+                                  child: RefreshIndicator(onRefresh: () async {
+                                    fetchDataStatusMenunggu();
+                                  }, child: FutureBuilder(
+                                      // future:
+                                      //     fetchDataStatusMenunggu(), // Mengganti fetchData() dengan fungsi atau metode yang digunakan untuk mengambil data tukangData dan item
+                                      builder: (context, snapshot) {
+                                    if (dataSMenunggu == [] ||
+                                        dataSMenunggu == null) {
+                                      return Center(
+                                        child:
+                                            CircularProgressIndicator(), // Menampilkan loading spinner
+                                      );
+                                    } else {
+                                      if (snapshot.hasError) {
+                                        return Center(
+                                          child: Text(
+                                              "Terjadi kesalahan dalam memuat data"), // Menampilkan pesan kesalahan jika terjadi error
+                                        );
+                                      } else {
+                                        if (dataSMenunggu.isEmpty) {
+                                          return Center(
+                                            child: Text(
+                                                "Tidak ada daftar pesanan"), // Menampilkan pesan jika data kosong
+                                          );
+                                        } else {
+                                          return ListView.builder(
+                                              shrinkWrap: true,
+                                              // physics: NeverScrollableScrollPhysics(),
+                                              itemCount: dataSMenunggu.length,
+                                              itemBuilder: (context, index) {
+                                                final item =
+                                                    dataSMenunggu[index];
+                                                return Card(
+                                                  child: SizedBox(
+                                                    width: 370,
+                                                    height: 190,
+                                                    child: Column(
                                                       children: [
-                                                        Spacer(flex: 1),
-                                                        Column(
-                                                          children: [
-                                                            Icon(
-                                                              Icons
-                                                                  .house_siding,
-                                                              color: Color(
-                                                                  0xffFF5403),
-                                                              size: 30.0,
-                                                            ),
-                                                          ],
+                                                        Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  top: 10,
+                                                                  bottom: 10),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            children: [
+                                                              Spacer(flex: 1),
+                                                              Column(
+                                                                children: [
+                                                                  Icon(
+                                                                    Icons
+                                                                        .house_siding,
+                                                                    color: Color(
+                                                                        0xffFF5403),
+                                                                    size: 30.0,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Container(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            10),
+                                                              ),
+                                                              // Spacer(flex: 1),
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    item[
+                                                                        'nama_customer'],
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    padding: EdgeInsets
+                                                                        .only(
+                                                                            top:
+                                                                                10),
+                                                                    child: Text(
+                                                                      item[
+                                                                          'detail_perbaikan'],
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              14),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Spacer(flex: 1),
+                                                            ],
+                                                          ),
                                                         ),
                                                         Container(
                                                           padding:
-                                                              EdgeInsets.all(
-                                                                  10),
+                                                              EdgeInsets.only(
+                                                                  top: 10),
+                                                          child: Text(
+                                                            "Lama Pengerjaan: 2 hari",
+                                                            style: TextStyle(
+                                                                fontSize: 14),
+                                                          ),
                                                         ),
-                                                        // Spacer(flex: 1),
-                                                        Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              item[
-                                                                  'nama_customer'],
-                                                              style: TextStyle(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                              ),
-                                                            ),
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      top: 10),
-                                                              child: Text(
-                                                                item[
-                                                                    'detail_perbaikan'],
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14),
-                                                              ),
-                                                            ),
-                                                          ],
+                                                        Container(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10),
+                                                          child: Center(
+                                                            child: Text(
+                                                                "Total Biaya: Rp.300.000"),
+                                                          ),
                                                         ),
-                                                        Spacer(flex: 1),
+                                                        Container(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    10),
+                                                            child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  ElevatedButton
+                                                                      .icon(
+                                                                    icon: Icon(
+                                                                        Icons
+                                                                            .close,
+                                                                        color: Color(
+                                                                            0xffFF5403)),
+                                                                    label: Text(
+                                                                        "Tolak"),
+                                                                    onPressed:
+                                                                        () {
+                                                                      _rejectOrder(
+                                                                          item[
+                                                                              'ID']);
+                                                                      // Navigator.push(
+                                                                      //   context,
+                                                                      //   MaterialPageRoute(
+                                                                      //     builder: (context) {
+                                                                      //       return CustomerTentangAppScreen();
+                                                                      //     },
+                                                                      //   ),
+                                                                      // );
+                                                                    },
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .black,
+                                                                      minimumSize:
+                                                                          Size(
+                                                                              130,
+                                                                              40),
+                                                                    ),
+                                                                  ),
+                                                                  ElevatedButton
+                                                                      .icon(
+                                                                    icon: Icon(
+                                                                        Icons
+                                                                            .done,
+                                                                        color: Color(
+                                                                            0xffFF5403)),
+                                                                    label: Text(
+                                                                        "Terima"),
+                                                                    onPressed:
+                                                                        () {
+                                                                      _acceptOrder(
+                                                                          item[
+                                                                              'ID']);
+                                                                      // Navigator.push(
+                                                                      //   context,
+                                                                      //   MaterialPageRoute(
+                                                                      //     builder: (context) {
+                                                                      //       return CustomerTentangAppScreen();
+                                                                      //     },
+                                                                      //   ),
+                                                                      // );
+                                                                    },
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .black,
+                                                                      minimumSize:
+                                                                          Size(
+                                                                              130,
+                                                                              40),
+                                                                    ),
+                                                                  ),
+                                                                ]))
                                                       ],
                                                     ),
                                                   ),
-                                                  Container(
-                                                    padding: EdgeInsets.only(
-                                                        top: 10),
-                                                    child: Text(
-                                                      "Lama Pengerjaan: 2 hari",
-                                                      style: TextStyle(
-                                                          fontSize: 14),
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.only(
-                                                        top: 10),
-                                                    child: Center(
-                                                      child: Text(
-                                                          "Total Biaya: Rp.300.000"),
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                      padding:
-                                                          EdgeInsets.all(10),
-                                                      child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceEvenly,
-                                                          children: [
-                                                            ElevatedButton.icon(
-                                                              icon: Icon(
-                                                                  Icons.close,
-                                                                  color: Color(
-                                                                      0xffFF5403)),
-                                                              label:
-                                                                  Text("Tolak"),
-                                                              onPressed: () {
-                                                                _rejectOrder(
-                                                                    item['ID']);
-                                                                // Navigator.push(
-                                                                //   context,
-                                                                //   MaterialPageRoute(
-                                                                //     builder: (context) {
-                                                                //       return CustomerTentangAppScreen();
-                                                                //     },
-                                                                //   ),
-                                                                // );
-                                                              },
-                                                              style:
-                                                                  ElevatedButton
-                                                                      .styleFrom(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                foregroundColor:
-                                                                    Colors
-                                                                        .black,
-                                                                minimumSize:
-                                                                    Size(130,
-                                                                        40),
-                                                              ),
-                                                            ),
-                                                            ElevatedButton.icon(
-                                                              icon: Icon(
-                                                                  Icons.done,
-                                                                  color: Color(
-                                                                      0xffFF5403)),
-                                                              label: Text(
-                                                                  "Terima"),
-                                                              onPressed: () {
-                                                                _acceptOrder(
-                                                                    item['ID']);
-                                                                // Navigator.push(
-                                                                //   context,
-                                                                //   MaterialPageRoute(
-                                                                //     builder: (context) {
-                                                                //       return CustomerTentangAppScreen();
-                                                                //     },
-                                                                //   ),
-                                                                // );
-                                                              },
-                                                              style:
-                                                                  ElevatedButton
-                                                                      .styleFrom(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                foregroundColor:
-                                                                    Colors
-                                                                        .black,
-                                                                minimumSize:
-                                                                    Size(130,
-                                                                        40),
-                                                              ),
-                                                            ),
-                                                          ]))
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                  ]),
-                                ),
-                              )),
+                                                );
+                                              });
+                                        }
+                                      }
+                                    }
+                                  })),
+                                )),
+                          ),
                         ],
                       )),
                   Expanded(

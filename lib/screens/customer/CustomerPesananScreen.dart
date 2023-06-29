@@ -122,6 +122,35 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     fetchDataStatusSelesai();
   }
 
+  Future<void> _cancelOrder(int orderId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    int idTukang = decodedToken['id'] as int;
+
+    final String response =
+        'http://192.168.1.100:8000/api/v1/orders/cancelOrderByCustomer/$orderId';
+
+    final responsePost = await http.put(
+      Uri.parse(response),
+      headers: {
+        'Authorization':
+            'Bearer $token', // Ganti <your_jwt_token> dengan token JWT yang valid
+      },
+    );
+
+    // final response = await http.post(
+    //   'http://localhost:8000/api/v1/orders/rejectOrderByTukang/$orderId',
+    // );
+    if (responsePost.statusCode == 200) {
+      fetchDataStatusMenunggu();
+      setState(() {
+        dataSMenunggu.removeWhere((item) => item['ID'] == orderId);
+      });
+    }
+    fetchDataStatusSelesai();
+  }
+
   @override
   Widget build(BuildContext context) {
     TabBar myTabBar = TabBar(
@@ -162,526 +191,771 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
             ),
             body: TabBarView(
               children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: ListView.builder(
-                    itemCount: dataSMenunggu.length,
-                    itemBuilder: (context, index) {
-                      final item = dataSMenunggu[index];
-                      return Card(
-                        child: SizedBox(
-                          width: 350,
-                          height: 294,
-                          child: Container(
-                            padding: EdgeInsets.all(5),
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    // mainAxisAlignment:
-                                    //     MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Spacer(flex: 1),
-                                      Container(
-                                          margin: EdgeInsets.only(right: 15),
-                                          child: Icon(Icons.home,
-                                              color: Color(0xffF24E1E))),
-                                      Container(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Status Pemesanan - Bekasi Selatan",
-                                              textAlign: TextAlign.end,
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                            Text(
-                                              item['kategori_tukang'],
-                                              textAlign: TextAlign.justify,
-                                              style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Spacer(flex: 1)
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 20),
-                                  // padding: EdgeInsets.all(20),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(bottom: 14),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text("Nomor Invoice",
-                                                style: TextStyle(fontSize: 14)),
-                                            SizedBox(
-                                              height: 3,
-                                            ),
-                                            Text("Total Biaya",
-                                                style: TextStyle(fontSize: 14)),
-                                            SizedBox(
-                                              height: 14,
-                                            ),
-                                            Text("Layanan Survey",
-                                                style: TextStyle(fontSize: 14))
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(left: 40),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            // Text("#20230316",
-                                            //     style: TextStyle(fontSize: 14)),
-                                            Text(
-                                                item['nama_tukang'] +
-                                                    '-' +
-                                                    random
-                                                        .nextInt(1000)
-                                                        .toString(),
-                                                style: TextStyle(fontSize: 14)),
-                                            Text("Rp.100.000",
-                                                style: TextStyle(fontSize: 14)),
-                                            ElevatedButton(
-                                                child: Text(item['status'],
+                RefreshIndicator(
+                  onRefresh: () async {
+                    fetchDataStatusMenunggu();
+                    fetchDataStatusDikerjakan();
+                    fetchDataStatusSelesai();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    child: FutureBuilder(
+                      // future:
+                      //     fetchDataStatusMenunggu(), // Mengganti fetchData() dengan fungsi atau metode yang digunakan untuk mengambil data tukangData dan item
+                      builder: (context, snapshot) {
+                        if (dataSMenunggu == [] || dataSMenunggu == null) {
+                          return Center(
+                            child:
+                                CircularProgressIndicator(), // Menampilkan loading spinner
+                          );
+                        } else {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                  "Terjadi kesalahan dalam memuat data"), // Menampilkan pesan kesalahan jika terjadi error
+                            );
+                          } else {
+                            if (dataSMenunggu.isEmpty) {
+                              return Center(
+                                child: Text(
+                                    "Tidak ada daftar pesanan"), // Menampilkan pesan jika data kosong
+                              );
+                            } else {
+                              return ListView.builder(
+                                  itemCount: dataSMenunggu.length,
+                                  itemBuilder: (context, index) {
+                                    final item = dataSMenunggu[index];
+                                    return Card(
+                                      child: SizedBox(
+                                        width: 350,
+                                        height: 294,
+                                        child: Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 10),
+                                                child: Row(
+                                                  // mainAxisAlignment:
+                                                  //     MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Spacer(flex: 1),
+                                                    Container(
+                                                        margin: EdgeInsets.only(
+                                                            right: 15),
+                                                        child: Icon(Icons.home,
+                                                            color: Color(
+                                                                0xffF24E1E))),
+                                                    Container(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            "Status Pemesanan - Bekasi Selatan",
+                                                            textAlign:
+                                                                TextAlign.end,
+                                                            style: TextStyle(
+                                                                fontSize: 12),
+                                                          ),
+                                                          Text(
+                                                            item[
+                                                                'kategori_tukang'],
+                                                            textAlign: TextAlign
+                                                                .justify,
+                                                            style: TextStyle(
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Spacer(flex: 1)
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 20),
+                                                // padding: EdgeInsets.all(20),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: 14),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text("Nomor Invoice",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          SizedBox(
+                                                            height: 3,
+                                                          ),
+                                                          Text("Total Biaya",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          SizedBox(
+                                                            height: 14,
+                                                          ),
+                                                          Text("Layanan Survey",
+                                                              style: TextStyle(
+                                                                  fontSize: 14))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 40),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          // Text("#20230316",
+                                                          //     style: TextStyle(fontSize: 14)),
+                                                          Text(
+                                                              item['nama_tukang'] +
+                                                                  '-' +
+                                                                  random
+                                                                      .nextInt(
+                                                                          1000)
+                                                                      .toString(),
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          Text("Rp.100.000",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          ElevatedButton(
+                                                              child: Text(
+                                                                  item[
+                                                                      'status'],
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12)),
+                                                              onPressed: () {},
+                                                              style: ElevatedButton.styleFrom(
+                                                                  backgroundColor:
+                                                                      Color(
+                                                                          0xff24309C),
+                                                                  foregroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  minimumSize:
+                                                                      Size(50,
+                                                                          26)))
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                  padding: EdgeInsets.only(
+                                                      top: 20, left: 8),
+                                                  child: Text(
+                                                    "Waktu Perjanjian",
                                                     style: TextStyle(
-                                                        fontSize: 12)),
-                                                onPressed: () {},
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Color(0xff24309C),
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                    minimumSize: Size(50, 26)))
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                    padding: EdgeInsets.only(top: 20, left: 8),
-                                    child: Text(
-                                      "Waktu Perjanjian",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500),
-                                    )),
-                                Container(
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Container(
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                              icon: Icon(Icons.date_range),
-                                              onPressed: () {},
-                                              color: Color(0xffF24E1E),
-                                            ),
-                                            Text("2023-03-16"),
-                                          ],
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  )),
+                                              Container(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    Container(
+                                                      child: Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons
+                                                                .date_range),
+                                                            onPressed: () {},
+                                                            color: Color(
+                                                                0xffF24E1E),
+                                                          ),
+                                                          Text("2023-03-16"),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          right: 17),
+                                                      child: Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons
+                                                                .access_time),
+                                                            onPressed: () {},
+                                                            color: Color(
+                                                                0xffF24E1E),
+                                                          ),
+                                                          Text("08:00"),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 10),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    ElevatedButton(
+                                                        child: Text(
+                                                            "Ubah Waktu",
+                                                            style: TextStyle(
+                                                                fontSize: 12)),
+                                                        onPressed: () {},
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                                backgroundColor:
+                                                                    Color(
+                                                                        0xffFF5403),
+                                                                foregroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                minimumSize:
+                                                                    Size(50,
+                                                                        26))),
+                                                    ElevatedButton(
+                                                        child: Text("Batalkan",
+                                                            style: TextStyle(
+                                                                fontSize: 12)),
+                                                        onPressed: () {
+                                                          _cancelOrder(
+                                                              item['ID']);
+                                                          fetchDataStatusMenunggu();
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                                backgroundColor:
+                                                                    Color(
+                                                                        0xffDD1D1D),
+                                                                foregroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                minimumSize:
+                                                                    Size(50,
+                                                                        26)))
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      Container(
-                                        margin: EdgeInsets.only(right: 17),
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                              icon: Icon(Icons.access_time),
-                                              onPressed: () {},
-                                              color: Color(0xffF24E1E),
-                                            ),
-                                            Text("08:00"),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      ElevatedButton(
-                                          child: Text("Ubah Waktu",
-                                              style: TextStyle(fontSize: 12)),
-                                          onPressed: () {},
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Color(0xffFF5403),
-                                              foregroundColor: Colors.white,
-                                              minimumSize: Size(50, 26))),
-                                      ElevatedButton(
-                                          child: Text("Batalkan",
-                                              style: TextStyle(fontSize: 12)),
-                                          onPressed: () {},
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  Color(0xffDD1D1D),
-                                              foregroundColor: Colors.white,
-                                              minimumSize: Size(50, 26)))
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                                    );
+                                  });
+                            }
+                          }
+                        }
+                      },
+                    ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: ListView.builder(
-                      itemCount: dataSDikerjakan.length,
-                      itemBuilder: (context, index) {
-                        final item = dataSDikerjakan[index];
-                        return Card(
-                          child: SizedBox(
-                            width: 350,
-                            height: 249,
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(top: 10),
-                                    child: Row(
-                                      // mainAxisAlignment:
-                                      //     MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Spacer(flex: 1),
-                                        Container(
-                                            margin: EdgeInsets.only(right: 15),
-                                            child: Icon(Icons.home,
-                                                color: Color(0xffF24E1E))),
-                                        Container(
+                RefreshIndicator(
+                    onRefresh: () async {
+                      fetchDataStatusDikerjakan();
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      child: FutureBuilder(
+                          future: Future.value(null),
+                          builder: (context, snapshot) {
+                            if (dataSDikerjakan == [] ||
+                                dataSDikerjakan == null) {
+                              return Center(
+                                child:
+                                    CircularProgressIndicator(), // Menampilkan loading spinner
+                              );
+                            } else {
+                              if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(
+                                      "Terjadi kesalahan dalam memuat data"), // Menampilkan pesan kesalahan jika terjadi error
+                                );
+                              } else {
+                                if (dataSDikerjakan.isEmpty) {
+                                  return Center(
+                                    child: Text(
+                                        "Tidak ada daftar pesanan"), // Menampilkan pesan jika data kosong
+                                  );
+                                } else {
+                                  return ListView.builder(
+                                      itemCount: dataSDikerjakan.length,
+                                      itemBuilder: (context, index) {
+                                        final item = dataSDikerjakan[index];
+                                        return Card(
+                                          child: SizedBox(
+                                            width: 350,
+                                            height: 249,
+                                            child: Container(
+                                              padding: EdgeInsets.all(5),
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        top: 10),
+                                                    child: Row(
+                                                      // mainAxisAlignment:
+                                                      //     MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Spacer(flex: 1),
+                                                        Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    right: 15),
+                                                            child: Icon(
+                                                                Icons.home,
+                                                                color: Color(
+                                                                    0xffF24E1E))),
+                                                        Container(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                "Status Pemesanan - Bekasi Selatan",
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .end,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12),
+                                                              ),
+                                                              Text(
+                                                                item[
+                                                                    'kategori_tukang'],
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .justify,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Spacer(flex: 1)
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        top: 20),
+                                                    // padding: EdgeInsets.all(20),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  bottom: 14),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                  "Nomor Invoice",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14)),
+                                                              SizedBox(
+                                                                height: 3,
+                                                              ),
+                                                              Text(
+                                                                  "Total Biaya",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14)),
+                                                              SizedBox(
+                                                                height: 14,
+                                                              ),
+                                                              Text(
+                                                                  "Layanan Survey",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14))
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  left: 40),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              Text(
+                                                                  item['nama_tukang'] +
+                                                                      '-' +
+                                                                      random
+                                                                          .nextInt(
+                                                                              1000)
+                                                                          .toString(),
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14)),
+                                                              Text("Rp.100.000",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14)),
+                                                              ElevatedButton(
+                                                                  child: Text(
+                                                                      item[
+                                                                          'status'],
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              12)),
+                                                                  onPressed:
+                                                                      () {},
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          Color(
+                                                                              0xff249C9C),
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      minimumSize:
+                                                                          Size(
+                                                                              50,
+                                                                              26)))
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                      padding: EdgeInsets.only(
+                                                          top: 20, left: 8),
+                                                      child: Text(
+                                                        "Waktu Perjanjian",
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      )),
+                                                  Container(
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Container(
+                                                          child: Row(
+                                                            children: [
+                                                              IconButton(
+                                                                icon: Icon(Icons
+                                                                    .date_range),
+                                                                onPressed:
+                                                                    () {},
+                                                                color: Color(
+                                                                    0xffF24E1E),
+                                                              ),
+                                                              Text(
+                                                                  "2023-03-16"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  right: 17),
+                                                          child: Row(
+                                                            children: [
+                                                              IconButton(
+                                                                icon: Icon(Icons
+                                                                    .access_time),
+                                                                onPressed:
+                                                                    () {},
+                                                                color: Color(
+                                                                    0xffF24E1E),
+                                                              ),
+                                                              Text("08:00"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      });
+                                }
+                              }
+                            }
+                          }),
+                    )),
+                RefreshIndicator(
+                    onRefresh: () async {
+                      fetchDataStatusMenunggu();
+                      fetchDataStatusDikerjakan();
+                      fetchDataStatusSelesai();
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      child: FutureBuilder(
+                          // future:
+                          //     fetchDataStatusMenunggu(), // Mengganti fetchData() dengan fungsi atau metode yang digunakan untuk mengambil data tukangData dan item
+                          builder: (context, snapshot) {
+                        if (dataSSelesai == [] || dataSSelesai == null) {
+                          return Center(
+                            child:
+                                CircularProgressIndicator(), // Menampilkan loading spinner
+                          );
+                        } else {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                  "Terjadi kesalahan dalam memuat data"), // Menampilkan pesan kesalahan jika terjadi error
+                            );
+                          } else {
+                            if (dataSSelesai.isEmpty) {
+                              return Center(
+                                child: Text(
+                                    "Tidak ada daftar pesanan"), // Menampilkan pesan jika data kosong
+                              );
+                            } else {
+                              return ListView.builder(
+                                  itemCount: dataSSelesai.length,
+                                  itemBuilder: (context, index) {
+                                    final item = dataSSelesai[index];
+                                    return Card(
+                                      child: SizedBox(
+                                        width: 350,
+                                        height: 249,
+                                        child: Container(
+                                          padding: EdgeInsets.all(5),
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                "Status Pemesanan - Bekasi Selatan",
-                                                textAlign: TextAlign.end,
-                                                style: TextStyle(fontSize: 12),
+                                              Container(
+                                                padding:
+                                                    EdgeInsets.only(top: 10),
+                                                child: Row(
+                                                  // mainAxisAlignment:
+                                                  //     MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Spacer(flex: 1),
+                                                    Container(
+                                                        margin: EdgeInsets.only(
+                                                            right: 15),
+                                                        child: Icon(Icons.home,
+                                                            color: Color(
+                                                                0xffF24E1E))),
+                                                    Container(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            "Status Pemesanan - Bekasi Selatan",
+                                                            textAlign:
+                                                                TextAlign.end,
+                                                            style: TextStyle(
+                                                                fontSize: 12),
+                                                          ),
+                                                          Text(
+                                                            item[
+                                                                'kategori_tukang'],
+                                                            textAlign: TextAlign
+                                                                .justify,
+                                                            style: TextStyle(
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Spacer(flex: 1)
+                                                  ],
+                                                ),
                                               ),
-                                              Text(
-                                                item['kategori_tukang'],
-                                                textAlign: TextAlign.justify,
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                    top: 20,
+                                                    left: 13,
+                                                    right: 13),
+                                                // padding: EdgeInsets.all(20),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: 14),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text("Nomor Invoice",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          SizedBox(
+                                                            height: 3,
+                                                          ),
+                                                          Text("Total Biaya",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          SizedBox(
+                                                            height: 14,
+                                                          ),
+                                                          Text("Layanan Survey",
+                                                              style: TextStyle(
+                                                                  fontSize: 14))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 40),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Text(
+                                                              item['nama_tukang'] +
+                                                                  '-' +
+                                                                  random
+                                                                      .nextInt(
+                                                                          1000)
+                                                                      .toString(),
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          Text("Rp.100.000",
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                          ElevatedButton(
+                                                              child: Text(
+                                                                  item[
+                                                                      'status'],
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12)),
+                                                              onPressed: () {},
+                                                              style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: item[
+                                                                              'status'] ==
+                                                                          "Selesai"
+                                                                      ? Color(
+                                                                          0xff1A7E2A)
+                                                                      : Color(
+                                                                          0xffDD1D1D),
+                                                                  foregroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  minimumSize:
+                                                                      Size(50,
+                                                                          26)))
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Container(
+                                                  padding: EdgeInsets.only(
+                                                      top: 20, left: 8),
+                                                  child: Text(
+                                                    "Waktu Perjanjian",
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  )),
+                                              Container(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    Container(
+                                                      child: Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons
+                                                                .date_range),
+                                                            onPressed: () {},
+                                                            color: Color(
+                                                                0xffF24E1E),
+                                                          ),
+                                                          Text("2023-03-16"),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                          right: 17),
+                                                      child: Row(
+                                                        children: [
+                                                          IconButton(
+                                                            icon: Icon(Icons
+                                                                .access_time),
+                                                            onPressed: () {},
+                                                            color: Color(
+                                                                0xffF24E1E),
+                                                          ),
+                                                          Text("08:00"),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                        Spacer(flex: 1)
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.only(top: 20),
-                                    // padding: EdgeInsets.all(20),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.only(bottom: 14),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text("Nomor Invoice",
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              Text("Total Biaya",
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              SizedBox(
-                                                height: 14,
-                                              ),
-                                              Text("Layanan Survey",
-                                                  style:
-                                                      TextStyle(fontSize: 14))
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(left: 40),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                  item['nama_tukang'] +
-                                                      '-' +
-                                                      random
-                                                          .nextInt(1000)
-                                                          .toString(),
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              Text("Rp.100.000",
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              ElevatedButton(
-                                                  child: Text(item['status'],
-                                                      style: TextStyle(
-                                                          fontSize: 12)),
-                                                  onPressed: () {},
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                          backgroundColor:
-                                                              Color(0xff249C9C),
-                                                          foregroundColor:
-                                                              Colors.white,
-                                                          minimumSize:
-                                                              Size(50, 26)))
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                      padding:
-                                          EdgeInsets.only(top: 20, left: 8),
-                                      child: Text(
-                                        "Waktu Perjanjian",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      )),
-                                  Container(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                icon: Icon(Icons.date_range),
-                                                onPressed: () {},
-                                                color: Color(0xffF24E1E),
-                                              ),
-                                              Text("2023-03-16"),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(right: 17),
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                icon: Icon(Icons.access_time),
-                                                onPressed: () {},
-                                                color: Color(0xffF24E1E),
-                                              ),
-                                              Text("08:00"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
+                                      ),
+                                    );
+                                  });
+                            }
+                          }
+                        }
                       }),
-                ),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: ListView.builder(
-                      itemCount: dataSSelesai.length,
-                      itemBuilder: (context, index) {
-                        final item = dataSSelesai[index];
-                        return Card(
-                          child: SizedBox(
-                            width: 350,
-                            height: 249,
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(top: 10),
-                                    child: Row(
-                                      // mainAxisAlignment:
-                                      //     MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Spacer(flex: 1),
-                                        Container(
-                                            margin: EdgeInsets.only(right: 15),
-                                            child: Icon(Icons.home,
-                                                color: Color(0xffF24E1E))),
-                                        Container(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Status Pemesanan - Bekasi Selatan",
-                                                textAlign: TextAlign.end,
-                                                style: TextStyle(fontSize: 12),
-                                              ),
-                                              Text(
-                                                item['kategori_tukang'],
-                                                textAlign: TextAlign.justify,
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Spacer(flex: 1)
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.only(
-                                        top: 20, left: 13, right: 13),
-                                    // padding: EdgeInsets.all(20),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.only(bottom: 14),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text("Nomor Invoice",
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              Text("Total Biaya",
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              SizedBox(
-                                                height: 14,
-                                              ),
-                                              Text("Layanan Survey",
-                                                  style:
-                                                      TextStyle(fontSize: 14))
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(left: 40),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                  item['nama_tukang'] +
-                                                      '-' +
-                                                      random
-                                                          .nextInt(1000)
-                                                          .toString(),
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              Text("Rp.100.000",
-                                                  style:
-                                                      TextStyle(fontSize: 14)),
-                                              ElevatedButton(
-                                                  child: Text(item['status'],
-                                                      style: TextStyle(
-                                                          fontSize: 12)),
-                                                  onPressed: () {},
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                          backgroundColor:
-                                                              Color(0xff1A7E2A),
-                                                          foregroundColor:
-                                                              Colors.white,
-                                                          minimumSize:
-                                                              Size(50, 26)))
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                      padding:
-                                          EdgeInsets.only(top: 20, left: 8),
-                                      child: Text(
-                                        "Waktu Perjanjian",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      )),
-                                  Container(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Container(
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                icon: Icon(Icons.date_range),
-                                                onPressed: () {},
-                                                color: Color(0xffF24E1E),
-                                              ),
-                                              Text("2023-03-16"),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(right: 17),
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                icon: Icon(Icons.access_time),
-                                                onPressed: () {},
-                                                color: Color(0xffF24E1E),
-                                              ),
-                                              Text("08:00"),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
+                    ))
               ],
             )),
       ),
