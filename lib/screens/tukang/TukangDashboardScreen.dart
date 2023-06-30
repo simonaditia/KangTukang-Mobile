@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
@@ -33,10 +34,28 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    checkJWTToken();
     // _getTokenAndFetchNama();
     // _fetchNama();
     loadUserNama();
     fetchDataStatusMenunggu();
+  }
+
+  Future<void> checkJWTToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jwtToken = prefs.getString('jwt') ?? '';
+
+    if (jwtToken == null || jwtToken == '' || jwtToken.isEmpty) {
+      // Token JWT is not available, display the toast warning
+      // Tampilkan peringatan toast
+      Fluttertoast.showToast(
+          msg: 'Anda harus login dulu\nSilahkan Login ya',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Color(0xffFF5403));
+      // Redirect the user to the login page
+      Navigator.pushReplacementNamed(context, '/login');
+    }
   }
 
   Future<void> loadUserNama() async {

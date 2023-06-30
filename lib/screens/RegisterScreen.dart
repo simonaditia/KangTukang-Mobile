@@ -6,6 +6,7 @@ import 'package:tukang_online/providers/auth_provider.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:email_validator/email_validator.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -152,6 +153,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
         }
       }
+      setState(() {
+        isLoading = false;
+      });
     }
 
     handleSignupTukang() async {
@@ -219,6 +223,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
         }
       }
+      setState(() {
+        isLoadingTukang = false;
+      });
     }
 
     final deviceHeight = MediaQuery.of(context).size.height;
@@ -306,6 +313,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       padding: const EdgeInsets.only(left: 15),
                       child: Center(
                         child: TextFormField(
+                          keyboardType: TextInputType.emailAddress,
                           controller: emailController,
                           decoration: InputDecoration(
                             border: InputBorder.none,
@@ -314,6 +322,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Email harus diisi";
+                            }
+                            if (!EmailValidator.validate(value)) {
+                              return 'Masukkan email yang valid';
                             }
                             return null;
                           },

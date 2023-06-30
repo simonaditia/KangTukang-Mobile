@@ -30,6 +30,8 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
   bool? _checked5 = false;
   bool? _checked6 = false;
   Map<String, dynamic>? userData;
+  List<dynamic>? categories;
+  List<int> userCategoryIDs = [];
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _noTelpController = TextEditingController();
@@ -39,13 +41,14 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
   double? _userLatitude;
   double? _userLongitude;
   bool _isLoading = false; // Tambahkan variabel isLoading
+  bool _isChecked = false;
 
   Future<void> fetchDataUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/findTukang/$idUser';
+    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     final response = await http.get(
       Uri.parse(apiUrl),
@@ -69,7 +72,25 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
         _kategoriController.text = userData!['kategori'];
         _biayaController.text = userData!['biaya'].toString();
         _alamatController.text = userData!['alamat'];
+        categories = userData!['Categories'];
+
+        for (var category in categories!) {
+          int categoryID = category['ID'];
+          userCategoryIDs.add(categoryID);
+        }
+        _checked1 = userCategoryIDs.contains(1); // ID kategori "Renovasi"
+        _checked2 = userCategoryIDs.contains(2); // ID kategori "Cat"
+        _checked3 = userCategoryIDs.contains(3);
+        _checked4 = userCategoryIDs.contains(4); // ID kategori "Renovasi"
+        _checked5 = userCategoryIDs.contains(5); // ID kategori "Cat"
+        _checked6 = userCategoryIDs.contains(6);
       });
+      // for (var category in categories) {
+      //   int categoryID = category['ID'];
+      //   String categoryName = category['Name'];
+      //   print('ID Kategori: $categoryID');
+      //   print('Nama Kategori: $categoryName');
+      // }
     } else {
       // Gagal mendapatkan data
       print('Error: ${response.statusCode}');
@@ -286,104 +307,109 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                   ),
                                 ),
                               ),
-                              /*
-                  Container(
-                      padding: EdgeInsets.only(left: 20, top: 20, bottom: 10),
-                      child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Kategori Pekerjaan",
-                            style: TextStyle(fontSize: 16),
-                          ))),
-                  Container(
-                      padding: EdgeInsets.only(left: 18, right: 18),
-                      child: Card(
-                        child: SizedBox(
-                          width: 600,
-                          height: 340,
-                          child: Column(children: [
-                            CheckboxListTile(
-                              // secondary: Icon(Icons.beach_access),
-                              title: Text("Renovasi"),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _checked1,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _checked1 = value;
-                                });
-                              },
-                              activeColor: Color(0xffFF5403),
-                              checkColor: Colors.white,
-                            ),
-                            CheckboxListTile(
-                              // secondary: Icon(Icons.beach_access),
-                              title: Text("Cat"),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _checked2,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _checked2 = value;
-                                });
-                              },
-                              activeColor: Color(0xffFF5403),
-                              checkColor: Colors.white,
-                            ),
-                            CheckboxListTile(
-                              // secondary: Icon(Icons.beach_access),
-                              title: Text("Plafon"),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _checked3,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _checked3 = value;
-                                });
-                              },
-                              activeColor: Color(0xffFF5403),
-                              checkColor: Colors.white,
-                            ),
-                            CheckboxListTile(
-                              // secondary: Icon(Icons.beach_access),
-                              title: Text("Kebocoran"),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _checked4,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _checked4 = value;
-                                });
-                              },
-                              activeColor: Color(0xffFF5403),
-                              checkColor: Colors.white,
-                            ),
-                            CheckboxListTile(
-                              // secondary: Icon(Icons.beach_access),
-                              title: Text("Keramik"),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _checked5,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _checked5 = value;
-                                });
-                              },
-                              activeColor: Color(0xffFF5403),
-                              checkColor: Colors.white,
-                            ),
-                            CheckboxListTile(
-                              // secondary: Icon(Icons.beach_access),
-                              title: Text("Dinding"),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _checked6,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  _checked6 = value;
-                                });
-                              },
-                              activeColor: Color(0xffFF5403),
-                              checkColor: Colors.white,
-                            ),
-                          ]),
-                        ),
-                      )),
-                  */
+                              Container(
+                                  padding: EdgeInsets.only(
+                                      left: 20, top: 20, bottom: 10),
+                                  child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        "Kategori Pekerjaan",
+                                        style: TextStyle(fontSize: 16),
+                                      ))),
+                              Container(
+                                  padding: EdgeInsets.only(left: 18, right: 18),
+                                  child: Card(
+                                    child: SizedBox(
+                                      width: 600,
+                                      height: 340,
+                                      child: Column(children: [
+                                        CheckboxListTile(
+                                          // secondary: Icon(Icons.beach_access),
+                                          title: Text("Renovasi"),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          value: _checked1,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              _checked1 = value;
+                                            });
+                                          },
+                                          activeColor: Color(0xffFF5403),
+                                          checkColor: Colors.white,
+                                        ),
+                                        CheckboxListTile(
+                                          // secondary: Icon(Icons.beach_access),
+                                          title: Text("Cat"),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          value: _checked2,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              _checked2 = value;
+                                            });
+                                          },
+                                          activeColor: Color(0xffFF5403),
+                                          checkColor: Colors.white,
+                                        ),
+                                        CheckboxListTile(
+                                          // secondary: Icon(Icons.beach_access),
+                                          title: Text("Plafon"),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          value: _checked3,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              _checked3 = value;
+                                            });
+                                          },
+                                          activeColor: Color(0xffFF5403),
+                                          checkColor: Colors.white,
+                                        ),
+                                        CheckboxListTile(
+                                          // secondary: Icon(Icons.beach_access),
+                                          title: Text("Kebocoran"),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          value: _checked4,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              _checked4 = value;
+                                            });
+                                          },
+                                          activeColor: Color(0xffFF5403),
+                                          checkColor: Colors.white,
+                                        ),
+                                        CheckboxListTile(
+                                          // secondary: Icon(Icons.beach_access),
+                                          title: Text("Keramik"),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          value: _checked5,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              _checked5 = value;
+                                            });
+                                          },
+                                          activeColor: Color(0xffFF5403),
+                                          checkColor: Colors.white,
+                                        ),
+                                        CheckboxListTile(
+                                          // secondary: Icon(Icons.beach_access),
+                                          title: Text("Dinding"),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          value: _checked6,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              _checked6 = value;
+                                            });
+                                          },
+                                          activeColor: Color(0xffFF5403),
+                                          checkColor: Colors.white,
+                                        ),
+                                      ]),
+                                    ),
+                                  )),
                               Container(
                                 padding: EdgeInsets.only(
                                     left: 20, right: 20, top: 10, bottom: 5),

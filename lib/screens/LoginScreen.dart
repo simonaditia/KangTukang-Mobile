@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -296,6 +297,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your email';
+                                  }
+                                  if (!EmailValidator.validate(value)) {
+                                    return 'Masukkan email yang valid';
                                   }
                                   return null;
                                 },
