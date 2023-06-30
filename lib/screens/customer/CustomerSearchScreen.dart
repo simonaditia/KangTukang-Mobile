@@ -122,6 +122,10 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                     item['alamat'],
                     double.parse(item['distance'].toString()),
                     double.parse(item['biaya'].toString()),
+                    (item['Categories'] as List<dynamic>)
+                        .map((category) =>
+                            Category(category['ID'], category['Name']))
+                        .toList(),
                     // item['latitude'],
                     // item['longitude'],
                   ),
@@ -140,6 +144,9 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['alamat'],
               double.parse(data['distance'].toString()),
               double.parse(data['biaya'].toString()),
+              (data['Categories'] as List<dynamic>)
+                  .map((category) => Category(category['ID'], category['Name']))
+                  .toList(),
               // data['latitude'],
               // data['longitude'],
             );
@@ -186,6 +193,10 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                       item['alamat'],
                       double.parse(item['distance'].toString()),
                       double.parse(item['biaya'].toString()),
+                      (item['Categories'] as List<dynamic>)
+                          .map((category) =>
+                              Category(category['ID'], category['Name']))
+                          .toList(),
                       // item['latitude'],
                       // item['longitude'],
                     ))
@@ -203,6 +214,9 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['alamat'],
               double.parse(data['distance'].toString()),
               double.parse(data['biaya'].toString()),
+              (data['Categories'] as List<dynamic>)
+                  .map((category) => Category(category['ID'], category['Name']))
+                  .toList(),
               // data['latitude'],
               // data['longitude'],
             );
@@ -337,13 +351,15 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                                       ),
                                     ),
                                     subtitle: Text(
-                                        '${display_list[index].kategori!} ${display_list[index].ID!}',
+                                        '${display_list[index].categories.map((category) => category.name).join(', ')}',
                                         style: TextStyle(
                                           color: Colors.black26,
                                         )),
                                     trailing: Text(
                                       "${display_list[index].distance}KM",
-                                      style: TextStyle(color: Colors.amber),
+                                      style: TextStyle(
+                                          color: Colors.amber,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     leading:
                                         Text('${display_list[index].role!}',

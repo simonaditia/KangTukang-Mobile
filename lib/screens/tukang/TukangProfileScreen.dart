@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
@@ -42,6 +43,9 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
   double? _userLongitude;
   bool _isLoading = false; // Tambahkan variabel isLoading
   bool _isChecked = false;
+  GoogleMapController? _mapController;
+  String _currentAddress = '';
+  TextEditingController _addressController = TextEditingController();
 
   Future<void> fetchDataUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -73,6 +77,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
         _biayaController.text = userData!['biaya'].toString();
         _alamatController.text = userData!['alamat'];
         categories = userData!['Categories'];
+        _addressController.text = userData!['alamat'];
 
         for (var category in categories!) {
           int categoryID = category['ID'];
@@ -97,7 +102,30 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     }
   }
 
+  // void _getUserLocation() async {
+  //   Position? position;
+  //   try {
+  //     position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high,
+  //     );
+  //   } catch (e) {
+  //     print('Could not get the location: $e');
+  //   }
+
+  //   setState(() {
+  //     if (position != null) {
+  //       _userLatitude = position.latitude;
+  //       _userLongitude = position.longitude;
+  //       _alamatController.text = '$_userLatitude, $_userLongitude';
+  //     }
+  //   });
+  // }
+
   void _getUserLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     Position? position;
     try {
       position = await Geolocator.getCurrentPosition(
@@ -107,13 +135,86 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
       print('Could not get the location: $e');
     }
 
-    setState(() {
-      if (position != null) {
-        _userLatitude = position.latitude;
-        _userLongitude = position.longitude;
-        _alamatController.text = '$_userLatitude, $_userLongitude';
+    if (position != null) {
+      setState(() {
+        _userLatitude = position!.latitude;
+        _userLongitude = position!.longitude;
+        _mapController?.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(_userLatitude!, _userLongitude!),
+          ),
+        );
+      });
+
+      try {
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          _userLatitude!,
+          _userLongitude!,
+        );
+        print(_userLatitude);
+        print(_userLongitude);
+        if (placemarks != null && placemarks.isNotEmpty) {
+          Placemark placemark = placemarks[0];
+          String address =
+              '${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}';
+          print("address");
+
+          setState(() {
+            _currentAddress = address;
+            _addressController.text = _currentAddress;
+          });
+        }
+      } catch (e) {
+        print('Could not get the address: $e');
       }
+    }
+
+    setState(() {
+      _isLoading = false;
     });
+  }
+
+  Future<void> saveDataCategories() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    int idUser = decodedToken['id'] as int;
+    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser/categories';
+    List<Map<String, dynamic>> selectedCategories = [];
+
+    if (_checked1!) {
+      selectedCategories.add({'id': 1, 'name': 'Renovasi'});
+    }
+    if (_checked2!) {
+      selectedCategories.add({'id': 2, 'name': 'Cat'});
+    }
+    if (_checked3!) {
+      selectedCategories.add({'id': 3, 'name': 'Kategori 3'});
+    }
+    if (_checked4!) {
+      selectedCategories.add({'id': 4, 'name': 'Renovasi'});
+    }
+    if (_checked5!) {
+      selectedCategories.add({'id': 5, 'name': 'Cat'});
+    }
+    if (_checked6!) {
+      selectedCategories.add({'id': 6, 'name': 'Kategori 6'});
+    }
+
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'categories': selectedCategories}),
+    );
+
+    if (response.statusCode == 200) {
+      print('Data kategori berhasil disimpan');
+    } else {
+      print('Error: ${response.statusCode}');
+    }
   }
 
   Future<void> saveData() async {
@@ -128,6 +229,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     _getUserLocation();
+    saveDataCategories();
 
     String nama = _namaController.text;
     String email = _emailController.text;
@@ -181,7 +283,6 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
   void initState() {
     super.initState();
     fetchDataUser();
-    // _getUserLocation();
   }
 
   @override
@@ -432,12 +533,12 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.only(
-                                    left: 20, right: 20, top: 5, bottom: 10),
+                                padding: EdgeInsets.only(left: 20, right: 20),
                                 child: TextFormField(
-                                  readOnly: true,
-                                  initialValue: userData!['alamat'],
-                                  // controller: _alamatController,
+                                  maxLines: 4,
+                                  controller: _addressController,
+                                  // initialValue: userData!['alamat'],
+                                  // readOnly: true,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),
                                   decoration: InputDecoration(
@@ -448,17 +549,20 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                       borderSide: BorderSide(
                                           color: Colors.white, width: 5.5),
                                     ),
-                                    hintText: "Alamat",
+                                    // hintText: "Jl.Mangga Raya...",
                                   ),
                                 ),
                               ),
                               Container(
                                 padding: EdgeInsets.only(
-                                    top: 10, left: 20, right: 20),
-                                height: 300,
+                                    top: 25, left: 20, right: 20),
+                                height: 300, // Sesuaikan dengan kebutuhan Anda
                                 child: Stack(
                                   children: [
                                     GoogleMap(
+                                      onMapCreated: (controller) {
+                                        _mapController = controller;
+                                      },
                                       initialCameraPosition: CameraPosition(
                                         target: LatLng(
                                           _userLatitude ??
@@ -499,7 +603,19 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                           onPressed: () {
                                             _getUserLocation();
                                           },
-                                          child: Icon(Icons.refresh),
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              _isLoading
+                                                  ? CircularProgressIndicator(
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                                  Color>(
+                                                              Colors.white),
+                                                    )
+                                                  : Icon(Icons.refresh),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),

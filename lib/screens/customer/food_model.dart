@@ -1,3 +1,17 @@
+class Category {
+  int id;
+  String name;
+
+  Category(this.id, this.name);
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      json['ID'],
+      json['Name'],
+    );
+  }
+}
+
 class FoodModel {
   int ID;
   String? nama;
@@ -9,17 +23,45 @@ class FoodModel {
   // double longitude;
   double distance;
   double biaya;
+  List<Category> categories;
 
   FoodModel(
-      this.ID,
-      this.nama,
-      this.kategori,
-      this.email,
-      this.role,
-      this.alamat,
-      //  this.latitude, this.longitude,
-      this.distance,
-      this.biaya);
+    this.ID,
+    this.nama,
+    this.kategori,
+    this.email,
+    this.role,
+    this.alamat,
+    //  this.latitude, this.longitude,
+    this.distance,
+    this.biaya,
+    this.categories,
+  );
+}
+
+class CustomerPesan {
+  int ID;
+  String? nama;
+  String? kategori;
+  dynamic email; // Update the type to match your data
+  String? role;
+  String? alamat;
+  // double latitude;
+  // double longitude;
+  double distance;
+  double biaya;
+
+  CustomerPesan(
+    this.ID,
+    this.nama,
+    this.kategori,
+    this.email,
+    this.role,
+    this.alamat,
+    //  this.latitude, this.longitude,
+    this.distance,
+    this.biaya,
+  );
 }
 
 // class FoodModel {

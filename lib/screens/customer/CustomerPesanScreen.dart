@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/customer/CustomerMapScreen.dart';
@@ -13,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:tukang_online/screens/customer/food_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/gestures.dart';
+import 'package:geocoding/geocoding.dart';
 
 class CustomerPesanScreen extends StatefulWidget {
   const CustomerPesanScreen({Key? key, required this.tukangId})
@@ -32,13 +34,20 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
   DateTime selectedDateTimeAwal = DateTime.now();
   DateTime selectedDateTimeAkhir = DateTime.now();
 
-  FoodModel? tukangData;
+  CustomerPesan? tukangData;
   Map<String, dynamic>? userData;
+  double? _userLatitude;
+  double? _userLongitude;
+  GoogleMapController? _mapController;
+  bool _isLoading = false;
+  String _currentAddress = '';
+  TextEditingController _addressController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     getToken();
+    loadCustomerLatitudeLongitude();
     // loadCustomerLatitudeLongitude();
   }
 
@@ -86,7 +95,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
         if (responseData['status'] == 'success') {
           var data = responseData['data'];
 
-          var foodModel = FoodModel(
+          var foodModel = CustomerPesan(
             data['ID'],
             data['nama'],
             data['kategori'],
@@ -132,12 +141,87 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
       var decodedData = json.decode(responseData);
       setState(() {
         userData = decodedData['data'];
+        _addressController.text = userData!['alamat'];
         // print(userData);
       });
     } else {
       // Menangani respons yang gagal
       throw Exception('Gagal mengambil data dari API');
     }
+  }
+
+  void _getAddressFromLatLng() async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        _userLatitude!,
+        _userLongitude!,
+      );
+
+      if (placemarks != null && placemarks.isNotEmpty) {
+        Placemark placemark = placemarks[0];
+        String address =
+            '${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}';
+
+        setState(() {
+          _currentAddress = address;
+        });
+      }
+    } catch (e) {
+      print('Could not get the address: $e');
+    }
+  }
+
+  void _getUserLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    Position? position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+    } catch (e) {
+      print('Could not get the location: $e');
+    }
+
+    if (position != null) {
+      setState(() {
+        _userLatitude = position!.latitude;
+        _userLongitude = position!.longitude;
+        _mapController?.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(_userLatitude!, _userLongitude!),
+          ),
+        );
+      });
+
+      try {
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          _userLatitude!,
+          _userLongitude!,
+        );
+        print(_userLatitude);
+        print(_userLongitude);
+        if (placemarks != null && placemarks.isNotEmpty) {
+          Placemark placemark = placemarks[0];
+          String address =
+              '${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}';
+          print("address");
+
+          setState(() {
+            _currentAddress = address;
+            _addressController.text = _currentAddress;
+          });
+        }
+      } catch (e) {
+        print('Could not get the address: $e');
+      }
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> postOrderData() async {
@@ -228,6 +312,12 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     } else {
       throw Exception('Tukang data or user data is null');
     }
+  }
+
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
   }
 
   // String selectDate2 = DateFormat.yMMMMEEEEd().format(DateTime.now());
@@ -525,7 +615,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          "Alamat",
+                          "Alamat Lengkap (RT, RW, No Rumah)",
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
@@ -534,8 +624,9 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                       padding: EdgeInsets.only(left: 20, right: 20),
                       child: TextFormField(
                         maxLines: 4,
-                        initialValue: tukangData!.alamat,
-                        readOnly: true,
+                        controller: _addressController,
+                        // initialValue: userData!['alamat'],
+                        // readOnly: true,
                         style: TextStyle(color: Color.fromARGB(190, 0, 0, 0)),
                         decoration: InputDecoration(
                           filled: true,
@@ -552,31 +643,63 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                     Container(
                       padding: EdgeInsets.only(top: 25, left: 20, right: 20),
                       height: 300, // Sesuaikan dengan kebutuhan Anda
-                      child: GestureDetector(
-                        onPanUpdate: (details) {},
-                        child: GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(-6.2344189,
-                                106.9861527), // Ganti dengan latitude dan longitude yang sesuai
-                            zoom: 14.0,
+                      child: Stack(
+                        children: [
+                          GoogleMap(
+                            onMapCreated: (controller) {
+                              _mapController = controller;
+                            },
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(
+                                _userLatitude ?? userData!['latitude'],
+                                _userLongitude ?? userData!['longitude'],
+                              ),
+                              zoom: 14.0,
+                            ),
+                            markers: {
+                              Marker(
+                                markerId: MarkerId('user_location'),
+                                position: LatLng(
+                                  _userLatitude ?? userData!['latitude'],
+                                  _userLongitude ?? userData!['longitude'],
+                                ),
+                                infoWindow: InfoWindow(
+                                  title: 'Lokasi Anda',
+                                  snippet: 'Ini adalah lokasi Anda.',
+                                ),
+                              ),
+                            },
+                            gestureRecognizers:
+                                <Factory<OneSequenceGestureRecognizer>>[
+                              Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer(),
+                              ),
+                            ].toSet(),
                           ),
-                          markers: {
-                            Marker(
-                              markerId: MarkerId('user_location'),
-                              position: LatLng(-6.2344189,
-                                  106.9861527), // Ganti dengan latitude dan longitude yang sesuai
-                              infoWindow: InfoWindow(
-                                title: 'Lokasi Anda',
-                                snippet: 'Ini adalah lokasi Anda.',
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: FloatingActionButton(
+                                onPressed: () {
+                                  _getUserLocation();
+                                },
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    _isLoading
+                                        ? CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          )
+                                        : Icon(Icons.refresh),
+                                  ],
+                                ),
                               ),
                             ),
-                          },
-                          gestureRecognizers:
-                              <Factory<OneSequenceGestureRecognizer>>[
-                            Factory<OneSequenceGestureRecognizer>(
-                                () => EagerGestureRecognizer()),
-                          ].toSet(),
-                        ),
+                          ),
+                        ],
                       ),
                     ),
 

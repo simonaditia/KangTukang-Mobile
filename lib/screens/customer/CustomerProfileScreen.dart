@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -29,8 +30,14 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   double? _userLatitude;
   double? _userLongitude;
   bool _isLoading = false; // Tambahkan variabel isLoading
+  GoogleMapController? _mapController;
+  String _currentAddress = '';
+  TextEditingController _addressController = TextEditingController();
 
   Future<void> fetchDataUser() async {
+    setState(() {
+      _isLoading = true;
+    });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
@@ -59,14 +66,22 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         // _kategoriController.text = userData!['kategori'];
         // _biayaController.text = userData!['biaya'];
         _alamatController.text = userData!['alamat'];
+        _addressController.text = userData!['alamat'];
       });
     } else {
       // Gagal mendapatkan data
       print('Error: ${response.statusCode}');
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _getUserLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     Position? position;
     try {
       position = await Geolocator.getCurrentPosition(
@@ -76,12 +91,42 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       print('Could not get the location: $e');
     }
 
-    setState(() {
-      if (position != null) {
-        _userLatitude = position.latitude;
-        _userLongitude = position.longitude;
-        _alamatController.text = '$_userLatitude, $_userLongitude';
+    if (position != null) {
+      setState(() {
+        _userLatitude = position!.latitude;
+        _userLongitude = position!.longitude;
+        _mapController?.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(_userLatitude!, _userLongitude!),
+          ),
+        );
+      });
+
+      try {
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          _userLatitude!,
+          _userLongitude!,
+        );
+        print(_userLatitude);
+        print(_userLongitude);
+        if (placemarks != null && placemarks.isNotEmpty) {
+          Placemark placemark = placemarks[0];
+          String address =
+              '${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.postalCode}, ${placemark.country}';
+          print("address");
+
+          setState(() {
+            _currentAddress = address;
+            _addressController.text = _currentAddress;
+          });
+        }
+      } catch (e) {
+        print('Could not get the address: $e');
       }
+    }
+
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -152,6 +197,12 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     super.initState();
     fetchDataUser();
     // _getUserLocation();
+  }
+
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -258,12 +309,12 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.only(
-                                    left: 20, right: 20, top: 5, bottom: 10),
+                                padding: EdgeInsets.only(left: 20, right: 20),
                                 child: TextFormField(
-                                  readOnly: true,
-                                  initialValue: userData!['alamat'],
-                                  // controller: _alamatController,
+                                  maxLines: 4,
+                                  controller: _addressController,
+                                  // initialValue: userData!['alamat'],
+                                  // readOnly: true,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),
                                   decoration: InputDecoration(
@@ -274,17 +325,20 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                       borderSide: BorderSide(
                                           color: Colors.white, width: 5.5),
                                     ),
-                                    hintText: "Alamat",
+                                    // hintText: "Jl.Mangga Raya...",
                                   ),
                                 ),
                               ),
                               Container(
                                 padding: EdgeInsets.only(
-                                    top: 10, left: 20, right: 20),
-                                height: 300,
+                                    top: 25, left: 20, right: 20),
+                                height: 300, // Sesuaikan dengan kebutuhan Anda
                                 child: Stack(
                                   children: [
                                     GoogleMap(
+                                      onMapCreated: (controller) {
+                                        _mapController = controller;
+                                      },
                                       initialCameraPosition: CameraPosition(
                                         target: LatLng(
                                           _userLatitude ??
@@ -325,7 +379,19 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                           onPressed: () {
                                             _getUserLocation();
                                           },
-                                          child: Icon(Icons.refresh),
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              _isLoading
+                                                  ? CircularProgressIndicator(
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                                  Color>(
+                                                              Colors.white),
+                                                    )
+                                                  : Icon(Icons.refresh),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
