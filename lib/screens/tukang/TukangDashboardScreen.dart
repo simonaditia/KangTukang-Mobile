@@ -64,7 +64,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
     final response = await http.get(
-      Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
+      Uri.parse('http://34.128.64.114:8000/api/v1/users/$idUser'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -111,7 +111,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idTukang = decodedToken['id'] as int;
     final String apiUrlSMenunggu =
-        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangMenunggu?id_tukang=$idTukang';
+        'http://34.128.64.114:8000/api/v1/orders/statusOrderTukangMenunggu?id_tukang=$idTukang';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -152,7 +152,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
     int idTukang = decodedToken['id'] as int;
 
     final String response =
-        'http://192.168.1.100:8000/api/v1/orders/rejectOrderByTukang/$orderId';
+        'http://34.128.64.114:8000/api/v1/orders/rejectOrderByTukang/$orderId';
 
     final responsePost = await http.put(
       Uri.parse(response),
@@ -180,7 +180,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
     int idTukang = decodedToken['id'] as int;
 
     final String response =
-        'http://192.168.1.100:8000/api/v1/orders/accOrderByTukang/$orderId';
+        'http://34.128.64.114:8000/api/v1/orders/accOrderByTukang/$orderId';
 
     final responsePost = await http.put(
       Uri.parse(response),
@@ -391,6 +391,19 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                                               itemBuilder: (context, index) {
                                                 final item =
                                                     dataSMenunggu[index];
+                                                DateTime selectedDateTimeAwal =
+                                                    DateTime.parse(item[
+                                                        'jadwal_perbaikan_awal']);
+
+                                                DateTime selectedDateTimeAkhir =
+                                                    DateTime.parse(item[
+                                                        'jadwal_perbaikan_akhir']);
+                                                int differenceInDays =
+                                                    selectedDateTimeAkhir
+                                                            .difference(
+                                                                selectedDateTimeAwal)
+                                                            .inDays +
+                                                        1;
                                                 return Card(
                                                   child: SizedBox(
                                                     width: 370,
@@ -467,7 +480,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                                                               EdgeInsets.only(
                                                                   top: 10),
                                                           child: Text(
-                                                            "Lama Pengerjaan: 2 hari",
+                                                            "Lama Pengerjaan: $differenceInDays hari",
                                                             style: TextStyle(
                                                                 fontSize: 14),
                                                           ),
@@ -478,7 +491,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
                                                                   top: 10),
                                                           child: Center(
                                                             child: Text(
-                                                                "Total Biaya: Rp.300.000"),
+                                                                "Total Biaya: Rp.${item['total_biaya']}"),
                                                           ),
                                                         ),
                                                         Container(

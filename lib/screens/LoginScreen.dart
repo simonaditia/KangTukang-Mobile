@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = true;
       });
       var url = Uri.parse(
-          'http://192.168.1.100:8000/auth/login'); // Ganti dengan URL endpoint login Anda
+          'http://34.128.64.114:8000/auth/login'); // Ganti dengan URL endpoint login Anda
 
       if (email.isNotEmpty && password.isNotEmpty) {
         // Kirim permintaan login

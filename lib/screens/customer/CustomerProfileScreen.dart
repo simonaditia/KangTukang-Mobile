@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -11,6 +12,8 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/customer/CustomerDashboardScreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
   const CustomerProfileScreen({super.key});
@@ -34,6 +37,45 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   String _currentAddress = '';
   TextEditingController _addressController = TextEditingController();
 
+  final picker = ImagePicker();
+  File? _imageFile;
+  String? _imageUrl;
+
+  Future<void> pickImageFromGallery() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> uploadImageToFirebase() async {
+    if (_imageFile == null) return;
+
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    String directory = 'images'; // Direktori yang ingin Anda buat
+    print(directory);
+    print(_imageFile);
+
+    // Membuat direktori di Firebase Storage
+    Reference directoryRef = FirebaseStorage.instance.ref().child(directory);
+    await directoryRef.putData(Uint8List.fromList([]));
+
+    // Mengunggah gambar ke direktori yang telah dibuat
+    Reference firebaseStorageRef =
+        FirebaseStorage.instance.ref().child('$directory/$fileName');
+    UploadTask uploadTask = firebaseStorageRef.putFile(_imageFile!);
+    await uploadTask.whenComplete(() => null);
+    String imageUrl = await firebaseStorageRef.getDownloadURL();
+
+    setState(() {
+      _imageUrl = imageUrl;
+    });
+
+    print('Image URL: $_imageUrl');
+  }
+
   Future<void> fetchDataUser() async {
     setState(() {
       _isLoading = true;
@@ -42,7 +84,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
+    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser';
 
     final response = await http.get(
       Uri.parse(apiUrl),
@@ -139,7 +181,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
+    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser';
 
     _getUserLocation();
 
@@ -248,6 +290,25 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                   radius: 70,
                                 ),
                               ),
+                              // _imageFile != null
+                              //     ? Image.file(
+                              //         _imageFile!,
+                              //         height: 200,
+                              //       )
+                              //     : Container(
+                              //         height: 200,
+                              //         color: Colors.grey[300],
+                              //       ),
+                              // ElevatedButton.icon(
+                              //   onPressed: pickImageFromGallery,
+                              //   icon: Icon(Icons.image),
+                              //   label: Text('Pilih Gambar'),
+                              // ),
+                              // ElevatedButton.icon(
+                              //   onPressed: uploadImageToFirebase,
+                              //   icon: Icon(Icons.cloud_upload),
+                              //   label: Text('Upload Gambar'),
+                              // ),
                               Container(
                                 padding: EdgeInsets.only(
                                     left: 20, right: 20, top: 10, bottom: 5),

@@ -27,7 +27,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idCustomer = decodedToken['id'] as int;
     final String apiUrlSMenunggu =
-        'http://192.168.1.100:8000/api/v1/orders/statusOrderCustomerMenunggu?id_customer=$idCustomer';
+        'http://34.128.64.114:8000/api/v1/orders/statusOrderCustomerMenunggu?id_customer=$idCustomer';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -58,7 +58,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idCustomer = decodedToken['id'] as int;
     final String apiUrlSDikerjakan =
-        'http://192.168.1.100:8000/api/v1/orders/statusOrderCustomerBerlangsung?id_customer=$idCustomer';
+        'http://34.128.64.114:8000/api/v1/orders/statusOrderCustomerBerlangsung?id_customer=$idCustomer';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -90,7 +90,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     int idCustomer = decodedToken['id'] as int;
     print(idCustomer);
     final String apiUrlSSelesai =
-        'http://192.168.1.100:8000/api/v1/orders/statusOrderCustomerSelesai?id_customer=$idCustomer';
+        'http://34.128.64.114:8000/api/v1/orders/statusOrderCustomerSelesai?id_customer=$idCustomer';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -130,7 +130,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     int idTukang = decodedToken['id'] as int;
 
     final String response =
-        'http://192.168.1.100:8000/api/v1/orders/cancelOrderByCustomer/$orderId';
+        'http://34.128.64.114:8000/api/v1/orders/cancelOrderByCustomer/$orderId';
 
     final responsePost = await http.put(
       Uri.parse(response),

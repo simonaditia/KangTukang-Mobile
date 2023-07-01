@@ -52,7 +52,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
+    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser';
 
     final response = await http.get(
       Uri.parse(apiUrl),
@@ -179,7 +179,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser/categories';
+    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser/categories';
     List<Map<String, dynamic>> selectedCategories = [];
 
     if (_checked1!) {
@@ -226,7 +226,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
+    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser';
 
     _getUserLocation();
     saveDataCategories();

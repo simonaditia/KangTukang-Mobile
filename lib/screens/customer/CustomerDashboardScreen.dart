@@ -71,7 +71,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
     final response = await http.get(
-      Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
+      Uri.parse('http://34.128.64.114:8000/api/v1/users/$idUser'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -111,7 +111,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
     print("TOKEN");
     if (token != null) {
       // _fetchNama(token);
-      var url = Uri.parse('http://192.168.1.100:8000/api/v1/users');
+      var url = Uri.parse('http://34.128.64.114:8000/api/v1/users');
 
       var response = await http.get(
         url,
@@ -489,46 +489,93 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                             children: [
                                               Flexible(
                                                 flex: 1,
-                                                child: Container(
-                                                  child: Column(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        backgroundImage: AssetImage(
-                                                            'assets/images/renovasi.jpg'),
-                                                        radius: 50,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            CustomerSearchScreen(
+                                                                tukangId: '',
+                                                                keyword:
+                                                                    "renovasi"),
                                                       ),
-                                                      Text("Renovasi"),
-                                                    ],
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    child: Column(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          backgroundImage:
+                                                              AssetImage(
+                                                                  'assets/images/renovasi.jpg'),
+                                                          radius: 50,
+                                                        ),
+                                                        Text("Renovasi"),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                               Flexible(
                                                 flex: 1,
-                                                child: Container(
-                                                  child: Column(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        backgroundImage: AssetImage(
-                                                            'assets/images/catb.jpg'),
-                                                        radius: 50,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            CustomerSearchScreen(
+                                                                tukangId: '',
+                                                                keyword: "cat"),
                                                       ),
-                                                      Text("Cat"),
-                                                    ],
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    child: Column(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          backgroundImage:
+                                                              AssetImage(
+                                                                  'assets/images/catb.jpg'),
+                                                          radius: 50,
+                                                        ),
+                                                        Text("Cat"),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                               Flexible(
                                                 flex: 1,
-                                                child: Container(
-                                                  child: Column(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        backgroundImage: AssetImage(
-                                                            'assets/images/plafon.jpg'),
-                                                        radius: 50,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            CustomerSearchScreen(
+                                                                tukangId: '',
+                                                                keyword:
+                                                                    "plafon"),
                                                       ),
-                                                      Text("Plafon"),
-                                                    ],
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    child: Column(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          backgroundImage:
+                                                              AssetImage(
+                                                                  'assets/images/plafon.jpg'),
+                                                          radius: 50,
+                                                        ),
+                                                        Text("Plafon"),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -543,46 +590,91 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                           children: [
                                             Flexible(
                                               flex: 1,
-                                              child: Container(
-                                                child: Column(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      backgroundImage: AssetImage(
-                                                          'assets/images/kebocoran.jpg'),
-                                                      radius: 50,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          CustomerSearchScreen(
+                                                              tukangId: '',
+                                                              keyword:
+                                                                  "kebocoran"),
                                                     ),
-                                                    Text("Kebocoran"),
-                                                  ],
+                                                  );
+                                                },
+                                                child: Container(
+                                                  child: Column(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        backgroundImage: AssetImage(
+                                                            'assets/images/kebocoran.jpg'),
+                                                        radius: 50,
+                                                      ),
+                                                      Text("Kebocoran"),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                             Flexible(
                                               flex: 1,
-                                              child: Container(
-                                                child: Column(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      backgroundImage: AssetImage(
-                                                          'assets/images/keramik.jpg'),
-                                                      radius: 50,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          CustomerSearchScreen(
+                                                              tukangId: '',
+                                                              keyword:
+                                                                  "keramik"),
                                                     ),
-                                                    Text("Keramik"),
-                                                  ],
+                                                  );
+                                                },
+                                                child: Container(
+                                                  child: Column(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        backgroundImage: AssetImage(
+                                                            'assets/images/keramik.jpg'),
+                                                        radius: 50,
+                                                      ),
+                                                      Text("Keramik"),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                             Flexible(
                                               flex: 1,
-                                              child: Container(
-                                                child: Column(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      backgroundImage: AssetImage(
-                                                          'assets/images/dinding.jpeg'),
-                                                      radius: 50,
+                                              child: InkWell(
+                                                onTap: () {
+                                                  // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          CustomerSearchScreen(
+                                                              tukangId: '',
+                                                              keyword:
+                                                                  "dinding"),
                                                     ),
-                                                    Text("Dinding"),
-                                                  ],
+                                                  );
+                                                },
+                                                child: Container(
+                                                  child: Column(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        backgroundImage: AssetImage(
+                                                            'assets/images/dinding.jpeg'),
+                                                        radius: 50,
+                                                      ),
+                                                      Text("Dinding"),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),

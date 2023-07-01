@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:tukang_online/models/user_model.dart';
 
 class AuthServiceCustomer {
-  String baseUrl = 'http://192.168.1.100:8000/auth';
+  String baseUrl = 'http://34.128.64.114:8000/auth';
 
   get response => null;
   Future<UserModel> register({
@@ -63,7 +63,7 @@ class AuthServiceCustomer {
 }
 
 class AuthServiceTukang {
-  String baseUrl = 'http://192.168.1.100:8000/auth';
+  String baseUrl = 'http://34.128.64.114:8000/auth';
 
   get response => null;
   Future<UserModel> register({
@@ -110,7 +110,7 @@ class AuthServiceTukang {
 }
 
 class AuthLogin {
-  // String baseUrl = 'http://192.168.1.100:8000/auth';
+  // String baseUrl = 'http://34.128.64.114:8000/auth';
   String baseUrl = 'http://localhost:8000/auth';
 
   get response => null;
@@ -154,7 +154,7 @@ class AuthLogin {
 }
 
 class AuthLoginn {
-  static const baseUrl = 'http://192.168.1.100:8000/auth';
+  static const baseUrl = 'http://34.128.64.114:8000/auth';
 
   Future<String?> login(
       {required String email, required String password}) async {

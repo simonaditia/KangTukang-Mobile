@@ -12,6 +12,13 @@ class Category {
   }
 }
 
+class Categoryy {
+  final int id;
+  final String name;
+
+  Categoryy(this.id, this.name);
+}
+
 class FoodModel {
   int ID;
   String? nama;
@@ -50,6 +57,7 @@ class CustomerPesan {
   // double longitude;
   double distance;
   double biaya;
+  List<Categoryy> categories;
 
   CustomerPesan(
     this.ID,
@@ -61,6 +69,7 @@ class CustomerPesan {
     //  this.latitude, this.longitude,
     this.distance,
     this.biaya,
+    this.categories,
   );
 }
 

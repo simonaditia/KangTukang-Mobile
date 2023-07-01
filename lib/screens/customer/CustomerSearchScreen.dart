@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,9 +8,10 @@ import 'package:tukang_online/screens/customer/food_model.dart';
 
 class CustomerSearchScreen extends StatefulWidget {
   final String tukangId;
+  final String? keyword;
 
   // const CustomerPesanScreen({required this.tukangId});
-  const CustomerSearchScreen({Key? key, required this.tukangId})
+  const CustomerSearchScreen({Key? key, required this.tukangId, this.keyword})
       : super(key: key);
 
   @override
@@ -50,7 +52,6 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
     //     "https://images.unsplash.com/photo-1489980557514-251d61e3eeb6"),
   ];
   List<FoodModel> display_list = [];
-  TextEditingController searchController = TextEditingController();
 
 //   Future<List<FoodModel>> fetchData(String query) async {
 //   var url = Uri.parse('http://localhost:8000/api/v1/users/findTukang?$query');
@@ -77,10 +78,19 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
 //     throw Exception('Failed to fetch data');
 //   }
 // }
-  @override
+
+  late TextEditingController searchController;
+
   void initState() {
     super.initState();
     getToken();
+    searchController = TextEditingController(text: widget.keyword ?? '');
+    // fetchDataByCategory(widget.keyword!, token);
+    // updateList(widget.keyword!, token);
+    // print(widget.keyword!);
+    // print(token);
+    // print("DIATAS INI HARUSNYA TOKEN");
+    // searchController;
   }
 
   void getToken() async {
@@ -92,11 +102,12 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
     setState(() {
       token = jwt;
     });
+    updateList(widget.keyword!, token);
   }
 
   Future<List<FoodModel>> fetchDataByName(String name, String token) async {
     var url = Uri.parse(
-        'http://192.168.1.100:8000/api/v1/users/findTukang?nama=$name');
+        'http://34.128.64.114:8000/api/v1/users/findTukang?nama=$name');
 
     try {
       var response = await http.get(url, headers: {
@@ -168,7 +179,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
   Future<List<FoodModel>> fetchDataByCategory(
       String category, String token) async {
     var url = Uri.parse(
-        'http://192.168.1.100:8000/api/v1/users/findTukang?kategori=$category');
+        'http://34.128.64.114:8000/api/v1/users/findTukang?kategori=$category');
 
     try {
       var response = await http.get(url, headers: {
@@ -236,10 +247,14 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
   }
 
   void updateList(String value, String token) {
+    print("UPDATE LIST");
+    print(value);
     setState(() {
       isLoading = true;
       if (value.isEmpty) {
-        display_list = [];
+        print("UPDATE LIST IS EMPTY");
+        // print(value);
+        // display_list = [];
       } else {
         if (value.toLowerCase().contains('nama:')) {
           var nama = value.toLowerCase().replaceAll('nama:', '').trim();
@@ -256,13 +271,32 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
             setState(() {
               display_list = data;
               isLoading = false;
+              // print(display_list);
             });
           }).catchError((error) {
             print('Error fetching data by categoryname: $error');
+            print(display_list);
+            print("DIDALAM CATCH ERROR");
+            // if (display_list == [] || display_list.isEmpty) {
+            Fluttertoast.showToast(
+              msg: "Maaf kategori tidak ditemukan\nSilahkan cari kategori lain",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Color(0xffFF5403),
+              textColor: Colors.white,
+            );
+            return isLoading = false;
+            // }
           });
         }
       }
     });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override

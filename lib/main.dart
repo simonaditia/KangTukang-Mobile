@@ -18,8 +18,16 @@ import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
 import 'package:tukang_online/screens/tukang/TukangPesananScreen.dart';
 import 'package:tukang_online/screens/tukang/TukangProfileScreen.dart';
 import 'package:tukang_online/screens/tukang/TukangTentangAppScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-void main() {
+void main() async {
+  // Inisialisasi Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  // Mengonfigurasi Firebase Storage
+  FirebaseStorage storage = FirebaseStorage.instance;
   // SdkContext.init(IsolateOrigin.main);
   // _initializeHERESDK();
   runApp(const MyApp());
@@ -125,9 +133,8 @@ class _MyAppState extends State<MyApp> {
           '/dashboard-customer': (context) => CustomerDashboardScreen(),
           '/status-pesanan-customer': (context) => CustomerPesananScreen(),
           '/status-pesanan-tukang': (context) => TukangPesananScreen(),
-          '/cari-tukang': (context) => CustomerSearchScreen(
-                tukangId: '',
-              ),
+          '/cari-tukang': (context) =>
+              CustomerSearchScreen(tukangId: '', keyword: ''),
           '/customer-pesan': (context) => CustomerPesanScreen(
                 tukangId: '',
               ),

@@ -15,6 +15,7 @@ import 'package:tukang_online/screens/customer/food_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:flutter/foundation.dart';
 
 class CustomerPesanScreen extends StatefulWidget {
   const CustomerPesanScreen({Key? key, required this.tukangId})
@@ -77,8 +78,8 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
   // }
 
   Future<void> fetchTukangData(String token) async {
-    var url = Uri.parse(
-        'http://192.168.1.100:8000/api/v1/users/findTukang/${widget.tukangId}');
+    var url =
+        Uri.parse('http://34.128.64.114:8000/api/v1/users/${widget.tukangId}');
     try {
       print("didialam get token customerpesanscreen fetchTukangData");
       print(token);
@@ -94,6 +95,9 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
 
         if (responseData['status'] == 'success') {
           var data = responseData['data'];
+          List<Categoryy> categories = (data['Categories'] as List<dynamic>)
+              .map((category) => Categoryy(category['ID'], category['Name']))
+              .toList();
 
           var foodModel = CustomerPesan(
             data['ID'],
@@ -104,6 +108,10 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
             data['alamat'],
             double.parse(data['distance'].toString()),
             double.parse(data['biaya'].toString()),
+            categories,
+            // (data['Categories'] as List<dynamic>)
+            //     .map((category) => Category(category['ID'], category['Name']))
+            //     .toList(),
             // data['latitude'],
             // data['longitude'],
           );
@@ -128,7 +136,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
     final response = await http.get(
-      Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
+      Uri.parse('http://34.128.64.114:8000/api/v1/users/$idUser'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -248,7 +256,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
       double totalBiaya = differenceInDays * tukangBiaya;
 
       var url = Uri.parse(
-          'http://192.168.1.100:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
+          'http://34.128.64.114:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $jwt'
@@ -379,18 +387,31 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                                 style: TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.w600),
                               ),
+                              // Text(
+                              //   'Kategori Tukang:',
+                              //   style: TextStyle(fontWeight: FontWeight.bold),
+                              // ),
+                              // ListView.builder(
+                              //   shrinkWrap: true,
+                              //   itemCount: tukangData?.categories?.length ?? 0,
+                              //   itemBuilder: (context, index) {
+                              //     var category = tukangData!.categories[index];
+                              //     return Text(category.name);
+                              //   },
+                              // ),
                               Container(
                                 padding: EdgeInsets.only(top: 10),
                                 // Kategori Tukang: Renovasi
                                 child: Text(
-                                  'Kategori: ${tukangData != null ? tukangData!.kategori : 'Kategori tidak tersedia'}',
+                                  // 'Kategori: ${tukangData != null ? tukangData!.kategori : 'Kategori tidak tersedia'}',
+                                  'Kategori: ${tukangData != null ? tukangData!.categories.map((category) => category.name).join(', ') : 'Kategori tidak tersedia'}',
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),
                               Container(
                                 padding: EdgeInsets.only(top: 10),
                                 child: Text(
-                                  "Biaya Tukang: Rp.${tukangData!.biaya}/hr",
+                                  "Biaya Tukang: Rp.${tukangData!.biaya.toInt()}/hr",
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),
