@@ -71,7 +71,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
     final response = await http.get(
-      Uri.parse('http://34.128.64.114:8000/api/v1/users/$idUser'),
+      Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -111,7 +111,7 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
     print("TOKEN");
     if (token != null) {
       // _fetchNama(token);
-      var url = Uri.parse('http://34.128.64.114:8000/api/v1/users');
+      var url = Uri.parse('http://192.168.1.100:8000/api/v1/users');
 
       var response = await http.get(
         url,

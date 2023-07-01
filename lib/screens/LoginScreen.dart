@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = true;
       });
       var url = Uri.parse(
-          'http://34.128.64.114:8000/auth/login'); // Ganti dengan URL endpoint login Anda
+          'http://192.168.1.100:8000/auth/login'); // Ganti dengan URL endpoint login Anda
 
       if (email.isNotEmpty && password.isNotEmpty) {
         // Kirim permintaan login
@@ -196,23 +196,17 @@ class _LoginScreenState extends State<LoginScreen> {
           // Redirect pengguna ke halaman yang sesuai berdasarkan role
           if (role == 'customer') {
             // Navigator.pushReplacementNamed(context, CustomerDashboardScreen());
-            Navigator.pushReplacement(
+            Navigator.pushNamedAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return CustomerDashboardScreen();
-                },
-              ),
+              '/dashboard-customer', // Ganti dengan nama route untuk halaman login
+              (route) => false,
             );
           } else if (role == 'tukang') {
             // Navigator.pushReplacementNamed(context, '/tukang_dashboard');
-            Navigator.pushReplacement(
+            Navigator.pushNamedAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return TukangDashboardScreen();
-                },
-              ),
+              '/dashboard-tukang', // Ganti dengan nama route untuk halaman login
+              (route) => false,
             );
           }
         } else {

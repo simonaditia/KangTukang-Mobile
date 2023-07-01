@@ -17,7 +17,7 @@ class AuthProvider with ChangeNotifier {
 
   Future<dynamic> checkEmailAvailability(String email) async {
     final response = await http.get(Uri.parse(
-        'http://34.128.64.114:8000/api/v1/checkIsAvailableEmail?email=$email'));
+        'http://192.168.1.100:8000/api/v1/checkIsAvailableEmail?email=$email'));
 
     if (response.statusCode == 200) {
       // Sukses mendapatkan respons dari API

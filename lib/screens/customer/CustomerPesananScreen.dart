@@ -8,6 +8,8 @@ import 'package:tukang_online/screens/customer/CustomerDashboardScreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
+
 class CustomerPesananScreen extends StatefulWidget {
   const CustomerPesananScreen({super.key});
 
@@ -27,7 +29,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idCustomer = decodedToken['id'] as int;
     final String apiUrlSMenunggu =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderCustomerMenunggu?id_customer=$idCustomer';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderCustomerMenunggu?id_customer=$idCustomer';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -58,7 +60,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idCustomer = decodedToken['id'] as int;
     final String apiUrlSDikerjakan =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderCustomerBerlangsung?id_customer=$idCustomer';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderCustomerBerlangsung?id_customer=$idCustomer';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -90,7 +92,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     int idCustomer = decodedToken['id'] as int;
     print(idCustomer);
     final String apiUrlSSelesai =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderCustomerSelesai?id_customer=$idCustomer';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderCustomerSelesai?id_customer=$idCustomer';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -130,7 +132,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
     int idTukang = decodedToken['id'] as int;
 
     final String response =
-        'http://34.128.64.114:8000/api/v1/orders/cancelOrderByCustomer/$orderId';
+        'http://192.168.1.100:8000/api/v1/orders/cancelOrderByCustomer/$orderId';
 
     final responsePost = await http.put(
       Uri.parse(response),
@@ -172,7 +174,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
             appBar: AppBar(
               leading: IconButton(
                   onPressed: () {
-                    Navigator.pop(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) {

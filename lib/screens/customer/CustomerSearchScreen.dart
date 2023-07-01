@@ -107,7 +107,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
 
   Future<List<FoodModel>> fetchDataByName(String name, String token) async {
     var url = Uri.parse(
-        'http://34.128.64.114:8000/api/v1/users/findTukang?nama=$name');
+        'http://192.168.1.100:8000/api/v1/users/findTukang?nama=$name');
 
     try {
       var response = await http.get(url, headers: {
@@ -179,7 +179,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
   Future<List<FoodModel>> fetchDataByCategory(
       String category, String token) async {
     var url = Uri.parse(
-        'http://34.128.64.114:8000/api/v1/users/findTukang?kategori=$category');
+        'http://192.168.1.100:8000/api/v1/users/findTukang?kategori=$category');
 
     try {
       var response = await http.get(url, headers: {

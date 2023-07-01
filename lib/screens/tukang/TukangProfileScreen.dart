@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -52,7 +53,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser';
+    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     final response = await http.get(
       Uri.parse(apiUrl),
@@ -179,7 +180,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser/categories';
+    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser/categories';
     List<Map<String, dynamic>> selectedCategories = [];
 
     if (_checked1!) {
@@ -226,7 +227,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser';
+    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     _getUserLocation();
     saveDataCategories();
@@ -517,6 +518,9 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                 child: TextFormField(
                                   //initialValue: "userData!['biaya']",
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                   controller: _biayaController,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),

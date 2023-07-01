@@ -79,7 +79,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
 
   Future<void> fetchTukangData(String token) async {
     var url =
-        Uri.parse('http://34.128.64.114:8000/api/v1/users/${widget.tukangId}');
+        Uri.parse('http://192.168.1.100:8000/api/v1/users/${widget.tukangId}');
     try {
       print("didialam get token customerpesanscreen fetchTukangData");
       print(token);
@@ -136,7 +136,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
     final response = await http.get(
-      Uri.parse('http://34.128.64.114:8000/api/v1/users/$idUser'),
+      Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -256,7 +256,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
       double totalBiaya = differenceInDays * tukangBiaya;
 
       var url = Uri.parse(
-          'http://34.128.64.114:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
+          'http://192.168.1.100:8000/api/v1/orders/$idTukang/order?id_customer=$idCustomer');
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $jwt'

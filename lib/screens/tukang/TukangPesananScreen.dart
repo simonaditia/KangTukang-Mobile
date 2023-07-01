@@ -31,7 +31,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idUser = decodedToken['id'] as int;
-    String apiUrl = 'http://34.128.64.114:8000/api/v1/users/$idUser';
+    String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     final response = await http.get(
       Uri.parse(apiUrl),
@@ -65,7 +65,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idTukang = decodedToken['id'] as int;
     final String apiUrlSMenunggu =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderTukangMenunggu?id_tukang=$idTukang';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangMenunggu?id_tukang=$idTukang';
 
     // print("TOKEN DI Pesanan screen");
     // print(token);
@@ -108,7 +108,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     int idTukang = decodedToken['id'] as int;
     final String apiUrlSDikerjakan =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderTukangBerlangsung?id_tukang=$idTukang';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangBerlangsung?id_tukang=$idTukang';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -150,7 +150,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     int idTukang = decodedToken['id'] as int;
     print(idTukang);
     final String apiUrlSSelesai =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderTukangSelesai?id_tukang=$idTukang';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangSelesai?id_tukang=$idTukang';
 
     print("TOKEN DI Pesanan screen");
     print(token);
@@ -224,11 +224,11 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     int idTukang = decodedToken['id'] as int;
 
     final String apiUrlSMenunggu =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderTukangMenunggu?id_tukang=$idTukang';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangMenunggu?id_tukang=$idTukang';
     final String apiUrlSDikerjakan =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderTukangBerlangsung?id_tukang=$idTukang';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangBerlangsung?id_tukang=$idTukang';
     final String apiUrlSSelesai =
-        'http://34.128.64.114:8000/api/v1/orders/statusOrderTukangSelesai?id_tukang=$idTukang';
+        'http://192.168.1.100:8000/api/v1/orders/statusOrderTukangSelesai?id_tukang=$idTukang';
 
     final responseSMenunggu = await http.get(
       Uri.parse(apiUrlSMenunggu),
@@ -280,7 +280,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     int idTukang = decodedToken['id'] as int;
 
     final String response =
-        'http://34.128.64.114:8000/api/v1/orders/rejectOrderByTukang/$orderId';
+        'http://192.168.1.100:8000/api/v1/orders/rejectOrderByTukang/$orderId';
 
     final responsePost = await http.put(
       Uri.parse(response),
@@ -309,7 +309,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     int idTukang = decodedToken['id'] as int;
 
     final String response =
-        'http://34.128.64.114:8000/api/v1/orders/accOrderByTukang/$orderId';
+        'http://192.168.1.100:8000/api/v1/orders/accOrderByTukang/$orderId';
 
     final responsePost = await http.put(
       Uri.parse(response),
@@ -335,7 +335,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     int idTukang = decodedToken['id'] as int;
 
     final String response =
-        'http://34.128.64.114:8000/api/v1/orders/doneOrderByTukang/$orderId';
+        'http://192.168.1.100:8000/api/v1/orders/doneOrderByTukang/$orderId';
 
     final responsePost = await http.put(
       Uri.parse(response),
