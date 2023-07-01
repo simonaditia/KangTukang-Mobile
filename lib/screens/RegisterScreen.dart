@@ -1,12 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/providers/auth_provider.dart';
 import 'package:tukang_online/screens/LoginScreen.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -101,6 +104,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               checkResult['available'] == true) {
             // Email tersedia, lanjutkan proses registrasi
             getCurrentLocation((latitude, longitude) async {
+              setState(() {
+                isLoading = true;
+              });
               dynamic result = await authProvider.registerCustomer(
                 nama: nama,
                 email: email,
@@ -132,10 +138,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   backgroundColor: Colors.red,
                   textColor: Colors.white,
                 );
+                setState(() {
+                  isLoading = false;
+                });
               }
-              setState(() {
-                isLoading = false;
-              });
             });
           } else {
             // Email sudah ada, tampilkan peringatan
@@ -158,6 +164,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
     }
 
+    /*
+    gk bisa, karna user tidak punya jwt
+    void saveDataCategories() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String token = prefs.getString('jwt') ?? '';
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+      int idUser = decodedToken['id'] as int;
+      String apiUrl =
+          'http://192.168.1.100:8000/api/v1/users/$idUser/categories/1';
+      print(apiUrl);
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        // body: json.encode({'categories': selectedCategories}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Data kategori berhasil disimpan');
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    }*/
+
     handleSignupTukang() async {
       setState(() {
         isLoadingTukang = true;
@@ -170,10 +203,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           dynamic result = null;
           dynamic checkResult =
               await authProvider.checkEmailAvailability(email);
+          // saveDataCategories(); gk bisa, karna user tidak punya jwt
 
           if (checkResult['status'] == 'success' &&
               checkResult['available'] == true) {
             getCurrentLocation((latitude, longitude) async {
+              setState(() {
+                isLoadingTukang = true;
+              });
               dynamic result = await authProvider.registerTukang(
                 nama: nama,
                 email: email,
@@ -183,7 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               );
               if (result != null && checkResult['status'] == 'success') {
                 Fluttertoast.showToast(
-                  msg: 'Register Berhasil!\n Silahkan Lakukan Login',
+                  msg: 'Register Berhasil!\nSilahkan Lakukan Login',
                   gravity: ToastGravity.CENTER,
                   toastLength: Toast.LENGTH_LONG,
                   backgroundColor: Colors.green,
@@ -202,10 +239,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   backgroundColor: Colors.red,
                   textColor: Colors.white,
                 );
+                setState(() {
+                  isLoadingTukang = false;
+                });
               }
-              setState(() {
-                isLoadingTukang = false;
-              });
             });
           } else {
             // Email sudah ada, tampilkan peringatan

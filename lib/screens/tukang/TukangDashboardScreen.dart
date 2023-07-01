@@ -28,7 +28,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    loadUserNama();
+    // loadUserNama();
   }
 
   @override
@@ -79,6 +79,14 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
         userData = decodedData['data'];
         print(userData);
       });
+
+      if (userData!['Categories'] == null || userData!['Categories'].isEmpty) {
+        Fluttertoast.showToast(
+            msg: 'Silahkan Pilih Kategori Pekerjaan\nDimenu Edit Profile',
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Color(0xffFF5403));
+      }
     } else {
       // Menangani respons yang gagal
       throw Exception('Gagal mengambil data dari API');
