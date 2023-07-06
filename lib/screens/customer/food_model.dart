@@ -55,6 +55,7 @@ class CustomerPesan {
   dynamic email; // Update the type to match your data
   String? role;
   String? alamat;
+  String? image_url;
   // double latitude;
   // double longitude;
   double distance;
@@ -68,6 +69,7 @@ class CustomerPesan {
     this.email,
     this.role,
     this.alamat,
+    this.image_url,
     //  this.latitude, this.longitude,
     this.distance,
     this.biaya,

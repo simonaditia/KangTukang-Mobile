@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -35,6 +36,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   double? _userLatitude;
   double? _userLongitude;
   bool _isLoading = false; // Tambahkan variabel isLoading
+  bool _isLoadingMap = false;
   GoogleMapController? _mapController;
   String _currentAddress = '';
   TextEditingController _addressController = TextEditingController();
@@ -43,9 +45,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   String? imageUrl;
 
   Future<void> fetchDataUser() async {
-    setState(() {
-      _isLoading = true;
-    });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('jwt') ?? '';
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
@@ -80,14 +79,11 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       // Gagal mendapatkan data
       print('Error: ${response.statusCode}');
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _getUserLocation() async {
     setState(() {
-      _isLoading = true;
+      _isLoadingMap = true;
     });
 
     Position? position;
@@ -134,7 +130,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     }
 
     setState(() {
-      _isLoading = false;
+      _isLoadingMap = false;
     });
   }
 
@@ -162,22 +158,23 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     final StoreGambar _statusLoading = StoreGambar();
 
     await _storeGambar.saveData(file: _image!);
+    // if (_image != null || _image != "") {
+    // }
     setState(() {
-      if (_statusLoading.statusLoading != null) {
-        _isLoading = _statusLoading.statusLoading!;
-      }
+      // if (_statusLoading.statusLoading != null) {
+      //   _isLoading = _statusLoading.statusLoading!;
+      // }
       imageUrl = _storeGambar.imageUrl;
       // saveData();
     });
     print("DIDALAM SAVE PHOTO");
-    print(_isLoading);
     print(imageUrl);
   }
 
   Future<void> saveData() async {
     setState(() {
-      _isLoading =
-          true; // Set isLoading menjadi true saat proses penyimpanan dimulai
+      // Set isLoading menjadi true saat proses penyimpanan dimulai
+      _isLoading = true;
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('jwt') ?? '';
@@ -185,8 +182,19 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     int idUser = decodedToken['id'] as int;
     String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
+    print("DIDALAM SAVE DATA");
+    print(_image);
+    print("HALOHALO");
     _getUserLocation();
-    await savePhoto();
+    if (userData!['image_url'] == null || userData!['image_url'] == "") {
+      if (_image == null || _image == "") {
+        userData!['image_url'] = "";
+      } else {
+        await savePhoto();
+      }
+    }
+    print(userData!['image_url']);
+    print("DIDALAM SAVE DATA");
 
     String nama = _namaController.text;
     String email = _emailController.text;
@@ -217,10 +225,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       }),
     );
 
-    setState(() {
-      _isLoading =
-          false; // Set isLoading menjadi false setelah proses penyimpanan selesai
-    });
     if (response.statusCode == 200) {
       // Berhasil menyimpan data
       print('Data berhasil disimpan');
@@ -236,6 +240,10 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       // Gagal menyimpan data
       print('Error: ${response.statusCode}');
     }
+    setState(() {
+      _isLoading =
+          false; // Set isLoading menjadi false setelah proses penyimpanan selesai
+    });
   }
 
   @override
@@ -377,6 +385,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                     left: 20, right: 20, top: 5, bottom: 5),
                                 child: TextFormField(
                                   //initialValue: userData!['email'],
+                                  keyboardType: TextInputType.emailAddress,
                                   controller: _emailController,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),
@@ -397,6 +406,10 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                     left: 20, right: 20, top: 5, bottom: 5),
                                 child: TextFormField(
                                   //initialValue: userData!['no_telp'],
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                   controller: _noTelpController,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),
@@ -476,7 +489,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                       ].toSet(),
                                     ),
                                     Align(
-                                      alignment: Alignment.bottomRight,
+                                      alignment: Alignment.topLeft,
                                       child: Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: FloatingActionButton(
@@ -486,7 +499,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                           child: Stack(
                                             alignment: Alignment.center,
                                             children: [
-                                              _isLoading
+                                              _isLoadingMap
                                                   ? CircularProgressIndicator(
                                                       valueColor:
                                                           AlwaysStoppedAnimation<

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,6 +16,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter/foundation.dart';
+import 'package:tukang_online/screens/customer/food_model.dart';
 
 class CustomerPesanScreen extends StatefulWidget {
   const CustomerPesanScreen({Key? key, required this.tukangId})
@@ -106,6 +107,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
             data['email'],
             data['role'],
             data['alamat'],
+            data['image_url'],
             double.parse(data['distance'].toString()),
             double.parse(data['biaya'].toString()),
             categories,
@@ -366,13 +368,49 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                           ),
                           Column(
                             children: [
-                              CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('assets/images/logo.png'),
-                                // NetworkImage(
-                                //     "https://images.unsplash.com/photo-1499996860823-5214fcc65f8f"),
-                                radius: 50,
-                              )
+                              Container(
+                                child: tukangData!.image_url == null ||
+                                        tukangData!.image_url == ""
+                                    ?
+                                    // CircleAvatar(
+                                    //     radius: 64,
+                                    //     backgroundImage: AssetImage(
+                                    //         'assets/images/default_profile_image.png'),
+                                    //   ),
+                                    ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(64.0),
+                                        child: Image.asset(
+                                            'assets/images/default_profile_image.png',
+                                            width: 105,
+                                            height: 105,
+                                            fit: BoxFit.cover),
+                                      )
+                                    : ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(64.0),
+                                        child: CachedNetworkImage(
+                                            fit: BoxFit.cover,
+                                            width: 105,
+                                            height: 105,
+                                            placeholder: (context, url) =>
+                                                Image.asset(
+                                                  'assets/images/content_placeholder.gif',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                            imageUrl: tukangData!.image_url!),
+                                      ),
+                                // CircleAvatar(
+                                //   radius: 64,
+                                //   child: FadeInImage(
+                                //     placeholder: AssetImage(
+                                //         'assets/images/content_placeholder.gif'),
+                                //     image:
+                                //         NetworkImage(userData!['image_url']),
+                                //     fit: BoxFit.fitWidth,
+                                //   ),
+                                // ),
+                              ),
                             ],
                           ),
                           Spacer(
@@ -411,7 +449,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                               Container(
                                 padding: EdgeInsets.only(top: 10),
                                 child: Text(
-                                  "Biaya Tukang: Rp.${tukangData!.biaya.toInt()}/hr",
+                                  "Biaya Tukang: Rp.${tukangData!.biaya.toInt()}/hari",
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),

@@ -47,6 +47,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
   double? _userLatitude;
   double? _userLongitude;
   bool _isLoading = false; // Tambahkan variabel isLoading
+  bool _isLoadingMap = false;
   bool _isChecked = false;
   GoogleMapController? _mapController;
   String _currentAddress = '';
@@ -107,28 +108,9 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     }
   }
 
-  // void _getUserLocation() async {
-  //   Position? position;
-  //   try {
-  //     position = await Geolocator.getCurrentPosition(
-  //       desiredAccuracy: LocationAccuracy.high,
-  //     );
-  //   } catch (e) {
-  //     print('Could not get the location: $e');
-  //   }
-
-  //   setState(() {
-  //     if (position != null) {
-  //       _userLatitude = position.latitude;
-  //       _userLongitude = position.longitude;
-  //       _alamatController.text = '$_userLatitude, $_userLongitude';
-  //     }
-  //   });
-  // }
-
   void _getUserLocation() async {
     setState(() {
-      _isLoading = true;
+      _isLoadingMap = true;
     });
 
     Position? position;
@@ -174,9 +156,9 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
       }
     }
 
-    // setState(() {
-    //   _isLoading = false;
-    // });
+    setState(() {
+      _isLoadingMap = false;
+    });
   }
 
   Uint8List? _image;
@@ -207,15 +189,8 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
 
     await _storeGambar.saveData(file: _image!);
     setState(() {
-      if (_statusLoading.statusLoading != null) {
-        _isLoading = _statusLoading.statusLoading!;
-      }
       imageUrl = _storeGambar.imageUrl;
-      // saveData();
     });
-    print("DIDALAM SAVE PHOTO");
-    print(_isLoading);
-    print(imageUrl);
   }
 
   Future<void> saveDataCategories() async {
@@ -264,8 +239,8 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
   Future<void> saveData() async {
     // final StoreGambar _storeGambar = StoreGambar();
     setState(() {
-      _isLoading =
-          true; // Set isLoading menjadi true saat proses penyimpanan dimulai
+      // Set isLoading menjadi true saat proses penyimpanan dimulai
+      _isLoading = true;
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('jwt') ?? '';
@@ -274,7 +249,13 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     _getUserLocation();
-    await savePhoto();
+    if (userData!['image_url'] == null || userData!['image_url'] == "") {
+      if (_image == null || _image == "") {
+        userData!['image_url'] = "";
+      } else {
+        await savePhoto();
+      }
+    }
     saveDataCategories();
 
     String nama = _namaController.text;
@@ -285,8 +266,6 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     // String alamat = _alamatController.text;
     double latitude = _userLatitude ?? userData!['latitude'];
     double longitude = _userLongitude ?? userData!['longitude'];
-    print("DIDALAM SAVE DATA TUKANGSCREEN");
-    print(imageUrl);
 
     final response = await http.patch(
       Uri.parse(apiUrl),
@@ -308,10 +287,6 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
       }),
     );
 
-    setState(() {
-      _isLoading =
-          false; // Set isLoading menjadi false setelah proses penyimpanan selesai
-    });
     if (response.statusCode == 200) {
       // Berhasil menyimpan data
       print('Data berhasil disimpan');
@@ -322,11 +297,15 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
-      Navigator.pushReplacementNamed(context, '/dashboard-customer');
+      Navigator.pushReplacementNamed(context, '/dashboard-tukang');
     } else {
       // Gagal menyimpan data
       print('Error: ${response.statusCode}');
     }
+    setState(() {
+      _isLoading =
+          false; // Set isLoading menjadi false setelah proses penyimpanan selesai
+    });
   }
 
   @override
@@ -481,6 +460,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                     left: 20, right: 20, top: 5, bottom: 5),
                                 child: TextFormField(
                                   //initialValue: userData!['email'],
+                                  keyboardType: TextInputType.emailAddress,
                                   controller: _emailController,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),
@@ -501,6 +481,10 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                     left: 20, right: 20, top: 5, bottom: 5),
                                 child: TextFormField(
                                   //initialValue: userData!['no_telp'],
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                   controller: _noTelpController,
                                   style: TextStyle(
                                       color: Color.fromARGB(190, 0, 0, 0)),
@@ -727,7 +711,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                       ].toSet(),
                                     ),
                                     Align(
-                                      alignment: Alignment.bottomRight,
+                                      alignment: Alignment.topLeft,
                                       child: Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: FloatingActionButton(
@@ -737,7 +721,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                           child: Stack(
                                             alignment: Alignment.center,
                                             children: [
-                                              _isLoading
+                                              _isLoadingMap
                                                   ? CircularProgressIndicator(
                                                       valueColor:
                                                           AlwaysStoppedAnimation<
