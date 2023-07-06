@@ -82,7 +82,7 @@ class _TukangDashboardScreenState extends State<TukangDashboardScreen> {
 
       if (userData!['Categories'] == null || userData!['Categories'].isEmpty) {
         Fluttertoast.showToast(
-            msg: 'Silahkan Pilih Kategori Pekerjaan\nDimenu Edit Profile',
+            msg: 'Silahkan Pilih Kategori Pekerjaan\nDi menu Edit Profile',
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.CENTER,
             backgroundColor: Color(0xffFF5403));

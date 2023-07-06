@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "179370470323",
-    "project_id": "skripsi-bc052",
-    "storage_bucket": "skripsi-bc052.appspot.com"
+    "project_number": "754932063789",
+    "project_id": "skripsi-upload-gambar",
+    "storage_bucket": "skripsi-upload-gambar.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:179370470323:android:503021f3ca946bf3edb9c6",
+        "mobilesdk_app_id": "1:754932063789:android:8b83993407aeb13fd8e2a4",
         "android_client_info": {
           "package_name": "com.example.tukang_online"
         }
       },
       "oauth_client": [
         {
-          "client_id": "179370470323-iobnfcanktjf0n99n9cogtd7f0m70miv.apps.googleusercontent.com",
+          "client_id": "754932063789-gmvt81pv7b8o1h92tfs61kk3fj7b33e1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCC4ESQZxoewfi7-jitTu8xntydcpELfJM"
+          "current_key": "AIzaSyDhvGakurPaMK7ltsS_jyGcrofnsGfuge4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "179370470323-iobnfcanktjf0n99n9cogtd7f0m70miv.apps.googleusercontent.com",
+              "client_id": "754932063789-gmvt81pv7b8o1h92tfs61kk3fj7b33e1.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

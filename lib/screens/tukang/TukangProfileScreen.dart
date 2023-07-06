@@ -6,6 +6,8 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
+// import 'package:googleapis/vision/v1.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
@@ -16,6 +18,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:tukang_online/resources/add_image.dart';
 
 class TukangProfileScreen extends StatefulWidget {
   const TukangProfileScreen({super.key});
@@ -170,9 +173,45 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
       }
     }
 
+    // setState(() {
+    //   _isLoading = false;
+    // });
+  }
+
+  Uint8List? _image;
+  String? imageUrl;
+
+  pickImage(ImageSource source) async {
+    final ImagePicker _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: source);
+    if (_file != null) {
+      return await _file.readAsBytes();
+    }
+    print("No Images Selected");
+  }
+
+  void selectImage() async {
+    Uint8List img = await pickImage(ImageSource.gallery);
     setState(() {
-      _isLoading = false;
+      _image = img;
     });
+  }
+
+  Future<void> savePhoto() async {
+    final StoreGambar _storeGambar = StoreGambar();
+    final StoreGambar _statusLoading = StoreGambar();
+
+    await _storeGambar.saveData(file: _image!);
+    setState(() {
+      if (_statusLoading.statusLoading != null) {
+        _isLoading = _statusLoading.statusLoading!;
+      }
+      imageUrl = _storeGambar.imageUrl;
+      // saveData();
+    });
+    print("DIDALAM SAVE PHOTO");
+    print(_isLoading);
+    print(imageUrl);
   }
 
   Future<void> saveDataCategories() async {
@@ -219,6 +258,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
   }
 
   Future<void> saveData() async {
+    // final StoreGambar _storeGambar = StoreGambar();
     setState(() {
       _isLoading =
           true; // Set isLoading menjadi true saat proses penyimpanan dimulai
@@ -230,6 +270,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     _getUserLocation();
+    await savePhoto();
     saveDataCategories();
 
     String nama = _namaController.text;
@@ -240,6 +281,8 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     // String alamat = _alamatController.text;
     double latitude = _userLatitude ?? userData!['latitude'];
     double longitude = _userLongitude ?? userData!['longitude'];
+    print("DIDALAM SAVE DATA TUKANGSCREEN");
+    print(imageUrl);
 
     final response = await http.patch(
       Uri.parse(apiUrl),
@@ -257,6 +300,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
         // 'alamat': alamat,
         'latitude': latitude,
         'longitude': longitude,
+        'image_url': imageUrl,
       }),
     );
 
@@ -312,23 +356,68 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
             ? ListView(
                 children: [
                   _isLoading
-                      ? CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(
-                            Colors.white,
+                      ? Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xffFF5403),
+                              ),
+                            ),
                           ),
                         )
                       : Container(
                           child: Column(
                             children: [
-                              Container(
-                                padding: EdgeInsets.only(top: 50, bottom: 20),
-                                child: CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage('assets/images/tukang1.jpg'),
-                                  radius: 70,
-                                ),
+                              // Container(
+                              //   padding: EdgeInsets.only(top: 50, bottom: 20),
+                              //   child: CircleAvatar(
+                              //     backgroundImage:
+                              //         // AssetImage('assets/images/tukang1.jpg'),
+                              //         NetworkImage(
+                              //             "https://firebasestorage.googleapis.com/v0/b/skripsi-bc052.appspot.com/o/profileImage%2F2023-07-06%2013%3A40%3A32.726535?alt=media&token=4d06c383-1772-41b4-a4c9-5385df1f0ea4"),
+                              //     radius: 70,
+                              //   ),
+                              // ),
+                              Stack(
+                                children: [
+                                  userData!['image_url'] == null ||
+                                          userData!['image_url'] == ""
+                                      ? _image != null
+                                          ? CircleAvatar(
+                                              radius: 64,
+                                              backgroundImage:
+                                                  MemoryImage(_image!),
+                                            )
+                                          : CircleAvatar(
+                                              radius: 64,
+                                              backgroundImage: AssetImage(
+                                                  'assets/images/default_profile_image.png'),
+                                            )
+                                      : CircleAvatar(
+                                          radius: 64,
+                                          backgroundImage:
+                                              FadeInImage.assetNetwork(
+                                            placeholder:
+                                                'assets/images/default_profile_image.png',
+                                            image: userData!['image_url'],
+                                          ).image,
+                                        ),
+                                  Positioned(
+                                    child: IconButton(
+                                      onPressed: selectImage,
+                                      icon: const Icon(Icons.add_a_photo),
+                                    ),
+                                    bottom: -10,
+                                    left: 80,
+                                  ),
+                                ],
                               ),
+                              // ElevatedButton(
+                              //   onPressed: savePhoto,
+                              //   child: Text('Save Photo'),
+                              // ),
                               Container(
                                 padding: EdgeInsets.only(
                                     left: 20, right: 20, top: 10, bottom: 5),
@@ -389,26 +478,26 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 20, right: 20, top: 5, bottom: 5),
-                                child: TextFormField(
-                                  //initialValue: userData!['kategori'],
-                                  controller: _kategoriController,
-                                  style: TextStyle(
-                                      color: Color.fromARGB(190, 0, 0, 0)),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(6.0),
-                                      borderSide: BorderSide(
-                                          color: Colors.white, width: 5.5),
-                                    ),
-                                    hintText: "Kategori",
-                                  ),
-                                ),
-                              ),
+                              // Container(
+                              //   padding: EdgeInsets.only(
+                              //       left: 20, right: 20, top: 5, bottom: 5),
+                              //   child: TextFormField(
+                              //     //initialValue: userData!['kategori'],
+                              //     controller: _kategoriController,
+                              //     style: TextStyle(
+                              //         color: Color.fromARGB(190, 0, 0, 0)),
+                              //     decoration: InputDecoration(
+                              //       filled: true,
+                              //       fillColor: Colors.white,
+                              //       border: OutlineInputBorder(
+                              //         borderRadius: BorderRadius.circular(6.0),
+                              //         borderSide: BorderSide(
+                              //             color: Colors.white, width: 5.5),
+                              //       ),
+                              //       hintText: "Kategori",
+                              //     ),
+                              //   ),
+                              // ),
                               Container(
                                   padding: EdgeInsets.only(
                                       left: 20, top: 20, bottom: 10),

@@ -27,7 +27,7 @@ void main() async {
   await Firebase.initializeApp();
 
   // Mengonfigurasi Firebase Storage
-  FirebaseStorage storage = FirebaseStorage.instance;
+  // FirebaseStorage storage = FirebaseStorage.instance;
   // SdkContext.init(IsolateOrigin.main);
   // _initializeHERESDK();
   runApp(const MyApp());
