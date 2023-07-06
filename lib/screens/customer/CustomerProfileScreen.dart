@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:tukang_online/screens/customer/CustomerDashboardScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tukang_online/resources/add_image.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
   const CustomerProfileScreen({super.key});
@@ -37,44 +39,8 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   String _currentAddress = '';
   TextEditingController _addressController = TextEditingController();
 
-  final picker = ImagePicker();
-  File? _imageFile;
-  String? _imageUrl;
-
-  Future<void> pickImageFromGallery() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> uploadImageToFirebase() async {
-    if (_imageFile == null) return;
-
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    String directory = 'images'; // Direktori yang ingin Anda buat
-    print(directory);
-    print(_imageFile);
-
-    // Membuat direktori di Firebase Storage
-    Reference directoryRef = FirebaseStorage.instance.ref().child(directory);
-    await directoryRef.putData(Uint8List.fromList([]));
-
-    // Mengunggah gambar ke direktori yang telah dibuat
-    Reference firebaseStorageRef =
-        FirebaseStorage.instance.ref().child('$directory/$fileName');
-    UploadTask uploadTask = firebaseStorageRef.putFile(_imageFile!);
-    await uploadTask.whenComplete(() => null);
-    String imageUrl = await firebaseStorageRef.getDownloadURL();
-
-    setState(() {
-      _imageUrl = imageUrl;
-    });
-
-    print('Image URL: $_imageUrl');
-  }
+  Uint8List? _image;
+  String? imageUrl;
 
   Future<void> fetchDataUser() async {
     setState(() {
@@ -172,6 +138,42 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     });
   }
 
+  pickImage(ImageSource source) async {
+    final ImagePicker _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: source);
+    if (_file != null) {
+      setState(() {
+        userData!['image_url'] = "";
+      });
+      return await _file.readAsBytes();
+    }
+    print("No Images Selected");
+  }
+
+  void selectImage() async {
+    Uint8List img = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = img;
+    });
+  }
+
+  Future<void> savePhoto() async {
+    final StoreGambar _storeGambar = StoreGambar();
+    final StoreGambar _statusLoading = StoreGambar();
+
+    await _storeGambar.saveData(file: _image!);
+    setState(() {
+      if (_statusLoading.statusLoading != null) {
+        _isLoading = _statusLoading.statusLoading!;
+      }
+      imageUrl = _storeGambar.imageUrl;
+      // saveData();
+    });
+    print("DIDALAM SAVE PHOTO");
+    print(_isLoading);
+    print(imageUrl);
+  }
+
   Future<void> saveData() async {
     setState(() {
       _isLoading =
@@ -184,6 +186,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     String apiUrl = 'http://192.168.1.100:8000/api/v1/users/$idUser';
 
     _getUserLocation();
+    await savePhoto();
 
     String nama = _namaController.text;
     String email = _emailController.text;
@@ -210,6 +213,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         // 'alamat': alamat,
         'latitude': latitude,
         'longitude': longitude,
+        'image_url': imageUrl,
       }),
     );
 
@@ -273,10 +277,15 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
             ? ListView(
                 children: [
                   _isLoading
-                      ? CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(
-                            Colors.white,
+                      ? Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xffFF5403),
+                              ),
+                            ),
                           ),
                         )
                       : Container(
@@ -284,30 +293,64 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                             children: [
                               Container(
                                 padding: EdgeInsets.only(top: 50, bottom: 20),
-                                child: CircleAvatar(
-                                  backgroundImage: AssetImage(
-                                      'assets/images/customer_small1.jpg'),
-                                  radius: 70,
+                                child: Stack(
+                                  children: [
+                                    userData!['image_url'] == null ||
+                                            userData!['image_url'] == ""
+                                        ? _image != null
+                                            ? CircleAvatar(
+                                                radius: 64,
+                                                backgroundImage:
+                                                    MemoryImage(_image!),
+                                              )
+                                            : CircleAvatar(
+                                                radius: 64,
+                                                backgroundImage: AssetImage(
+                                                    'assets/images/default_profile_image.png'),
+                                              )
+                                        : ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(64.0),
+                                            child: CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                width: 130,
+                                                height: 130,
+                                                placeholder: (context, url) =>
+                                                    Image.asset(
+                                                      'assets/images/content_placeholder.gif',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                imageUrl:
+                                                    userData!['image_url']),
+                                          ),
+                                    // CircleAvatar(
+                                    //   radius: 64,
+                                    //   child: FadeInImage(
+                                    //     placeholder: AssetImage(
+                                    //         'assets/images/content_placeholder.gif'),
+                                    //     image:
+                                    //         NetworkImage(userData!['image_url']),
+                                    //     fit: BoxFit.fitWidth,
+                                    //   ),
+                                    // ),
+                                    Positioned(
+                                      child: IconButton(
+                                        onPressed: selectImage,
+                                        icon: const Icon(Icons.add_a_photo),
+                                      ),
+                                      bottom: -10,
+                                      left: 80,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              // _imageFile != null
-                              //     ? Image.file(
-                              //         _imageFile!,
-                              //         height: 200,
-                              //       )
-                              //     : Container(
-                              //         height: 200,
-                              //         color: Colors.grey[300],
-                              //       ),
-                              // ElevatedButton.icon(
-                              //   onPressed: pickImageFromGallery,
-                              //   icon: Icon(Icons.image),
-                              //   label: Text('Pilih Gambar'),
-                              // ),
-                              // ElevatedButton.icon(
-                              //   onPressed: uploadImageToFirebase,
-                              //   icon: Icon(Icons.cloud_upload),
-                              //   label: Text('Upload Gambar'),
+                              // Container(
+                              //   padding: EdgeInsets.only(top: 50, bottom: 20),
+                              //   child: CircleAvatar(
+                              //     backgroundImage: AssetImage(
+                              //         'assets/images/customer_small1.jpg'),
+                              //     radius: 70,
+                              //   ),
                               // ),
                               Container(
                                 padding: EdgeInsets.only(

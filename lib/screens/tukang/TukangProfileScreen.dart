@@ -322,6 +322,7 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
+      Navigator.pushReplacementNamed(context, '/dashboard-customer');
     } else {
       // Gagal menyimpan data
       print('Error: ${response.statusCode}');

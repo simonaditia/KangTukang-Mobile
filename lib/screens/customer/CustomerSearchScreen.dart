@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -131,6 +132,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                     item['email'],
                     item['role'],
                     item['alamat'],
+                    item['image_url'],
                     double.parse(item['distance'].toString()),
                     double.parse(item['biaya'].toString()),
                     (item['Categories'] as List<dynamic>)
@@ -153,6 +155,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['email'],
               data['role'],
               data['alamat'],
+              data['image_url'],
               double.parse(data['distance'].toString()),
               double.parse(data['biaya'].toString()),
               (data['Categories'] as List<dynamic>)
@@ -202,6 +205,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                       item['email'],
                       item['role'],
                       item['alamat'],
+                      item['image_url'],
                       double.parse(item['distance'].toString()),
                       double.parse(item['biaya'].toString()),
                       (item['Categories'] as List<dynamic>)
@@ -223,6 +227,7 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
               data['email'],
               data['role'],
               data['alamat'],
+              data['image_url'],
               double.parse(data['distance'].toString()),
               double.parse(data['biaya'].toString()),
               (data['Categories'] as List<dynamic>)
@@ -395,11 +400,56 @@ class _CustomerSearchScreenState extends State<CustomerSearchScreen> {
                                           color: Colors.amber,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    leading:
-                                        Text('${display_list[index].role!}',
-                                            style: TextStyle(
-                                              color: Colors.black26,
-                                            )),
+                                    leading: Container(
+                                      child: display_list[index].image_url! ==
+                                                  null ||
+                                              display_list[index].image_url! ==
+                                                  ""
+                                          ?
+                                          // CircleAvatar(
+                                          //     radius: 64,
+                                          //     backgroundImage: AssetImage(
+                                          //         'assets/images/default_profile_image.png'),
+                                          //   ),
+                                          ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(64.0),
+                                              child: Image.asset(
+                                                  'assets/images/default_profile_image.png',
+                                                  width: 60,
+                                                  height: 60,
+                                                  fit: BoxFit.cover),
+                                            )
+                                          : ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(64.0),
+                                              child: CachedNetworkImage(
+                                                  fit: BoxFit.cover,
+                                                  width: 60,
+                                                  height: 60,
+                                                  placeholder: (context, url) =>
+                                                      Image.asset(
+                                                        'assets/images/content_placeholder.gif',
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                  imageUrl: display_list[index]
+                                                      .image_url!),
+                                            ),
+                                      // CircleAvatar(
+                                      //   radius: 64,
+                                      //   child: FadeInImage(
+                                      //     placeholder: AssetImage(
+                                      //         'assets/images/content_placeholder.gif'),
+                                      //     image:
+                                      //         NetworkImage(userData!['image_url']),
+                                      //     fit: BoxFit.fitWidth,
+                                      //   ),
+                                      // ),
+                                    ),
+                                    // Text('${display_list[index].role!}',
+                                    //     style: TextStyle(
+                                    //       color: Colors.black26,
+                                    //     )),
                                     // leading: Image.asset(display_list[index].image!)
                                     // leading: Image.network(
                                     //     display_list[index].str_meal_thumb!),
