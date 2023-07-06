@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -185,6 +186,9 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
     final ImagePicker _imagePicker = ImagePicker();
     XFile? _file = await _imagePicker.pickImage(source: source);
     if (_file != null) {
+      setState(() {
+        userData!['image_url'] = "";
+      });
       return await _file.readAsBytes();
     }
     print("No Images Selected");
@@ -371,48 +375,81 @@ class _TukangProfileScreenState extends State<TukangProfileScreen> {
                           child: Column(
                             children: [
                               // Container(
+                              //     padding: EdgeInsets.only(top: 50, bottom: 20),
+                              //     child: FadeInImage.assetNetwork(
+                              //       placeholder:
+                              //           "assets/images/content_placeholder.gif",
+                              //       image:
+                              //           "https://firebasestorage.googleapis.com/v0/b/skripsi-bc052.appspot.com/o/profileImage%2F2023-07-06%2013%3A40%3A32.726535?alt=media&token=4d06c383-1772-41b4-a4c9-5385df1f0ea4",
+                              //     )),
+                              // Container(
                               //   padding: EdgeInsets.only(top: 50, bottom: 20),
                               //   child: CircleAvatar(
-                              //     backgroundImage:
-                              //         // AssetImage('assets/images/tukang1.jpg'),
-                              //         NetworkImage(
-                              //             "https://firebasestorage.googleapis.com/v0/b/skripsi-bc052.appspot.com/o/profileImage%2F2023-07-06%2013%3A40%3A32.726535?alt=media&token=4d06c383-1772-41b4-a4c9-5385df1f0ea4"),
+                              //     // backgroundImage: FadeInImage.assetNetwork(
+                              //     //   placeholder:
+                              //     //       "assets/images/content_placeholder.gif",
+                              //     //   image:
+                              //     //       "https://firebasestorage.googleapis.com/v0/b/skripsi-bc052.appspot.com/o/profileImage%2F2023-07-06%2013%3A40%3A32.726535?alt=media&token=4d06c383-1772-41b4-a4c9-5385df1f0ea4",
+                              //     // ).image,
+                              //     backgroundImage: AssetImage(
+                              //         'assets/images/content_placeholder.gif'),
+                              //     // NetworkImage(
+                              //     //     "https://firebasestorage.googleapis.com/v0/b/skripsi-bc052.appspot.com/o/profileImage%2F2023-07-06%2013%3A40%3A32.726535?alt=media&token=4d06c383-1772-41b4-a4c9-5385df1f0ea4"),
                               //     radius: 70,
                               //   ),
                               // ),
-                              Stack(
-                                children: [
-                                  userData!['image_url'] == null ||
-                                          userData!['image_url'] == ""
-                                      ? _image != null
-                                          ? CircleAvatar(
-                                              radius: 64,
-                                              backgroundImage:
-                                                  MemoryImage(_image!),
-                                            )
-                                          : CircleAvatar(
-                                              radius: 64,
-                                              backgroundImage: AssetImage(
-                                                  'assets/images/default_profile_image.png'),
-                                            )
-                                      : CircleAvatar(
-                                          radius: 64,
-                                          backgroundImage:
-                                              FadeInImage.assetNetwork(
-                                            placeholder:
-                                                'assets/images/default_profile_image.png',
-                                            image: userData!['image_url'],
-                                          ).image,
-                                        ),
-                                  Positioned(
-                                    child: IconButton(
-                                      onPressed: selectImage,
-                                      icon: const Icon(Icons.add_a_photo),
+                              Container(
+                                padding: EdgeInsets.only(top: 50, bottom: 20),
+                                child: Stack(
+                                  children: [
+                                    userData!['image_url'] == null ||
+                                            userData!['image_url'] == ""
+                                        ? _image != null
+                                            ? CircleAvatar(
+                                                radius: 64,
+                                                backgroundImage:
+                                                    MemoryImage(_image!),
+                                              )
+                                            : CircleAvatar(
+                                                radius: 64,
+                                                backgroundImage: AssetImage(
+                                                    'assets/images/default_profile_image.png'),
+                                              )
+                                        : ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(64.0),
+                                            child: CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                width: 130,
+                                                height: 130,
+                                                placeholder: (context, url) =>
+                                                    Image.asset(
+                                                      'assets/images/content_placeholder.gif',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                imageUrl:
+                                                    userData!['image_url']),
+                                          ),
+                                    // CircleAvatar(
+                                    //   radius: 64,
+                                    //   child: FadeInImage(
+                                    //     placeholder: AssetImage(
+                                    //         'assets/images/content_placeholder.gif'),
+                                    //     image:
+                                    //         NetworkImage(userData!['image_url']),
+                                    //     fit: BoxFit.fitWidth,
+                                    //   ),
+                                    // ),
+                                    Positioned(
+                                      child: IconButton(
+                                        onPressed: selectImage,
+                                        icon: const Icon(Icons.add_a_photo),
+                                      ),
+                                      bottom: -10,
+                                      left: 80,
                                     ),
-                                    bottom: -10,
-                                    left: 80,
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               // ElevatedButton(
                               //   onPressed: savePhoto,
