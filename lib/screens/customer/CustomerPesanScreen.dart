@@ -28,28 +28,55 @@ class CustomerPesanScreen extends StatefulWidget {
 }
 
 class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
-  String token = '';
+  String? token = '';
   // DateTime selectDate = DateTime.now();
   TextEditingController detailPerbaikanController =
       TextEditingController(text: '');
   String alamat = '';
   DateTime selectedDateTimeAwal = DateTime.now();
   DateTime selectedDateTimeAkhir = DateTime.now();
+  List<DateTime> disabledDates = [];
 
   CustomerPesan? tukangData;
   Map<String, dynamic>? userData;
+  // Map<String, dynamic>? tukangDataAlreadyBooked;
+  List<dynamic>? tukangDataAlreadyBooked = [];
   double? _userLatitude;
   double? _userLongitude;
   GoogleMapController? _mapController;
   bool _isLoading = false;
-  String _currentAddress = '';
+  String? _currentAddress = '';
   TextEditingController _addressController = TextEditingController();
+
+  bool isDateDisabled(DateTime date) {
+    if (tukangDataAlreadyBooked != null) {
+      DateTime hariIni = DateTime.now();
+      for (var data in tukangDataAlreadyBooked!) {
+        var jadwalPerbaikanAwal = DateTime.parse(data['jadwal_perbaikan_awal']);
+        var jadwalPerbaikanAkhir =
+            DateTime.parse(data['jadwal_perbaikan_akhir']);
+        print("DI DALAM isDateDisabled");
+        print(jadwalPerbaikanAwal);
+        print(jadwalPerbaikanAkhir);
+        print(date.isAfter(jadwalPerbaikanAwal));
+        print(date.isBefore(jadwalPerbaikanAkhir));
+        print("DI DALAM isDateDisabled");
+        // if (jadwalPerbaikanAwal.day == hariIni.day) {
+        //   return true;
+        // }
+        if (date.isAfter(jadwalPerbaikanAwal) &&
+            date.isBefore(jadwalPerbaikanAkhir)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   @override
   void initState() {
     super.initState();
     getToken();
-    loadCustomerLatitudeLongitude();
     // loadCustomerLatitudeLongitude();
   }
 
@@ -60,7 +87,9 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     setState(() {
       token = jwt;
     });
-    fetchTukangData(token);
+    fetchTukangData(token!);
+    loadCustomerLatitudeLongitude(token!);
+    fetchTukangDataAlreadyBooked(token!);
   }
 
   // Future<void> executeOrderProcess() async {
@@ -132,10 +161,72 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     }
   }
 
-  Future<void> loadCustomerLatitudeLongitude() async {
+  Future<void> fetchTukangDataAlreadyBooked(String token) async {
+    var url = Uri.parse(
+        'http://192.168.1.100:8000/api/v1/orders/readOrderByTukang?id_tukang=${widget.tukangId}');
+    try {
+      print("didialam get token customerpesanscreen fetchTukangData");
+      print(token);
+      print("didialam get token customerpesanscreen fetchTukangData");
+      var response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+      });
+      if (response.statusCode == 200) {
+        final dynamic responseData = jsonDecode(response.body);
+        final List<dynamic>? responseTukangAlreadyBooked = responseData['data'];
+
+        if (responseTukangAlreadyBooked != null &&
+            responseTukangAlreadyBooked != []) {
+          setState(() {
+            tukangDataAlreadyBooked = responseTukangAlreadyBooked;
+          });
+          await checkDatetime();
+        }
+      } else {
+        // Gagal mendapatkan data
+        print('Error: ${response.statusCode}');
+      }
+    } catch (error) {
+      throw Exception('Error fetching tukang data already booked: $error');
+    }
+  }
+
+  Future<void> checkDatetime() async {
+    for (var data in tukangDataAlreadyBooked!) {
+      DateTime bookedDateAwal = DateTime.parse(data['jadwal_perbaikan_awal']);
+      DateTime bookedDateAkhir = DateTime.parse(data['jadwal_perbaikan_akhir']);
+
+      if (selectedDateTimeAwal.isAfter(bookedDateAwal) &&
+          selectedDateTimeAwal.isBefore(bookedDateAkhir) &&
+          selectedDateTimeAkhir.isAfter(bookedDateAwal) &&
+          selectedDateTimeAkhir.isBefore(bookedDateAkhir)) {
+        int differenceInDays =
+            bookedDateAkhir.difference(bookedDateAwal).inDays + 1;
+
+        // Jika selectedDateTimeAwal dan selectedDateTimeAkhir berada dalam rentang yang sama,
+        // pindahkan selectedDateTimeAwal dan selectedDateTimeAkhir ke hari selanjutnya.
+        selectedDateTimeAwal =
+            selectedDateTimeAwal.add(Duration(days: differenceInDays));
+        selectedDateTimeAkhir =
+            selectedDateTimeAkhir.add(Duration(days: differenceInDays));
+
+        // Pastikan selectedDateTimeAwal dan selectedDateTimeAkhir berbeda hari dari bookedDateAwal dan bookedDateAkhir
+        if (selectedDateTimeAwal.day == bookedDateAwal.day) {
+          selectedDateTimeAwal = selectedDateTimeAwal.add(Duration(days: 1));
+        }
+        if (selectedDateTimeAkhir.day == bookedDateAkhir.day) {
+          selectedDateTimeAkhir = selectedDateTimeAkhir.add(Duration(days: 1));
+        }
+      }
+
+      print("Di dalam checkDatetime");
+    }
+  }
+
+  Future<void> loadCustomerLatitudeLongitude(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('jwt') ?? '';
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    // String token = prefs.getString('jwt') ?? '';
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     int idUser = decodedToken['id'] as int;
     final response = await http.get(
       Uri.parse('http://192.168.1.100:8000/api/v1/users/$idUser'),
@@ -160,7 +251,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     }
   }
 
-  void _getAddressFromLatLng() async {
+  /*void _getAddressFromLatLng() async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         _userLatitude!,
@@ -179,7 +270,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
     } catch (e) {
       print('Could not get the address: $e');
     }
-  }
+  }*/
 
   void _getUserLocation() async {
     setState(() {
@@ -221,7 +312,7 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
 
           setState(() {
             _currentAddress = address;
-            _addressController.text = _currentAddress;
+            _addressController.text = _currentAddress!;
           });
         }
       } catch (e) {
@@ -235,8 +326,8 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
   }
 
   Future<void> postOrderData() async {
-    await fetchTukangData(token);
-    await loadCustomerLatitudeLongitude();
+    await fetchTukangData(token!);
+    await loadCustomerLatitudeLongitude(token!);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jwt = prefs.getString('jwt') ?? '';
     var idCustomer = JwtDecoder.decode(jwt)['id'].toString();
@@ -334,10 +425,27 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
   // DateTime selectDate3 = DateTime(2)
   @override
   Widget build(BuildContext context) {
-    if (tukangData == null) {
+    print("DIDALAM WIDGET BUILD");
+    // print(_currentAddress);
+    print(userData);
+    print(tukangDataAlreadyBooked);
+    print("DIDALAM WIDGET BUILD");
+    if (tukangData == null ||
+        userData == null ||
+        userData!.isEmpty ||
+        tukangDataAlreadyBooked == null ||
+        tukangDataAlreadyBooked == [] ||
+        userData!['latitude'] == null ||
+        userData!['longitude'] == null ||
+        userData!['latitude'] == "" ||
+        userData!['longitude'] == "") {
       return Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Color(0xffFF5403),
+            ),
+          ),
         ),
       );
     }
@@ -515,6 +623,13 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                             firstDate: DateTime.now(),
                             lastDate: DateTime(2025),
                             initialEntryMode: DatePickerEntryMode.calendar,
+                            selectableDayPredicate: (DateTime dateTime) {
+                              print("DI Dalam showdatepicker");
+                              print(selectedDateTimeAwal);
+                              print(dateTime);
+                              print("DI Dalam showdatepicker");
+                              return !isDateDisabled(dateTime);
+                            },
                           );
 
                           if (date != null) {
@@ -590,6 +705,9 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                             firstDate: DateTime.now(),
                             lastDate: DateTime(2025),
                             initialEntryMode: DatePickerEntryMode.calendar,
+                            selectableDayPredicate: (DateTime dateTime) {
+                              return !isDateDisabled(dateTime);
+                            },
                           );
 
                           if (selectedDate != null) {
@@ -706,22 +824,37 @@ class _CustomerPesanScreenState extends State<CustomerPesanScreen> {
                         children: [
                           GoogleMap(
                             onMapCreated: (controller) {
-                              _mapController = controller;
+                              setState(() {
+                                _mapController = controller;
+                              });
                             },
                             initialCameraPosition: CameraPosition(
                               target: LatLng(
-                                _userLatitude ?? userData!['latitude'],
-                                _userLongitude ?? userData!['longitude'],
-                              ),
+                                  _userLatitude ??
+                                      (userData != null
+                                          ? userData!['latitude']
+                                          : null),
+                                  _userLongitude ??
+                                      (userData != null
+                                          ? userData!['longitude']
+                                          : null)
+                                  // _userLatitude ?? userData!['latitude'],
+                                  // _userLongitude ?? userData!['longitude'],
+                                  ),
                               zoom: 14.0,
                             ),
                             markers: {
                               Marker(
                                 markerId: MarkerId('user_location'),
                                 position: LatLng(
-                                  _userLatitude ?? userData!['latitude'],
-                                  _userLongitude ?? userData!['longitude'],
-                                ),
+                                    _userLatitude ??
+                                        (userData != null
+                                            ? userData!['latitude']
+                                            : null),
+                                    _userLongitude ??
+                                        (userData != null
+                                            ? userData!['longitude']
+                                            : null)),
                                 infoWindow: InfoWindow(
                                   title: 'Lokasi Anda',
                                   snippet: 'Ini adalah lokasi Anda.',

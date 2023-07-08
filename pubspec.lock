@@ -272,6 +272,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.9"
+  flutter_rounded_date_picker:
+    dependency: "direct main"
+    description:
+      name: flutter_rounded_date_picker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -749,6 +756,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.12"
+  time_picker_widget:
+    dependency: "direct main"
+    description:
+      name: time_picker_widget
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+10"
   typed_data:
     dependency: transitive
     description:
