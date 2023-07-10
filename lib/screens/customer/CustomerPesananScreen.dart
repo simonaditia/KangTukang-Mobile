@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:tukang_online/screens/tukang/TukangDashboardScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerPesananScreen extends StatefulWidget {
   const CustomerPesananScreen({super.key});
@@ -230,7 +231,7 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                     final item = dataSMenunggu[index];
                                     return Card(
                                       child: SizedBox(
-                                        width: 350,
+                                        width: 400,
                                         height: 294,
                                         child: Container(
                                           padding: EdgeInsets.all(5),
@@ -477,27 +478,11 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                       MainAxisAlignment
                                                           .spaceEvenly,
                                                   children: [
-                                                    ElevatedButton(
-                                                        child: Text(
-                                                            "Ubah Waktu",
-                                                            style: TextStyle(
-                                                                fontSize: 12)),
-                                                        onPressed: () {},
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                                backgroundColor:
-                                                                    Color(
-                                                                        0xffFF5403),
-                                                                foregroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                minimumSize:
-                                                                    Size(50,
-                                                                        26))),
-                                                    ElevatedButton(
-                                                        child: Text("Batalkan",
-                                                            style: TextStyle(
-                                                                fontSize: 12)),
+                                                    ElevatedButton.icon(
+                                                        icon: Icon(Icons.close,
+                                                            color: Colors.white,
+                                                            size: 18),
+                                                        label: Text("Batalkan"),
                                                         onPressed: () {
                                                           _cancelOrder(
                                                               item['ID']);
@@ -513,7 +498,45 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                                         .white,
                                                                 minimumSize:
                                                                     Size(50,
-                                                                        26)))
+                                                                        30))),
+                                                    ElevatedButton.icon(
+                                                      icon: Icon(Icons.call,
+                                                          color: Colors.white,
+                                                          size: 18),
+                                                      label: Text(
+                                                          "Hubungi Sekarang"),
+                                                      onPressed: () {
+                                                        String nomorTelpTukang =
+                                                            item[
+                                                                'no_telp_tukang'];
+                                                        String
+                                                            nomorTelpTukangCodeCountry =
+                                                            nomorTelpTukang
+                                                                .replaceFirst(
+                                                                    '0', '+62');
+                                                        print(nomorTelpTukang);
+                                                        String urlWhatsApp =
+                                                            "https://wa.me/$nomorTelpTukangCodeCountry/?text=Halo...";
+
+                                                        launchUrl(
+                                                                Uri.parse(
+                                                                    urlWhatsApp),
+                                                                mode: LaunchMode
+                                                                    .externalApplication)
+                                                            .catchError((e) {
+                                                          throw 'Tidak dapat membuka aplikasi WhatsApp.';
+                                                        });
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Color(0xffFF5403),
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        minimumSize:
+                                                            Size(50, 30),
+                                                      ),
+                                                    )
                                                   ],
                                                 ),
                                               )
@@ -564,8 +587,8 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                         final item = dataSDikerjakan[index];
                                         return Card(
                                           child: SizedBox(
-                                            width: 350,
-                                            height: 249,
+                                            width: 400,
+                                            height: 295,
                                             child: Container(
                                               padding: EdgeInsets.all(5),
                                               child: Column(
@@ -868,6 +891,46 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                       ],
                                                     ),
                                                   ),
+                                                  Container(
+                                                    child: ElevatedButton.icon(
+                                                      icon: Icon(Icons.call,
+                                                          color: Colors.white,
+                                                          size: 18),
+                                                      label: Text(
+                                                          "Hubungi Sekarang"),
+                                                      onPressed: () {
+                                                        String nomorTelpTukang =
+                                                            item[
+                                                                'no_telp_tukang'];
+                                                        String
+                                                            nomorTelpTukangCodeCountry =
+                                                            nomorTelpTukang
+                                                                .replaceFirst(
+                                                                    '0', '+62');
+                                                        print(nomorTelpTukang);
+                                                        String urlWhatsApp =
+                                                            "https://wa.me/$nomorTelpTukangCodeCountry/?text=Halo...";
+
+                                                        launchUrl(
+                                                                Uri.parse(
+                                                                    urlWhatsApp),
+                                                                mode: LaunchMode
+                                                                    .externalApplication)
+                                                            .catchError((e) {
+                                                          throw 'Tidak dapat membuka aplikasi WhatsApp.';
+                                                        });
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Color(0xffFF5403),
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                        minimumSize:
+                                                            Size(330, 30),
+                                                      ),
+                                                    ),
+                                                  )
                                                 ],
                                               ),
                                             ),
@@ -915,8 +978,8 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                     final item = dataSSelesai[index];
                                     return Card(
                                       child: SizedBox(
-                                        width: 350,
-                                        height: 249,
+                                        width: 400,
+                                        height: 295,
                                         child: Container(
                                           padding: EdgeInsets.all(5),
                                           child: Column(
@@ -1198,6 +1261,46 @@ class _CustomerPesananScreenState extends State<CustomerPesananScreen> {
                                                   ],
                                                 ),
                                               ),
+                                              Container(
+                                                child: ElevatedButton.icon(
+                                                  icon: Icon(
+                                                    Icons.call,
+                                                    color: Colors.white,
+                                                    size: 18,
+                                                  ),
+                                                  label:
+                                                      Text("Hubungi Sekarang"),
+                                                  onPressed: () {
+                                                    String nomorTelpTukang =
+                                                        item['no_telp_tukang'];
+                                                    String
+                                                        nomorTelpTukangCodeCountry =
+                                                        nomorTelpTukang
+                                                            .replaceFirst(
+                                                                '0', '+62');
+                                                    print(nomorTelpTukang);
+                                                    String urlWhatsApp =
+                                                        "https://wa.me/$nomorTelpTukangCodeCountry/?text=Halo...";
+
+                                                    launchUrl(
+                                                            Uri.parse(
+                                                                urlWhatsApp),
+                                                            mode: LaunchMode
+                                                                .externalApplication)
+                                                        .catchError((e) {
+                                                      throw 'Tidak dapat membuka aplikasi WhatsApp.';
+                                                    });
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Color(0xffFF5403),
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    minimumSize: Size(330, 30),
+                                                  ),
+                                                ),
+                                              )
                                             ],
                                           ),
                                         ),
