@@ -34,6 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   bool _isEmail = false;
   bool _isPhoneNumber = false;
+  Color emailOrNoTelpColor = Color.fromARGB(255, 92, 92, 92);
+  Color passwordColor = Color.fromARGB(255, 92, 92, 92);
 
   // final _formKey = GlobalKey<FormState>();
 
@@ -410,9 +412,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: emailOrNoTelpController,
                                 onChanged: checkInputT,
                                 decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "test@gmail.com",
-                                ),
+                                    border: InputBorder.none,
+                                    hintText: "Email / No Telepon",
+                                    labelText: "Email / No Telepon",
+                                    labelStyle: TextStyle(
+                                      color: emailOrNoTelpColor,
+                                    )),
+                                onTap: () {
+                                  setState(() {
+                                    emailOrNoTelpColor = Color(0xffFF5403);
+                                    passwordColor =
+                                        Color.fromARGB(255, 92, 92, 92);
+                                  });
+                                },
                                 textInputAction: TextInputAction.next,
                                 // validator: (value) {
                                 //   if (value == null || value.isEmpty) {
@@ -465,7 +477,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   border: InputBorder.none,
                                   hintText: "Password",
+                                  labelText: "Password",
+                                  labelStyle: TextStyle(
+                                    color: passwordColor,
+                                  ),
                                 ),
+                                onTap: () {
+                                  setState(() {
+                                    emailOrNoTelpColor =
+                                        Color.fromARGB(255, 92, 92, 92);
+                                    passwordColor = Color(0xffFF5403);
+                                  });
+                                },
                                 // validator: (value) {
                                 //   if (value == null || value.isEmpty) {
                                 //     return 'Please enter your password';
