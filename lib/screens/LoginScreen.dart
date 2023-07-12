@@ -28,9 +28,12 @@ class _LoginScreenState extends State<LoginScreen> {
   // //  final _formKey = GlobalKey<FormState>();
   // final emailController = TextEditingController();
   // final passwordController = TextEditingController();
-  TextEditingController emailController = TextEditingController(text: '');
+  TextEditingController emailOrNoTelpController =
+      TextEditingController(text: '');
   TextEditingController passwordController = TextEditingController(text: '');
   bool isLoading = false;
+  bool _isEmail = false;
+  bool _isPhoneNumber = false;
 
   // final _formKey = GlobalKey<FormState>();
 
@@ -149,83 +152,205 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
     }*/
-    Future<void> loginUser(
-        String email, String password, BuildContext context) async {
+
+    void checkInputT(String value) {
+      setState(() {
+        // Check if input is an email
+        _isEmail = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+            .hasMatch(value);
+
+        // Check if input is a phone number
+        _isPhoneNumber = RegExp(r'^[0-9]{10,12}$').hasMatch(value);
+      });
+    }
+
+    Future<void> loginUserEmail() async {
+      print("Di Email");
       setState(() {
         isLoading = true;
       });
       var url = Uri.parse(
-          'http://192.168.1.100:8000/auth/login'); // Ganti dengan URL endpoint login Anda
+          'http://192.168.1.100:8000/auth/v2/login'); // Ganti dengan URL endpoint login Anda
+      if (_formKey.currentState!.validate()) {
+        String email = emailOrNoTelpController.text;
+        String password = passwordController.text;
+        if (email.isNotEmpty && password.isNotEmpty) {
+          // Kirim permintaan login
+          var requestBody = {'email': email, 'password': password};
 
-      if (email.isNotEmpty && password.isNotEmpty) {
-        // Kirim permintaan login
-        var requestBody = {'email': email, 'password': password};
+          var response =
+              await http.post(url, body: json.encode(requestBody), headers: {
+            'Content-Type': 'application/json',
+          });
 
-        var response =
-            await http.post(url, body: json.encode(requestBody), headers: {
-          'Content-Type': 'application/json',
-        });
+          print(response.body);
+          print(response.statusCode);
 
-        print(response.body);
-        print(response.statusCode);
+          if (response.statusCode == 200) {
+            var responseData = json.decode(response.body);
+            log(responseData.toString());
+            print(responseData);
+            var token = responseData['jwt'];
+            var role = responseData['user']['role'];
+            log(token);
+            print(token);
+            log(role);
+            print(token);
 
-        if (response.statusCode == 200) {
-          var responseData = json.decode(response.body);
-          log(responseData.toString());
-          print(responseData);
-          var token = responseData['jwt'];
-          var role = responseData['user']['role'];
-          log(token);
-          print(token);
-          log(role);
-          print(token);
+            // Simpan token JWT dan role di shared_preferences
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('jwt', token);
+            prefs.setString('role', role);
 
-          // Simpan token JWT dan role di shared_preferences
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('jwt', token);
-          prefs.setString('role', role);
-
-          Fluttertoast.showToast(
-            msg: "Login Berhasil",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-          );
-
-          // Redirect pengguna ke halaman yang sesuai berdasarkan role
-          if (role == 'customer') {
-            // Navigator.pushReplacementNamed(context, CustomerDashboardScreen());
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/dashboard-customer', // Ganti dengan nama route untuk halaman login
-              (route) => false,
+            Fluttertoast.showToast(
+              msg: "Login Berhasil",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
             );
-          } else if (role == 'tukang') {
-            // Navigator.pushReplacementNamed(context, '/tukang_dashboard');
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/dashboard-tukang', // Ganti dengan nama route untuk halaman login
-              (route) => false,
+
+            // Redirect pengguna ke halaman yang sesuai berdasarkan role
+            if (role == 'customer') {
+              // Navigator.pushReplacementNamed(context, CustomerDashboardScreen());
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/dashboard-customer', // Ganti dengan nama route untuk halaman login
+                (route) => false,
+              );
+            } else if (role == 'tukang') {
+              // Navigator.pushReplacementNamed(context, '/tukang_dashboard');
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/dashboard-tukang', // Ganti dengan nama route untuk halaman login
+                (route) => false,
+              );
+            }
+          } else {
+            // Login gagal
+            print('Login gagal');
+            Fluttertoast.showToast(
+              msg: "Login Gagal\nPeriksa kembali Email & Password Anda",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
             );
           }
         } else {
-          // Login gagal
-          print('Login gagal');
-          Fluttertoast.showToast(
-            msg: "Login Gagal\nPeriksa kembali Email & Password Anda",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-          );
+          print("Email / No Telpon dan password harus diisi");
         }
-      } else {
-        print("Email dan password harus diisi");
       }
       setState(() {
         isLoading = false;
       });
+    }
+
+    Future<void> loginUserNoTelp() async {
+      print("Di No Telp");
+      setState(() {
+        isLoading = true;
+      });
+      var url = Uri.parse(
+          'http://192.168.1.100:8000/auth/v2/login'); // Ganti dengan URL endpoint login Anda
+      if (_formKey.currentState!.validate()) {
+        String notelp = emailOrNoTelpController.text;
+        String password = passwordController.text;
+        if (notelp.isNotEmpty && password.isNotEmpty) {
+          // Kirim permintaan login
+          var requestBody = {'no_telp': notelp, 'password': password};
+
+          var response =
+              await http.post(url, body: json.encode(requestBody), headers: {
+            'Content-Type': 'application/json',
+          });
+
+          print(response.body);
+          print(response.statusCode);
+
+          if (response.statusCode == 200) {
+            var responseData = json.decode(response.body);
+            log(responseData.toString());
+            print(responseData);
+            var token = responseData['jwt'];
+            var role = responseData['user']['role'];
+            log(token);
+            print(token);
+            log(role);
+            print(token);
+
+            // Simpan token JWT dan role di shared_preferences
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('jwt', token);
+            prefs.setString('role', role);
+
+            Fluttertoast.showToast(
+              msg: "Login Berhasil",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+            );
+
+            // Redirect pengguna ke halaman yang sesuai berdasarkan role
+            if (role == 'customer') {
+              // Navigator.pushReplacementNamed(context, CustomerDashboardScreen());
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/dashboard-customer', // Ganti dengan nama route untuk halaman login
+                (route) => false,
+              );
+            } else if (role == 'tukang') {
+              // Navigator.pushReplacementNamed(context, '/tukang_dashboard');
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/dashboard-tukang', // Ganti dengan nama route untuk halaman login
+                (route) => false,
+              );
+            }
+          } else {
+            // Login gagal
+            print('Login gagal');
+            Fluttertoast.showToast(
+              msg: "Login Gagal\nPeriksa kembali Email & Password Anda",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+            );
+          }
+        } else {
+          print("Email / No Telpon dan password harus diisi");
+        }
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
+    cekEmailOrNoTelpCustomer() async {
+      if (emailOrNoTelpController.text.isEmpty ||
+          passwordController.text.isEmpty) {
+        Fluttertoast.showToast(
+          msg: 'Mohon isi Email/No Telepon dan Password',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.black,
+        );
+      } else if (_isEmail) {
+        loginUserEmail();
+      } else if (_isPhoneNumber) {
+        loginUserNoTelp();
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Mohon hanya inputkan format email atau no telepon.',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.black,
+        );
+      }
     }
 
     final deviceHeight = MediaQuery.of(context).size.height;
@@ -282,24 +407,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: const EdgeInsets.only(left: 15),
                             child: Center(
                               child: TextFormField(
-                                // controller: emailController,
+                                controller: emailOrNoTelpController,
+                                onChanged: checkInputT,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: "test@gmail.com",
                                 ),
                                 textInputAction: TextInputAction.next,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your email';
-                                  }
-                                  if (!EmailValidator.validate(value)) {
-                                    return 'Masukkan email yang valid';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _email = value!;
-                                },
+                                // validator: (value) {
+                                //   if (value == null || value.isEmpty) {
+                                //     return 'Please enter your email';
+                                //   }
+                                //   // if (!EmailValidator.validate(value)) {
+                                //   //   return 'Masukkan email yang valid';
+                                //   // }
+                                //   return null;
+                                // },
+                                // onSaved: (value) {
+                                //   _email = value!;
+                                // },
                                 // onChanged: (value) =>
                                 //     setState(() => _email = value.trim()),
                                 // validator: (value) =>
@@ -321,7 +447,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: const EdgeInsets.only(left: 15),
                             child: Center(
                               child: TextFormField(
-                                // controller: passwordController,
+                                controller: passwordController,
                                 obscureText: _isVisible ? false : true,
                                 decoration: InputDecoration(
                                   suffixIcon: IconButton(
@@ -340,15 +466,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   border: InputBorder.none,
                                   hintText: "Password",
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your password';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _password = value!;
-                                },
+                                // validator: (value) {
+                                //   if (value == null || value.isEmpty) {
+                                //     return 'Please enter your password';
+                                //   }
+                                //   return null;
+                                // },
+                                // onSaved: (value) {
+                                //   _password = value!;
+                                // },
                                 textInputAction: TextInputAction.done,
                                 // onChanged: (value) =>
                                 //     setState(() => _password = value.trim()),
@@ -426,12 +552,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   top: constraints.maxHeight * 0.05,
                                 ),
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    if (_formKey.currentState!.validate()) {
-                                      _formKey.currentState!.save();
-                                      loginUser(_email, _password, context);
-                                    }
-                                  },
+                                  onPressed: cekEmailOrNoTelpCustomer,
                                   child: Text(
                                     'Login',
                                     style: TextStyle(

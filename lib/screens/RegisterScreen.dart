@@ -37,8 +37,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //   // getCurrentLocation();
   // }
 
+  Color namaColor = Color.fromARGB(255, 92, 92, 92);
+  Color emailOrNoTelpColor = Color.fromARGB(255, 92, 92, 92);
+  Color passwordColor = Color.fromARGB(255, 92, 92, 92);
+
+  TextEditingController _emailOrNoTelpController =
+      TextEditingController(text: '');
+  bool _isEmail = false;
+  bool _isPhoneNumber = false;
+
+  // @override
+  // void dispose() {
+  // _emailOrNoTelpController.dispose();
+  // for (final focusNode in _focusNodes.values) {
+  //   focusNode.dispose();
+  // }
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
+    void checkInputT(String value) {
+      setState(() {
+        // Check if input is an email
+        _isEmail = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+            .hasMatch(value);
+
+        // Check if input is a phone number
+        _isPhoneNumber = RegExp(r'^[0-9]{10,12}$').hasMatch(value);
+      });
+    }
+
     // void getCurrentLocation() async {
     void getCurrentLocation(
         Function(double latitude, double longitude) locationCallback) async {
@@ -86,13 +115,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
 
-    handleSignupCustomer() async {
+    handleSignupCustomerEmail() async {
       setState(() {
         isLoading = true;
       });
       if (_formKey.currentState!.validate()) {
         String nama = namaController.text;
-        String email = emailController.text;
+        String email = _emailOrNoTelpController.text;
         String password = passwordController.text;
         if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
           dynamic result = null;
@@ -107,7 +136,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               setState(() {
                 isLoading = true;
               });
-              dynamic result = await authProvider.registerCustomer(
+              dynamic result = await authProvider.registerCustomerEmail(
                 nama: nama,
                 email: email,
                 password: password,
@@ -146,7 +175,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else {
             // Email sudah ada, tampilkan peringatan
             Fluttertoast.showToast(
-              msg: 'Email sudah digunakan. Gunakan email lain.',
+              msg: 'Email sudah digunakan. Gunakan Email lain.',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_LONG,
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
+            );
+
+            setState(() {
+              isLoading = false;
+            });
+          }
+        }
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }
+
+    handleSignupCustomerNoTelp() async {
+      setState(() {
+        isLoading = true;
+      });
+      if (_formKey.currentState!.validate()) {
+        String nama = namaController.text;
+        String notelp = _emailOrNoTelpController.text;
+        String password = passwordController.text;
+        if (nama.isNotEmpty && notelp.isNotEmpty && password.isNotEmpty) {
+          dynamic result = null;
+          // Kirim permintaan ke API untuk memeriksa notelp
+          dynamic checkResult =
+              await authProvider.checkNoTelpAvailability(notelp);
+
+          if (checkResult['status'] == 'success' &&
+              checkResult['available'] == true) {
+            // Email tersedia, lanjutkan proses registrasi
+            getCurrentLocation((latitude, longitude) async {
+              setState(() {
+                isLoading = true;
+              });
+              dynamic result = await authProvider.registerCustomerNoTelp(
+                nama: nama,
+                notelp: notelp,
+                password: password,
+                latitude: latitude,
+                longitude: longitude,
+              );
+              print("Register CUSTOMER");
+              print(latitude);
+              print(longitude);
+              if (result != null && checkResult['status'] == 'success') {
+                Fluttertoast.showToast(
+                  msg: 'Register Berhasil!\n Silahkan Lakukan Login',
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                );
+                Navigator.pushNamed(context, '/login');
+              } else {
+                print("di else");
+                String errorMessage = result != null
+                    ? checkResult['error']
+                    : 'Gagal Register Customer!\n Silahkan Register Kembali';
+                Fluttertoast.showToast(
+                  msg: errorMessage,
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                );
+                setState(() {
+                  isLoading = false;
+                });
+              }
+            });
+          } else {
+            // No Telepon sudah ada, tampilkan peringatan
+            Fluttertoast.showToast(
+              msg: 'No Telepon sudah digunakan. Gunakan No Telepon lain.',
               gravity: ToastGravity.CENTER,
               toastLength: Toast.LENGTH_LONG,
               backgroundColor: Colors.yellow,
@@ -191,13 +298,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     }*/
 
-    handleSignupTukang() async {
+    handleSignupTukangEmail() async {
+      print("EMAIL DETEK");
       setState(() {
         isLoadingTukang = true;
       });
       if (_formKey.currentState!.validate()) {
         String nama = namaController.text;
-        String email = emailController.text;
+        String email = _emailOrNoTelpController.text;
         String password = passwordController.text;
         if (nama.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
           dynamic result = null;
@@ -211,7 +319,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               setState(() {
                 isLoadingTukang = true;
               });
-              dynamic result = await authProvider.registerTukang(
+              dynamic result = await authProvider.registerTukangEmail(
                 nama: nama,
                 email: email,
                 password: password,
@@ -265,6 +373,123 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
     }
 
+    handleSignupTukangNoTelp() async {
+      print("NO TELP DETEK");
+      setState(() {
+        isLoadingTukang = true;
+      });
+      if (_formKey.currentState!.validate()) {
+        String nama = namaController.text;
+        String notelp = _emailOrNoTelpController.text;
+        String password = passwordController.text;
+        if (nama.isNotEmpty && notelp.isNotEmpty && password.isNotEmpty) {
+          dynamic result = null;
+          dynamic checkResult =
+              await authProvider.checkNoTelpAvailability(notelp);
+          // saveDataCategories(); gk bisa, karna user tidak punya jwt
+
+          if (checkResult['status'] == 'success' &&
+              checkResult['available'] == true) {
+            getCurrentLocation((latitude, longitude) async {
+              setState(() {
+                isLoadingTukang = true;
+              });
+              dynamic result = await authProvider.registerTukangNoTelp(
+                nama: nama,
+                notelp: notelp,
+                password: password,
+                latitude: latitude,
+                longitude: longitude,
+              );
+              if (result != null && checkResult['status'] == 'success') {
+                Fluttertoast.showToast(
+                  msg: 'Register Berhasil!\nSilahkan Lakukan Login',
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                );
+                Navigator.pushNamed(context, '/login');
+              } else {
+                String errorMessage = result != null
+                    ? checkResult['error']
+                    : 'Gagal Register Tukang!\n Silahkan Register Kembali';
+                print("di else");
+                Fluttertoast.showToast(
+                  msg: errorMessage,
+                  gravity: ToastGravity.CENTER,
+                  toastLength: Toast.LENGTH_LONG,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                );
+                setState(() {
+                  isLoadingTukang = false;
+                });
+              }
+            });
+          } else {
+            // no_telp sudah ada, tampilkan peringatan
+            Fluttertoast.showToast(
+              msg: 'No Telepon sudah digunakan. Gunakan No Telepon lain.',
+              gravity: ToastGravity.CENTER,
+              toastLength: Toast.LENGTH_LONG,
+              backgroundColor: Colors.yellow,
+              textColor: Colors.black,
+            );
+
+            setState(() {
+              isLoadingTukang = false;
+            });
+          }
+        }
+      }
+      setState(() {
+        isLoadingTukang = false;
+      });
+    }
+
+    cekEmailOrNoTelpCustomer() async {
+      if (namaController.text.isEmpty ||
+          _emailOrNoTelpController.text.isEmpty ||
+          passwordController.text.isEmpty) {
+        Fluttertoast.showToast(
+          msg: 'Mohon isi Email/No Telepon dan Password',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.black,
+        );
+      } else if (_isEmail) {
+        await handleSignupCustomerEmail();
+      } else if (_isPhoneNumber) {
+        handleSignupCustomerNoTelp();
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Mohon hanya inputkan format email atau no telepon.',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.black,
+        );
+      }
+    }
+
+    cekEmailOrNoTelpTukang() async {
+      if (_isEmail) {
+        await handleSignupTukangEmail();
+      } else if (_isPhoneNumber) {
+        handleSignupTukangNoTelp();
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Mohon hanya inputkan format email atau no telepon.',
+          gravity: ToastGravity.CENTER,
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.black,
+        );
+      }
+    }
+
     final deviceHeight = MediaQuery.of(context).size.height;
     final deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -308,6 +533,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
+                  // Container(
+                  //   height: constraints.maxHeight * 0.10,
+                  //   decoration: BoxDecoration(
+                  //     color: Color(0xffB4B4B4).withOpacity(0.4),
+                  //     borderRadius: BorderRadius.circular(16),
+                  //   ),
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.only(left: 15),
+                  //     child: Center(
+                  //       child: TextFormField(
+                  //         controller: _emailOrNoTelpController,
+                  //         onChanged: checkInputT,
+                  //         decoration: InputDecoration(
+                  //           labelText: 'Email / Phone Number',
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(height: 16.0),
+                  // Text(
+                  //   _isEmail
+                  //       ? 'Valid email format'
+                  //       : (_isPhoneNumber ? 'Valid phone number format' : ''),
+                  // ),
+                  // SizedBox(
+                  //   height: constraints.maxHeight * 0.08,
+                  // ),
                   SizedBox(
                     height: constraints.maxHeight * 0.08,
                   ),
@@ -325,13 +578,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "Nama Lengkap",
+                            labelText: "Nama Lengkap",
+                            labelStyle: TextStyle(
+                              color: namaColor,
+                            ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Nama harus diisi";
-                            }
-                            return null;
+                          onTap: () {
+                            setState(() {
+                              namaColor = Color(0xffFF5403);
+                              emailOrNoTelpColor =
+                                  Color.fromARGB(255, 92, 92, 92);
+                              passwordColor = Color.fromARGB(255, 92, 92, 92);
+                            });
                           },
+                          // validator: (value) {
+                          //   if (value == null || value.isEmpty) {
+                          //     return "Nama harus diisi";
+                          //   }
+                          //   return null;
+                          // },
                           textInputAction: TextInputAction.next,
                         ),
                       ),
@@ -351,20 +616,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Center(
                         child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
-                          controller: emailController,
+                          // controller: emailController,
+                          controller: _emailOrNoTelpController,
+                          onChanged: checkInputT,
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: "Email",
+                            hintText: "Email / No Telepon",
+                            labelText: "Email / No Telepon",
+                            labelStyle: TextStyle(
+                              color: emailOrNoTelpColor,
+                            ),
+                            // focusedBorder: OutlineInputBorder(
+                            //   borderSide: BorderSide(
+                            //     color: Color(0xffFF5403),
+                            //   ),
+                            // ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Email harus diisi";
-                            }
-                            if (!EmailValidator.validate(value)) {
-                              return 'Masukkan email yang valid';
-                            }
-                            return null;
+                          onTap: () {
+                            setState(() {
+                              namaColor = Color.fromARGB(255, 92, 92, 92);
+                              emailOrNoTelpColor = Color(0xffFF5403);
+                              passwordColor = Color.fromARGB(255, 92, 92, 92);
+                            });
                           },
+                          // validator: (value) {
+                          //   if (value == null || value.isEmpty) {
+                          //     return "Email harus diisi";
+                          //   }
+                          //   // if (!EmailValidator.validate(value)) {
+                          //   //   return 'Masukkan email yang valid';
+                          //   // }
+                          //   return null;
+                          // },
                           textInputAction: TextInputAction.next,
                         ),
                       ),
@@ -401,13 +684,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             border: InputBorder.none,
                             hintText: "Password",
+                            labelText: "Password",
+                            labelStyle: TextStyle(
+                              color: passwordColor,
+                            ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Password harus diisi";
-                            }
-                            return null;
+                          onTap: () {
+                            setState(() {
+                              namaColor = Color.fromARGB(255, 92, 92, 92);
+                              emailOrNoTelpColor =
+                                  Color.fromARGB(255, 92, 92, 92);
+                              passwordColor = Color(0xffFF5403);
+                            });
                           },
+                          // validator: (value) {
+                          //   if (value == null || value.isEmpty) {
+                          //     return "Password harus diisi";
+                          //   }
+                          //   return null;
+                          // },
                           textInputAction: TextInputAction.done,
                         ),
                       ),
@@ -462,7 +757,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             top: constraints.maxHeight * 0.04,
                           ),
                           child: ElevatedButton(
-                            onPressed: handleSignupCustomer,
+                            // onPressed: handleSignupCustomer,
+                            onPressed: cekEmailOrNoTelpCustomer,
                             child: Text(
                               'Register Sebagai Customer',
                               style: TextStyle(
@@ -527,7 +823,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             top: constraints.maxHeight * 0.01,
                           ),
                           child: ElevatedButton(
-                            onPressed: handleSignupTukang,
+                            onPressed: cekEmailOrNoTelpTukang,
                             child: Text(
                               'Register Sebagai Tukang',
                               style: TextStyle(

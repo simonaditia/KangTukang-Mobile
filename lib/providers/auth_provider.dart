@@ -36,14 +36,35 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool?> registerCustomer(
+  Future<dynamic> checkNoTelpAvailability(String no_telp) async {
+    final response = await http.get(Uri.parse(
+        'http://192.168.1.100:8000/api/v1/checkIsAvailableNoTelp?no_telp=$no_telp'));
+
+    if (response.statusCode == 200) {
+      // Sukses mendapatkan respons dari API
+      return {'status': 'success', 'available': true};
+    } else if (response.statusCode == 400) {
+      // No Telepon sudah ada
+      return {
+        'status': 'error',
+        'message': 'No Telepon sudah digunakan',
+      };
+    } else {
+      // Gagal mendapatkan respons dari API, tangani sesuai kebutuhan Anda
+      final errorMessage = response.body ?? 'Gagal memeriksa no_telp';
+      print('Error message: $errorMessage');
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<bool?> registerCustomerEmail(
       {String? nama,
       String? email,
       String? password,
       double? latitude,
       double? longitude}) async {
     try {
-      UserModel user = await AuthServiceCustomer().register(
+      UserModel user = await AuthServiceCustomerEmail().register(
         nama: nama,
         email: email,
         password: password,
@@ -58,16 +79,60 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool?> registerTukang(
+  Future<bool?> registerCustomerNoTelp(
+      {String? nama,
+      String? notelp,
+      String? password,
+      double? latitude,
+      double? longitude}) async {
+    try {
+      UserModel user = await AuthServiceCustomerNoTelp().register(
+        nama: nama,
+        notelp: notelp,
+        password: password,
+        latitude: latitude,
+        longitude: longitude,
+      );
+      _user = user;
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool?> registerTukangEmail(
       {String? nama,
       String? email,
       String? password,
       double? latitude,
       double? longitude}) async {
     try {
-      UserModel user = await AuthServiceTukang().register(
+      UserModel user = await AuthServiceTukangEmail().register(
         nama: nama,
         email: email,
+        password: password,
+        latitude: latitude,
+        longitude: longitude,
+      );
+      _user = user;
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool?> registerTukangNoTelp(
+      {String? nama,
+      String? notelp,
+      String? password,
+      double? latitude,
+      double? longitude}) async {
+    try {
+      UserModel user = await AuthServiceTukangNoTelp().register(
+        nama: nama,
+        notelp: notelp,
         password: password,
         latitude: latitude,
         longitude: longitude,

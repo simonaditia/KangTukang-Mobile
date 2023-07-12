@@ -4,8 +4,8 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:tukang_online/models/user_model.dart';
 
-class AuthServiceCustomer {
-  String baseUrl = 'http://192.168.1.100:8000/auth';
+class AuthServiceCustomerEmail {
+  String baseUrl = 'http://192.168.1.100:8000/auth/v2';
 
   get response => null;
   Future<UserModel> register({
@@ -49,21 +49,61 @@ class AuthServiceCustomer {
       return user;
     } else {
       throw Exception('Gagal Register');
-      // }
-      // } catch (e) {
-      //   print("-----------blok catch-----------");
-      //   print(e.toString);
-      //   print(response.toString());
-      //   print(response.statusCode.toString());
-      //   print("-----------blok catch-----------");
-      //   throw Exception("Gagal Register | Blok Catch");
-      // }
     }
   }
 }
 
-class AuthServiceTukang {
-  String baseUrl = 'http://192.168.1.100:8000/auth';
+class AuthServiceCustomerNoTelp {
+  String baseUrl = 'http://192.168.1.100:8000/auth/v2';
+
+  get response => null;
+  Future<UserModel> register({
+    String? nama,
+    String? notelp,
+    String? password,
+    double? latitude,
+    double? longitude,
+  }) async {
+    if (latitude == null || longitude == null) {
+      print("Latidue dan Longitude tidak ditemukan");
+    }
+    if (nama == null || notelp == null || password == null) {
+      throw Exception('Nama, notelp, dan password harus diisi');
+    }
+
+    var url = '$baseUrl/register-customer';
+    var headers = {'Content-Type': 'application/json'};
+    var body = jsonEncode({
+      'nama': nama,
+      'no_telp': notelp,
+      'password': password,
+      'latitude': latitude,
+      'longitude': longitude,
+    });
+
+    // try {
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+    print(response.toString());
+    print(response.statusCode.toString());
+    print(response.body);
+
+    if (response.statusCode == 201) {
+      var data = jsonDecode(response.body)['user'];
+      UserModel user = UserModel.fromJson(data);
+      // user.token = 'Bearer ' + data['access_token'];
+      return user;
+    } else {
+      throw Exception('Gagal Register');
+    }
+  }
+}
+
+class AuthServiceTukangEmail {
+  String baseUrl = 'http://192.168.1.100:8000/auth/v2';
 
   get response => null;
   Future<UserModel> register({
@@ -85,6 +125,53 @@ class AuthServiceTukang {
     var body = jsonEncode({
       'nama': nama,
       'email': email,
+      'password': password,
+      'latitude': latitude,
+      'longitude': longitude,
+    });
+
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+    print(response.toString());
+    print(response.statusCode.toString());
+    print(response.body);
+
+    if (response.statusCode == 201) {
+      var data = jsonDecode(response.body)['user'];
+      UserModel user = UserModel.fromJson(data);
+      return user;
+    } else {
+      throw Exception('Gagal Register');
+    }
+  }
+}
+
+class AuthServiceTukangNoTelp {
+  String baseUrl = 'http://192.168.1.100:8000/auth/v2';
+
+  get response => null;
+  Future<UserModel> register({
+    String? nama,
+    String? notelp,
+    String? password,
+    double? latitude,
+    double? longitude,
+  }) async {
+    if (latitude == null || longitude == null) {
+      print("Latidue dan Longitude tidak ditemukan");
+    }
+    if (nama == null || notelp == null || password == null) {
+      throw Exception('Nama, notelp, dan password harus diisi');
+    }
+
+    var url = '$baseUrl/register-tukang';
+    var headers = {'Content-Type': 'application/json'};
+    var body = jsonEncode({
+      'nama': nama,
+      'no_telp': notelp,
       'password': password,
       'latitude': latitude,
       'longitude': longitude,
