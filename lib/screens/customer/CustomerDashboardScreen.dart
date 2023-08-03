@@ -481,205 +481,194 @@ if (await canLaunchUrl(emailLaunchUri.toString())) {
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           top: 17.0, bottom: 15.0),
-                                      child: Flexible(
-                                          flex: 1,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              Flexible(
-                                                flex: 1,
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    // Arahkan ke halaman Search dengan parameter "renovasi"
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            CustomerSearchScreen(
-                                                                tukangId: '',
-                                                                keyword:
-                                                                    "renovasi"),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    child: Column(
-                                                      children: [
-                                                        CircleAvatar(
-                                                          backgroundImage:
-                                                              AssetImage(
-                                                                  'assets/images/renovasi.jpg'),
-                                                          radius: 50,
-                                                        ),
-                                                        Text("Renovasi"),
-                                                      ],
-                                                    ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Flexible(
+                                            flex: 1,
+                                            child: InkWell(
+                                              onTap: () {
+                                                // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CustomerSearchScreen(
+                                                            tukangId: '',
+                                                            keyword:
+                                                                "renovasi"),
                                                   ),
+                                                );
+                                              },
+                                              child: Container(
+                                                child: Column(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundImage: AssetImage(
+                                                          'assets/images/renovasi.jpg'),
+                                                      radius: 50,
+                                                    ),
+                                                    Text("Renovasi"),
+                                                  ],
                                                 ),
                                               ),
-                                              Flexible(
-                                                flex: 1,
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    // Arahkan ke halaman Search dengan parameter "renovasi"
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            CustomerSearchScreen(
-                                                                tukangId: '',
-                                                                keyword: "cat"),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    child: Column(
-                                                      children: [
-                                                        CircleAvatar(
-                                                          backgroundImage:
-                                                              AssetImage(
-                                                                  'assets/images/catb.jpg'),
-                                                          radius: 50,
-                                                        ),
-                                                        Text("Cat"),
-                                                      ],
-                                                    ),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 1,
+                                            child: InkWell(
+                                              onTap: () {
+                                                // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CustomerSearchScreen(
+                                                            tukangId: '',
+                                                            keyword: "cat"),
                                                   ),
+                                                );
+                                              },
+                                              child: Container(
+                                                child: Column(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundImage: AssetImage(
+                                                          'assets/images/catb.jpg'),
+                                                      radius: 50,
+                                                    ),
+                                                    Text("Cat"),
+                                                  ],
                                                 ),
                                               ),
-                                              Flexible(
-                                                flex: 1,
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    // Arahkan ke halaman Search dengan parameter "renovasi"
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            CustomerSearchScreen(
-                                                                tukangId: '',
-                                                                keyword:
-                                                                    "plafon"),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    child: Column(
-                                                      children: [
-                                                        CircleAvatar(
-                                                          backgroundImage:
-                                                              AssetImage(
-                                                                  'assets/images/plafon.jpg'),
-                                                          radius: 50,
-                                                        ),
-                                                        Text("Plafon"),
-                                                      ],
-                                                    ),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 1,
+                                            child: InkWell(
+                                              onTap: () {
+                                                // Arahkan ke halaman Search dengan parameter "renovasi"
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CustomerSearchScreen(
+                                                            tukangId: '',
+                                                            keyword: "plafon"),
                                                   ),
+                                                );
+                                              },
+                                              child: Container(
+                                                child: Column(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundImage: AssetImage(
+                                                          'assets/images/plafon.jpg'),
+                                                      radius: 50,
+                                                    ),
+                                                    Text("Plafon"),
+                                                  ],
                                                 ),
                                               ),
-                                            ],
-                                          )),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    Flexible(
-                                        flex: 1,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            Flexible(
-                                              flex: 1,
-                                              child: InkWell(
-                                                onTap: () {
-                                                  // Arahkan ke halaman Search dengan parameter "renovasi"
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          CustomerSearchScreen(
-                                                              tukangId: '',
-                                                              keyword:
-                                                                  "kebocoran"),
-                                                    ),
-                                                  );
-                                                },
-                                                child: Container(
-                                                  child: Column(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        backgroundImage: AssetImage(
-                                                            'assets/images/kebocoran.jpg'),
-                                                        radius: 50,
-                                                      ),
-                                                      Text("Kebocoran"),
-                                                    ],
-                                                  ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Flexible(
+                                          flex: 1,
+                                          child: InkWell(
+                                            onTap: () {
+                                              // Arahkan ke halaman Search dengan parameter "renovasi"
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CustomerSearchScreen(
+                                                          tukangId: '',
+                                                          keyword: "kebocoran"),
                                                 ),
+                                              );
+                                            },
+                                            child: Container(
+                                              child: Column(
+                                                children: [
+                                                  CircleAvatar(
+                                                    backgroundImage: AssetImage(
+                                                        'assets/images/kebocoran.jpg'),
+                                                    radius: 50,
+                                                  ),
+                                                  Text("Kebocoran"),
+                                                ],
                                               ),
                                             ),
-                                            Flexible(
-                                              flex: 1,
-                                              child: InkWell(
-                                                onTap: () {
-                                                  // Arahkan ke halaman Search dengan parameter "renovasi"
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          CustomerSearchScreen(
-                                                              tukangId: '',
-                                                              keyword:
-                                                                  "keramik"),
-                                                    ),
-                                                  );
-                                                },
-                                                child: Container(
-                                                  child: Column(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        backgroundImage: AssetImage(
-                                                            'assets/images/keramik.jpg'),
-                                                        radius: 50,
-                                                      ),
-                                                      Text("Keramik"),
-                                                    ],
-                                                  ),
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 1,
+                                          child: InkWell(
+                                            onTap: () {
+                                              // Arahkan ke halaman Search dengan parameter "renovasi"
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CustomerSearchScreen(
+                                                          tukangId: '',
+                                                          keyword: "keramik"),
                                                 ),
+                                              );
+                                            },
+                                            child: Container(
+                                              child: Column(
+                                                children: [
+                                                  CircleAvatar(
+                                                    backgroundImage: AssetImage(
+                                                        'assets/images/keramik.jpg'),
+                                                    radius: 50,
+                                                  ),
+                                                  Text("Keramik"),
+                                                ],
                                               ),
                                             ),
-                                            Flexible(
-                                              flex: 1,
-                                              child: InkWell(
-                                                onTap: () {
-                                                  // Arahkan ke halaman Search dengan parameter "renovasi"
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          CustomerSearchScreen(
-                                                              tukangId: '',
-                                                              keyword:
-                                                                  "dinding"),
-                                                    ),
-                                                  );
-                                                },
-                                                child: Container(
-                                                  child: Column(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        backgroundImage: AssetImage(
-                                                            'assets/images/dinding.jpeg'),
-                                                        radius: 50,
-                                                      ),
-                                                      Text("Dinding"),
-                                                    ],
-                                                  ),
+                                          ),
+                                        ),
+                                        Flexible(
+                                          flex: 1,
+                                          child: InkWell(
+                                            onTap: () {
+                                              // Arahkan ke halaman Search dengan parameter "renovasi"
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CustomerSearchScreen(
+                                                          tukangId: '',
+                                                          keyword: "dinding"),
                                                 ),
+                                              );
+                                            },
+                                            child: Container(
+                                              child: Column(
+                                                children: [
+                                                  CircleAvatar(
+                                                    backgroundImage: AssetImage(
+                                                        'assets/images/dinding.jpeg'),
+                                                    radius: 50,
+                                                  ),
+                                                  Text("Dinding"),
+                                                ],
                                               ),
                                             ),
-                                          ],
-                                        )),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ],
