@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +27,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
   List<dynamic> dataSSelesai = []; // Variabel untuk menyimpan data dari API
   var random = Random();
   Map<String, dynamic>? tukangData;
+  TextEditingController _alasanController = TextEditingController();
 
   Future<void> fetchDataUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -201,6 +203,7 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
     fetchDataStatusMenunggu();
     fetchDataStatusDikerjakan();
     fetchDataStatusSelesai();
+    _alasanController = TextEditingController();
   }
   // refreshDataStatusDikerjakan();
   // _refreshData();
@@ -282,14 +285,17 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
 
     final String response =
         'http://192.168.1.100:8000/api/v1/orders/rejectOrderByTukang/$orderId';
-
-    final responsePost = await http.put(
-      Uri.parse(response),
-      headers: {
-        'Authorization':
-            'Bearer $token', // Ganti <your_jwt_token> dengan token JWT yang valid
-      },
-    );
+    String alasan = _alasanController.text;
+    final responsePost = await http.put(Uri.parse(response),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Bearer $token', // Ganti <your_jwt_token> dengan token JWT yang valid
+        },
+        body: json.encode({
+          'status': "Ditolak",
+          'alasan_tolak_batal': alasan,
+        }));
 
     // final response = await http.post(
     //   'http://localhost:8000/api/v1/orders/rejectOrderByTukang/$orderId',
@@ -299,6 +305,13 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
       setState(() {
         dataSMenunggu.removeWhere((item) => item['ID'] == orderId);
       });
+      Fluttertoast.showToast(
+        msg: 'Berhasil Tolak Pemesanan!',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Color(0xffFF5403),
+        textColor: Colors.white,
+      );
     }
     fetchDataStatusSelesai();
   }
@@ -326,6 +339,13 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
         dataSMenunggu.removeWhere((item) => item['ID'] == orderId);
       });
       fetchDataStatusDikerjakan();
+      Fluttertoast.showToast(
+        msg: 'Berhasil Terima Pemesanan!',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -352,6 +372,13 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
         dataSDikerjakan.removeWhere((item) => item['ID'] == orderId);
       });
       fetchDataStatusSelesai();
+      Fluttertoast.showToast(
+        msg: 'Berhasil Selesaikan Pemesanan!',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -749,9 +776,137 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                                   fontSize:
                                                                       12)),
                                                           onPressed: () {
-                                                            _rejectOrder(
-                                                                item['ID']);
-                                                            fetchDataStatusMenunggu();
+                                                            // _rejectOrder(
+                                                            //     item['ID']);
+                                                            // fetchDataStatusMenunggu();
+                                                            // print("hello");
+                                                            showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return AlertDialog(
+                                                                    contentPadding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    content:
+                                                                        Stack(
+                                                                      clipBehavior:
+                                                                          Clip.none,
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Positioned(
+                                                                          right:
+                                                                              -15.0,
+                                                                          top:
+                                                                              -15.0,
+                                                                          child:
+                                                                              InkResponse(
+                                                                            onTap:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                            },
+                                                                            child:
+                                                                                CircleAvatar(
+                                                                              radius: 12,
+                                                                              child: Icon(
+                                                                                Icons.close,
+                                                                                size: 18,
+                                                                              ),
+                                                                              backgroundColor: Colors.red,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        Form(
+                                                                          // key: _formKey,
+                                                                          child:
+                                                                              Column(
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
+                                                                            children: <Widget>[
+                                                                              Container(
+                                                                                height: 60,
+                                                                                width: MediaQuery.of(context).size.width,
+                                                                                decoration: BoxDecoration(color: Color.fromARGB(255, 212, 212, 212).withOpacity(0.2), border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.3)))),
+                                                                                child: Center(child: Text("Apakah yakin tolak pemesanan?", style: TextStyle(color: Color(0xffFF5403), fontWeight: FontWeight.w700, fontSize: 20, fontStyle: FontStyle.italic, fontFamily: "Helvetica"))),
+                                                                              ),
+                                                                              Padding(
+                                                                                // padding:
+                                                                                //     EdgeInsets.all(20.0),
+                                                                                padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
+                                                                                child: Container(
+                                                                                    height: 250,
+                                                                                    decoration: BoxDecoration(border: Border.all(color: Colors.grey.withOpacity(0.2))),
+                                                                                    child: Row(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      children: [
+                                                                                        Expanded(
+                                                                                          // flex: 4,
+                                                                                          child: TextFormField(
+                                                                                            controller: _alasanController,
+                                                                                            maxLines: 18,
+                                                                                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                                                                                            onChanged: (text) {
+                                                                                              setState(() {});
+                                                                                            },
+                                                                                            validator: (value) {
+                                                                                              if (value!.isEmpty) {
+                                                                                                return "Alasan harus diisi.";
+                                                                                              } else if (value.length < 10) {
+                                                                                                return "Alasan harus memiliki setidaknya 10 karakter";
+                                                                                              }
+                                                                                              return null;
+                                                                                            },
+                                                                                            // initialValue: item['detail_perbaikan'],
+                                                                                            decoration: InputDecoration(
+                                                                                              hintText: "Input alasan tolak pemesanan",
+                                                                                              contentPadding: EdgeInsets.only(left: 20),
+                                                                                              border: InputBorder.none,
+                                                                                              focusedBorder: InputBorder.none,
+                                                                                              errorBorder: InputBorder.none,
+                                                                                              hintStyle: TextStyle(
+                                                                                                color: Colors.black26,
+                                                                                                fontSize: 18,
+                                                                                                fontWeight: FontWeight.w500,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    )),
+                                                                              ),
+                                                                              Container(
+                                                                                padding: EdgeInsets.only(top: 2),
+                                                                                child: ElevatedButton.icon(
+                                                                                  onFocusChange: (text) {
+                                                                                    setState(() {});
+                                                                                  },
+                                                                                  icon: Icon(Icons.close, color: Colors.white, size: 18),
+                                                                                  label: Text("Tolak Pemesanan", style: TextStyle(fontSize: 12)),
+                                                                                  onPressed: _alasanController.text.isEmpty || _alasanController.text.length < 10
+                                                                                      ? null // Tidak dapat ditekan jika alasan kosong atau kurang dari 10 karakter
+                                                                                      : () {
+                                                                                          _rejectOrder(item['ID']);
+                                                                                          fetchDataStatusMenunggu();
+                                                                                          Navigator.of(context).pop();
+                                                                                        },
+                                                                                  style: ElevatedButton.styleFrom(
+                                                                                    backgroundColor: _alasanController.text.isEmpty || _alasanController.text.length < 10
+                                                                                        ? Colors.grey // Warna abu-abu jika tidak memenuhi syarat
+                                                                                        : Color(0xffDD1D1D),
+                                                                                    foregroundColor: Colors.white,
+                                                                                    minimumSize: Size(300, 33), // Sesuaikan ukuran tombol
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                });
                                                           },
                                                           style: ElevatedButton
                                                               .styleFrom(
@@ -1720,7 +1875,10 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                     Card(
                                       child: SizedBox(
                                         width: 420,
-                                        height: 245,
+                                        height: item['status'] == "Ditolak" ||
+                                                item['status'] == "Dibatalkan"
+                                            ? 300
+                                            : 245,
                                         child: Container(
                                           padding: EdgeInsets.all(5),
                                           child: Column(
@@ -2002,6 +2160,150 @@ class _TukangPesananScreenState extends State<TukangPesananScreen>
                                                   ],
                                                 ),
                                               ),
+                                              item['status'] == "Ditolak" ||
+                                                      item['status'] ==
+                                                          "Dibatalkan"
+                                                  ? Container(
+                                                      child:
+                                                          ElevatedButton.icon(
+                                                        icon: Icon(
+                                                            Icons.task_alt,
+                                                            color:
+                                                                Colors.white),
+                                                        label: Text(item[
+                                                                    'status'] ==
+                                                                "Ditolak"
+                                                            ? "Lihat Alasan Tolak Pemesanan"
+                                                            : "Lihat Alasan Batal Pemesanan"),
+                                                        onPressed: () {
+                                                          // _doneOrder(
+                                                          //     item['ID']);
+                                                          // fetchDataStatusDikerjakan();
+                                                          showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return AlertDialog(
+                                                                  contentPadding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  content:
+                                                                      Stack(
+                                                                    clipBehavior:
+                                                                        Clip.none,
+                                                                    children: <
+                                                                        Widget>[
+                                                                      Positioned(
+                                                                        right:
+                                                                            -15.0,
+                                                                        top:
+                                                                            -15.0,
+                                                                        child:
+                                                                            InkResponse(
+                                                                          onTap:
+                                                                              () {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          child:
+                                                                              CircleAvatar(
+                                                                            radius:
+                                                                                12,
+                                                                            child:
+                                                                                Icon(
+                                                                              Icons.close,
+                                                                              size: 18,
+                                                                            ),
+                                                                            backgroundColor:
+                                                                                Colors.red,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      Form(
+                                                                        // key: _formKey,
+                                                                        child:
+                                                                            Column(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          children: <
+                                                                              Widget>[
+                                                                            Container(
+                                                                              height: 60,
+                                                                              width: MediaQuery.of(context).size.width,
+                                                                              decoration: BoxDecoration(
+                                                                                color: Color.fromARGB(255, 212, 212, 212).withOpacity(0.2),
+                                                                                border: Border(
+                                                                                  bottom: BorderSide(
+                                                                                    color: Colors.grey.withOpacity(0.3),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              child: Center(
+                                                                                child: Text(
+                                                                                  item['status'] == "Ditolak" ? "Alasan tolak pemesanan\noleh tukang" : "Alasan batal pemesanan\noleh customer",
+                                                                                  style: TextStyle(
+                                                                                    color: Color(0xffFF5403),
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    fontSize: 20,
+                                                                                    fontStyle: FontStyle.italic,
+                                                                                    fontFamily: "Helvetica",
+                                                                                  ),
+                                                                                  textAlign: TextAlign.center,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            Padding(
+                                                                              padding: EdgeInsets.all(20.0),
+                                                                              child: Container(
+                                                                                  height: 250,
+                                                                                  decoration: BoxDecoration(border: Border.all(color: Colors.grey.withOpacity(0.2))),
+                                                                                  child: Row(
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      Expanded(
+                                                                                        // flex: 4,
+                                                                                        child: TextFormField(
+                                                                                          readOnly: true,
+                                                                                          maxLines: 18,
+                                                                                          initialValue: item['alasan_tolak_batal'],
+                                                                                          decoration: InputDecoration(
+                                                                                            // hintText: "Input alasan tolak pemesanan",
+                                                                                            contentPadding: EdgeInsets.only(left: 20),
+                                                                                            border: InputBorder.none,
+                                                                                            focusedBorder: InputBorder.none,
+                                                                                            errorBorder: InputBorder.none,
+                                                                                            hintStyle: TextStyle(
+                                                                                              color: Colors.black26,
+                                                                                              fontSize: 18,
+                                                                                              fontWeight: FontWeight.w500,
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  )),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              });
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              Color(0xffFF5403),
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          minimumSize:
+                                                              Size(330, 35),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : Container(),
+
                                               /*Container(
                                                 padding:
                                                     EdgeInsets.only(top: 1),
